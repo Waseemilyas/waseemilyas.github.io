@@ -1,0 +1,246 @@
+body {
+  background-image: url('../images/background.png');
+  background-attachment: fixed;
+  font-family: Arial;
+  color: #333;
+  font-size: 12px;
+  line-height: 20px;
+}
+h1 {
+  display: block;
+  width: auto;
+  margin: 30px 0px 10px;
+  padding-top: 0px;
+  padding-left: 50px;
+  float: left;
+  background-image: none;
+  font-family:'Sketch Block', sans-serif;
+  color: #ca2027;
+  font-size: 84px;
+  line-height: 100px;
+  font-style: normal;
+  font-weight: 400;
+  letter-spacing: 0px;
+  text-decoration: none;
+}
+h2 {
+  margin: 10px 0px;
+  font-size: 32px;
+  line-height: 36px;
+  font-weight: 700;
+}
+h3 {
+  margin: 10px 0px;
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 700;
+}
+h4 {
+  margin: 10px 0px;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 700;
+}
+h5 {
+  margin: 10px 0px;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 700;
+}
+h6 {
+  margin: 10px 0px;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 700;
+}
+p {
+  margin-bottom: 5px;
+}
+.button {
+  display: inline-block;
+  padding: 4px 15px;
+  background-color: black;
+  color: white;
+  text-align: center;
+  text-decoration: none;
+}
+.main {
+  height: 600px;
+  background-image: url('../images/background.png');
+  background-attachment: fixed;
+}
+.footer {
+  height: 300px;
+  background-image: url('../images/darkbackground.jpg');
+  background-position: 50% 0px;
+  background-repeat: repeat-x;
+}
+.portfolio {
+  display: block;
+  width: 90%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-top: 5px;
+  padding-right: 0px;
+  padding-bottom: 5px;
+}
+.social {
+  width: auto;
+  margin-top: 30px;
+  margin-right: 20px;
+  float: right;
+  clear: none;
+}
+.socialicon {
+  opacity: 0.75;
+  -webkit-transition: all 300ms ease;
+  -o-transition: all 300ms ease;
+  transition: all 300ms ease;
+}
+.socialicon:hover {
+  opacity: 1;
+  -webkit-transform: translate(0px, -5px);
+  -ms-transform: translate(0px, -5px);
+  -o-transform: translate(0px, -5px);
+  transform: translate(0px, -5px);
+  -webkit-transition: initial 300ms initial;
+  -o-transition: initial 300ms initial;
+  transition: initial 300ms initial;
+}
+.socialicon:active {
+  box-shadow: none;
+  -webkit-transform: translate(0px, 5px);
+  -ms-transform: translate(0px, 5px);
+  -o-transform: translate(0px, 5px);
+  transform: translate(0px, 5px);
+  -webkit-transition: all 100ms linear;
+  -o-transition: all 100ms linear;
+  transition: all 100ms linear;
+}
+.socialicon:focus {
+  -webkit-transition: none initial initial;
+  -o-transition: none initial initial;
+  transition: none initial initial;
+}
+.content {
+  height: 600px;
+}
+.head {
+  margin-bottom: 30px;
+}
+.middle {
+  padding-top: 30px;
+  padding-bottom: 30px;
+}
+.quarter {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+.placeholder {
+  box-shadow: #888 0px 0px 13px -2px;
+}
+.caption {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 0;
+  display: inline;
+  overflow-x: visible;
+  overflow-y: visible;
+  padding-top: 50px;
+  padding-right: 15px;
+  padding-left: 15px;
+  float: none;
+  clear: none;
+  border: 0px solid white;
+  background-color: #ca2027;
+  opacity: 0;
+  -webkit-transition: all 500ms ease;
+  -o-transition: all 500ms ease;
+  transition: all 500ms ease;
+  color: white;
+  text-align: center;
+}
+.caption:hover {
+  border-width: 5px;
+  background-color: rgba(201, 32, 38, 0.8);
+  opacity: 1;
+}
+.caption:active {
+  background-color: #c92026;
+}
+.socialshare {
+  height: 25px;
+  margin-right: auto;
+  margin-left: auto;
+  padding-top: 30px;
+  text-align: center;
+}
+.facebooklike {
+  position: relative;
+  left: 0px;
+  top: -6px;
+  right: 0px;
+  display: inline-block;
+}
+.twitterfollow {
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  display: inline-block;
+  width: 215px;
+  margin-left: 25px;
+}
+.googleplusone {
+  left: 0px;
+  top: 0px;
+  right: 0px;
+  display: inline-block;
+  width: 72px;
+  margin-left: 25px;
+}
+@media (max-width: 991px) {
+  h1 {
+    width: 100%;
+    padding-left: 0px;
+    float: none;
+    text-align: center;
+  }
+  .social {
+    width: 100%;
+    margin-top: 10px;
+    margin-right: 0px;
+    text-align: center;
+  }
+  .caption {
+    padding-top: 5px;
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+}
+@media (max-width: 767px) {
+  h1 {
+    font-size: 80px;
+  }
+}
+@media (max-width: 479px) {
+  h1 {
+    font-size: 72px;
+    line-height: 70px;
+  }
+  .social {
+    padding-top: 0px;
+    padding-bottom: 0px;
+  }
+  .socialicon {
+    margin-top: 10px;
+  }
+}
+@font-face {
+    font-family: 'Sketch Block';
+    font-style: normal;
+    font-weight: 400;
+    src: local('Sketch Block'), url(../font/Sketch_Block.ttf) format('truetype');
+}
