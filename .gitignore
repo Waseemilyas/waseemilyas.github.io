@@ -1,2 +1,23 @@
 # Include your project-specific ignores in this file
 # Read about how to use .gitignore: https://help.github.com/articles/ignoring-files
+
+# --- naz-git-security-hardening ---
+# Runtime/state and sensitive material
+.openclaw/
+memory/
+MEMORY.md
+USER.md
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*.token
+*token*
+*secret*
+*credential*
+openclaw.json
+**/openclaw.json
+*.jsonl
+# --- /naz-git-security-hardening ---

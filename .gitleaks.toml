@@ -1,0 +1,10 @@
+title = "repo-local-policy"
+[allowlist]
+description = "Allow benign placeholders"
+regexes = [
+  '''YOUR_(API|TOKEN|SECRET)_HERE''',
+  '''example(_|-)?(api|token|secret|key)''',
+]
+paths = [
+  '''(^|/)\.git/''',
+]
