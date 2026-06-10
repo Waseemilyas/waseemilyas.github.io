@@ -4,6 +4,7 @@ export default function (eleventyConfig) {
   // Static passthrough: assets, plus the root-level files GitHub Pages needs.
   eleventyConfig.addPassthroughCopy({ "src/assets": "assets" });
   eleventyConfig.addPassthroughCopy({ "src/static": "/" });
+  eleventyConfig.addPassthroughCopy({ audio: "audio" });
 
   // Case studies collection (datasheet narratives in src/work/).
   eleventyConfig.addCollection("casestudies", (api) =>
