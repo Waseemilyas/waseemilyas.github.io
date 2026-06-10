@@ -1,0 +1,60 @@
+{
+  "intro": "Five connected strands, one practice: turning technology into things people can use.",
+  "nodes": [
+    {
+      "key": "ai",
+      "code": "AI·AUTO",
+      "label": "AI·AUTO",
+      "title": "AI automation",
+      "body": "Designing and building AI-assisted workflows and lightweight systems that do real work for small businesses.",
+      "x": 140,
+      "y": 96,
+      "textY": -36,
+      "trace": "M360,220 C260,150 200,120 140,96"
+    },
+    {
+      "key": "digital",
+      "code": "DIGITAL",
+      "label": "DIGITAL",
+      "title": "Digital practice",
+      "body": "Standing up a digital function inside an organisation, from zero to a meaningful share of the business.",
+      "x": 600,
+      "y": 104,
+      "textY": -36,
+      "trace": "M360,220 C470,150 540,128 600,104"
+    },
+    {
+      "key": "learn",
+      "code": "LEARN",
+      "label": "LEARN",
+      "title": "Learning design",
+      "body": "Instructional design and e-learning production: turning complex topics into things people can learn from.",
+      "x": 150,
+      "y": 340,
+      "textY": 46,
+      "trace": "M360,220 C250,270 200,300 150,340"
+    },
+    {
+      "key": "web",
+      "code": "WEB",
+      "label": "WEB",
+      "title": "Web & product",
+      "body": "Front-end and product delivery across static sites, apps, and internal tools.",
+      "x": 596,
+      "y": 344,
+      "textY": 46,
+      "trace": "M360,220 C470,280 540,310 596,344"
+    },
+    {
+      "key": "creative",
+      "code": "CREATIVE",
+      "label": "CREATIVE",
+      "title": "Creative roots",
+      "body": "Graphic design and visual communication since age 15. The origin story, still in the toolkit.",
+      "x": 360,
+      "y": 392,
+      "textY": 46,
+      "trace": "M360,220 C360,300 360,330 360,392"
+    }
+  ]
+}

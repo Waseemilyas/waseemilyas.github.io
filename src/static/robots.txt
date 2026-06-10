@@ -1,0 +1,5 @@
+# https://waseemilyas.uk
+User-agent: *
+Allow: /
+
+Sitemap: https://waseemilyas.uk/sitemap.xml

@@ -1,0 +1,10 @@
+/* TEAM */
+Name: Waseem Ilyas
+Site: https://waseemilyas.uk
+Contact: waseem [at] automancer.uk
+From: United Kingdom
+
+/* SITE */
+Standards: HTML5, CSS3
+Components: Eleventy (static site generator)
+Typeface: Geist, Geist Mono (self-hosted)

@@ -1,0 +1,32 @@
+---
+layout: base.njk
+---
+<article class="essay section" aria-labelledby="case-title">
+  <div class="shell">
+    <div class="casehead" data-cal>
+      <span class="ref">{{ ref }}</span>
+      <h1 id="case-title">{{ title }}</h1>
+      <p class="kick">{{ kicker }}</p>
+    </div>
+
+    <div class="casegrid">
+      <div class="prose" data-cal>
+        {{ content | safe }}
+      </div>
+
+      <aside class="datasheet" data-cal aria-label="Case datasheet">
+        <div class="dh">Datasheet</div>
+        <dl>
+          {%- for row in datasheet %}
+          <dt>{{ row.k }}</dt><dd>{{ row.v | safe }}</dd>
+          {%- endfor %}
+        </dl>
+      </aside>
+    </div>
+
+    <nav class="casenav" aria-label="Case study">
+      <a href="/work/">← All work</a>
+      <a href="mailto:{{ site.email }}">Email Waseem →</a>
+    </nav>
+  </div>
+</article>

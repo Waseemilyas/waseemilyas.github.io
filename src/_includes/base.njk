@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script>document.documentElement.className+=' js';</script>
+
+{% set pageTitle = title if title else site.shortTitle %}
+{% set fullTitle = pageTitle + " — " + site.shortTitle if title and page.url != "/" else site.title %}
+{% set pageDesc = description if description else site.description %}
+{% set canonical = site.url + page.url %}
+
+<title>{{ fullTitle }}</title>
+<meta name="description" content="{{ pageDesc }}">
+<link rel="canonical" href="{{ canonical }}">
+<meta name="author" content="{{ site.author }}">
+<meta name="theme-color" content="#2b2622">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ site.shortTitle }}">
+<meta property="og:title" content="{{ fullTitle }}">
+<meta property="og:description" content="{{ pageDesc }}">
+<meta property="og:url" content="{{ canonical }}">
+<meta property="og:locale" content="{{ site.locale }}">
+<meta property="og:image" content="{{ site.url }}{{ site.ogImage }}">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ fullTitle }}">
+<meta name="twitter:description" content="{{ pageDesc }}">
+<meta name="twitter:image" content="{{ site.url }}{{ site.ogImage }}">
+
+<!-- Icons -->
+<link rel="icon" href="/assets/img/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+
+<!-- Fonts: self-hosted, preloaded -->
+<link rel="preload" href="/assets/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/styles.css">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Waseem Ilyas",
+  "url": "{{ site.url }}",
+  "email": "mailto:{{ site.email }}",
+  "jobTitle": "Automation practitioner",
+  "worksFor": { "@type": "Organization", "name": "Automancer", "url": "{{ site.automancer }}" },
+  "sameAs": ["{{ site.github }}", "{{ site.automancer }}"]
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="shell">
+    <a class="wordmark" href="/">Waseem Ilyas<b>.</b></a>
+    <button class="nav-toggle" type="button" aria-label="Toggle navigation" aria-controls="primary-nav" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <nav class="nav" id="primary-nav" aria-label="Primary">
+      {%- for item in site.nav %}
+      <a href="{{ item.url }}"{% if page.url == item.url %} aria-current="page"{% endif %}>{{ item.label }}</a>
+      {%- endfor %}
+      <a class="cta" href="mailto:{{ site.email }}">Email</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+{{ content | safe }}
+</main>
+
+<footer class="console foot">
+  <div class="shell">
+    <div>
+      <div class="meta">Waseem Ilyas · Automancer · United Kingdom</div>
+      <div class="meta" style="margin-top:.4rem"><a href="mailto:{{ site.email }}">{{ site.email }}</a> · <a href="{{ site.github }}" rel="me noopener">GitHub</a></div>
+    </div>
+    <nav class="fnav" aria-label="Footer">
+      {%- for item in site.nav %}
+      <a href="{{ item.url }}">{{ item.label }}</a>
+      {%- endfor %}
+    </nav>
+  </div>
+</footer>
+
+<script src="/assets/js/site.js" defer></script>
+</body>
+</html>

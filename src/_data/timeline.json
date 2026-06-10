@@ -1,0 +1,37 @@
+{
+  "intro": "Not a CV. A line from the first thing I designed to the practice I run now.",
+  "milestones": [
+    {
+      "era": "Age 15",
+      "label": "Started designing and building",
+      "body": "Designing and building on the web. Graphic design, logos, branding, event and web work."
+    },
+    {
+      "era": "University",
+      "label": "Computer Science",
+      "body": "Studied Computer Science."
+    },
+    {
+      "era": "SportsShoes",
+      "label": "Front-end web developer",
+      "body": "Front-end web developer."
+    },
+    {
+      "era": "Global Diversity Practice",
+      "label": "Built the digital practice",
+      "body": "Built the digital practice single-handedly. Instructional design, Articulate Rise and Storyline, e-learning production, workshop and leadership-programme design.",
+      "proof": [
+        "Set up GDP's digital practice from scratch.",
+        "Grew it to approximately 25% of business revenue.",
+        "Onboarded approximately 30 digital clients over 6 years.",
+        "Delivered approximately 50 bespoke e-learning modules for clients including Fortune 500 organisations.",
+        "Designed and delivered 2 modules end-to-end for Shell, reaching more than 100,000 learners around the world."
+      ]
+    },
+    {
+      "era": "Automancer",
+      "label": "AI artisan & automation practitioner",
+      "body": "AI artisan and automation practitioner. Turning new AI capabilities into real business workflows."
+    }
+  ]
+}

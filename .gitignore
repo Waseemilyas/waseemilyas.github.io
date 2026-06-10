@@ -1,6 +1,11 @@
 # Include your project-specific ignores in this file
 # Read about how to use .gitignore: https://help.github.com/articles/ignoring-files
 
+# --- WI-PF1 build ---
+node_modules/
+_site/
+# --- /WI-PF1 build ---
+
 # --- naz-git-security-hardening ---
 # Runtime/state and sensitive material
 .openclaw/
@@ -21,3 +26,12 @@ openclaw.json
 **/openclaw.json
 *.jsonl
 # --- /naz-git-security-hardening ---
+
+# Agent runtime state
+.omc/
+
+# Internal WI-PF1 planning docs — kept OUT of this PUBLIC repo (privacy boundary).
+# Canonical record lives in the Paperclip AUT-412 plan document.
+/DESIGN.md
+/PRODUCT.md
+/ops/

@@ -1,0 +1,190 @@
+---
+layout: base.njk
+title: false
+description: "Waseem Ilyas runs Automancer, a UK automation consultancy helping small businesses use AI and practical digital systems. A long career across web, design, instructional design, and product delivery."
+---
+
+<!-- ========== HERO (console) ========== -->
+<section class="console hero" aria-label="Introduction">
+  <span class="reg tl" aria-hidden="true"></span><span class="reg tr" aria-hidden="true"></span>
+  <span class="reg bl" aria-hidden="true"></span><span class="reg br" aria-hidden="true"></span>
+  <div class="shell">
+    <div>
+      <p class="eyebrow" data-cal><span class="dot" aria-hidden="true"></span><span class="mono label" style="text-transform:none">WASEEM ILYAS / UK</span></p>
+      <h1 data-cal>Technologist who designs, builds, teaches, and <em>automates</em>.</h1>
+      <p class="lede" data-cal>I run Automancer, a UK automation consultancy helping small businesses get real value from AI and practical digital systems. Before that: front-end web, instructional design, and fifteen-plus years of making digital things.</p>
+      <div class="actions" data-cal>
+        <a class="btn btn-primary" href="mailto:{{ site.email }}">Email Waseem →</a>
+        <a class="btn btn-ghost" href="#capability">Read the work ↓</a>
+      </div>
+    </div>
+
+    <aside class="panel" data-cal aria-label="Current status">
+      <div class="phead">
+        <span class="mono label" style="color:var(--bone)">STATUS</span>
+        <span class="live mono" style="font-size:var(--step--1)"><span class="blip" aria-hidden="true"></span>LIVE</span>
+      </div>
+      <dl>
+        <div class="readout"><dt>NOW</dt><dd>Building Automancer · AI + automation for small businesses</dd></div>
+        <div class="readout"><dt>BASE</dt><dd>United Kingdom</dd></div>
+        <div class="readout"><dt>SINCE</dt><dd>Designing and building on the web since age 15</dd></div>
+        <div class="readout"><dt>STACK</dt><dd>AI / automation · web / product · learning design · creative</dd></div>
+      </dl>
+    </aside>
+  </div>
+</section>
+
+<!-- ========== CAPABILITY MAP (console) ========== -->
+<section class="console section" id="capability" aria-label="Capability map">
+  <div class="shell">
+    <div class="section-head" data-cal>
+      <span class="ref">MAP·01</span>
+      <h2>What I actually do</h2>
+      <p>{{ capabilities.intro }}</p>
+    </div>
+
+    <div class="cap" data-cal>
+      <figure class="capfig">
+        <svg viewBox="0 0 720 440" role="img" aria-label="Capability map: five domains wired to one practice hub. Activate a node to read its description.">
+          <g id="traces" stroke-linecap="round">
+            {%- for n in capabilities.nodes %}
+            <path class="trace" data-for="{{ n.key }}" d="{{ n.trace }}"/>
+            {%- endfor %}
+          </g>
+          <g class="hub" aria-hidden="true">
+            <circle cx="360" cy="220" r="30"/>
+            <text x="360" y="224" text-anchor="middle">PRACTICE</text>
+          </g>
+          {%- for n in capabilities.nodes %}
+          <g class="node" tabindex="0" role="button" aria-describedby="capread"
+             data-key="{{ n.key }}" data-code="{{ n.code }}" data-title="{{ n.title }}" data-body="{{ n.body }}"
+             transform="translate({{ n.x }},{{ n.y }})">
+            <circle class="ring" r="26"></circle><circle class="core" r="6"></circle>
+            <text x="0" y="{{ n.textY }}" text-anchor="middle">{{ n.label }}</text>
+          </g>
+          {%- endfor %}
+        </svg>
+      </figure>
+
+      <div class="capread" id="capread" aria-live="polite">
+        <span class="k" data-bind="k">{{ capabilities.nodes[0].code }}</span>
+        <h3 data-bind="h">{{ capabilities.nodes[0].title }}</h3>
+        <p data-bind="p">{{ capabilities.nodes[0].body }}</p>
+        <p class="caphint">Hover, tap, or tab through the nodes to trace each strand.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SELECTED WORK (console) ========== -->
+<section class="console section" id="work" aria-label="Selected work">
+  <div class="shell">
+    <div class="section-head" data-cal>
+      <span class="ref">WORK·02</span>
+      <h2>Selected work</h2>
+      <p>A few projects where the mix mattered more than any single skill. Some are public. Some are anonymised to protect client privacy.</p>
+    </div>
+    <div class="worklist" data-cal>
+      {%- for cs in collections.casestudies %}
+      <a class="workcard" href="{{ cs.url }}">
+        <span class="ref">{{ cs.data.ref }}</span>
+        <span><h3>{{ cs.data.title }}</h3><span class="kick">{{ cs.data.kicker }}</span></span>
+        <span class="go">Read →</span>
+      </a>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ========== AUTOMANCER (console) ========== -->
+<section class="console section" id="automancer-teaser" aria-label="Automancer">
+  <div class="shell">
+    <div class="section-head" data-cal>
+      <span class="ref">AUTO·03</span>
+      <h2>Automancer</h2>
+      <p>AI and practical digital systems for small businesses, without enterprise overhead.</p>
+    </div>
+    <div class="amancer" data-cal>
+      <div class="body">
+        <p>Automancer is my automation consultancy. I help small businesses benefit from AI and practical digital systems, without the cost and complexity of enterprise software.</p>
+        <p class="note-line">The work is hands-on: scope the real problem, design a lightweight system, and build it.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="/automancer/">About Automancer →</a>
+          <a class="btn btn-ghost" href="{{ site.automancer }}" rel="noopener">Visit automancer.uk ↗</a>
+        </div>
+      </div>
+      {% include "partials/diagram-workflow.njk" %}
+    </div>
+  </div>
+</section>
+
+<!-- ========== THE ARC (console) ========== -->
+<section class="console section" id="arc" aria-label="Career arc">
+  <div class="shell">
+    <div class="section-head" data-cal>
+      <span class="ref">ARC·04</span>
+      <h2>The arc</h2>
+      <p>{{ timeline.intro }}</p>
+    </div>
+    <div class="arc arc-line" data-cal>
+      {%- for m in timeline.milestones %}
+      <div class="milestone{% if m.proof %} key{% endif %}">
+        <span class="era">{{ m.era }}</span>
+        <h3>{{ m.label }}</h3>
+        <p>{{ m.body }}</p>
+        {%- if m.proof %}
+        <ul class="proof">
+          {%- for line in m.proof %}<li>{{ line }}</li>{%- endfor %}
+        </ul>
+        {%- endif %}
+      </div>
+      {%- endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- ========== LAB TEASER (console) ========== -->
+<section class="console section" id="lab-teaser" aria-label="Lab">
+  <div class="shell">
+    <div class="section-head" data-cal>
+      <span class="ref">LAB·05</span>
+      <h2>Lab</h2>
+      <p>Public projects, prototypes, and things built to find out whether they would work.</p>
+    </div>
+    <div class="lab-grid" data-cal>
+      <a class="lab-card" href="{{ site.automancer }}" rel="noopener">
+        <span class="tag">PUBLIC · SITE</span>
+        <h3>Automancer site</h3>
+        <p>The consultancy's public website.</p>
+        <span class="ext">automancer.uk ↗</span>
+      </a>
+      <a class="lab-card" href="{{ site.icommit }}" rel="noopener">
+        <span class="tag">PUBLIC · PRODUCT</span>
+        <h3>iCommit</h3>
+        <p>A live, publicly reachable product.</p>
+        <span class="ext">icommit.globaldiversitypractice.com ↗</span>
+      </a>
+      <a class="lab-card" href="/lab/">
+        <span class="tag">INDEX</span>
+        <h3>All experiments</h3>
+        <p>The full lab index.</p>
+        <span class="ext">/lab →</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ========== CONTACT (console) ========== -->
+<section class="console section" id="contact-teaser" aria-label="Contact">
+  <div class="shell">
+    <div class="section-head" data-cal>
+      <span class="ref">SAY·06</span>
+      <h2>Get in touch</h2>
+    </div>
+    <div class="contact-cta" data-cal>
+      <p class="contact-close" style="color:var(--bone-mute);max-width:52ch">The fastest way to reach me is email. If you run a small business and want to know whether AI or automation is worth it for you, that is exactly the conversation I like having.</p>
+      <a class="email-big" href="mailto:{{ site.email }}">{{ site.email }}</a>
+      <p class="contact-close">No funnel, no pitch deck. Just send a note. · <a href="{{ site.github }}" rel="me noopener" style="color:var(--bone)">GitHub ↗</a></p>
+    </div>
+  </div>
+</section>

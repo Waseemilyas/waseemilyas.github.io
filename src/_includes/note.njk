@@ -1,0 +1,19 @@
+---
+layout: base.njk
+---
+<article class="essay section" aria-labelledby="note-title">
+  <div class="shell">
+    <div class="casehead" data-cal>
+      <span class="ref">NOTES</span>
+      <h1 id="note-title">{{ title }}</h1>
+      <p class="kick"><time datetime="{{ page.date | isoDate }}">{{ page.date | readableDate }}</time>{% if summary %} · {{ summary }}{% endif %}</p>
+    </div>
+    <div class="prose" data-cal>
+      {{ content | safe }}
+    </div>
+    <nav class="casenav" aria-label="Notes">
+      <a href="/notes/">← All notes</a>
+      <a href="mailto:{{ site.email }}">Email Waseem →</a>
+    </nav>
+  </div>
+</article>

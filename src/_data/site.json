@@ -1,0 +1,23 @@
+{
+  "name": "Waseem Ilyas",
+  "title": "Waseem Ilyas — Technologist, builder, automation practitioner",
+  "shortTitle": "Waseem Ilyas",
+  "description": "Waseem Ilyas runs Automancer, a UK automation consultancy helping small businesses use AI and practical digital systems. A long career across web, design, instructional design, and product delivery.",
+  "url": "https://waseemilyas.uk",
+  "locale": "en_GB",
+  "lang": "en",
+  "author": "Waseem Ilyas",
+  "email": "waseem@automancer.uk",
+  "github": "https://github.com/Waseemilyas",
+  "automancer": "https://automancer.uk",
+  "icommit": "https://icommit.globaldiversitypractice.com",
+  "ogImage": "/assets/img/og-card.png",
+  "nav": [
+    { "label": "Home", "url": "/" },
+    { "label": "About", "url": "/about/" },
+    { "label": "Work", "url": "/work/" },
+    { "label": "Automancer", "url": "/automancer/" },
+    { "label": "Lab", "url": "/lab/" },
+    { "label": "Contact", "url": "/contact/" }
+  ]
+}

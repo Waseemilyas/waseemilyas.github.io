@@ -1,0 +1,39 @@
+---
+layout: case.njk
+tags: casestudy
+order: 2
+ref: "CS·CARE"
+title: "Operational systems for a UK care provider"
+kicker: "Anonymised client delivery · domiciliary care"
+description: "Designing and building digital and operational systems for an anonymised UK domiciliary care provider. Client never named; abstract diagram only."
+datasheet:
+  - { k: "REF", v: "CS·CARE" }
+  - { k: "SECTOR", v: "UK domiciliary care (client anonymised)" }
+  - { k: "ROLE", v: "Designed &amp; built the operational systems" }
+  - { k: "CRAFT", v: "Software delivery · process design · automation" }
+  - { k: "OUTCOME", v: "⚑ Pending board-approved statement" }
+  - { k: "CONSTRAINTS", v: "Client never named · no repo links · no screenshots · abstract diagram only" }
+---
+**Context.** A UK domiciliary care provider needed better digital and operational systems to support the day-to-day work of delivering care. The brief was practical, not glamorous: less manual overhead, more reliable process.
+
+<figure class="figure" aria-label="Abstract diagram: intake feeding scheduling and records, with an automation layer reducing manual steps. No real data.">
+  <svg viewBox="0 0 640 230" role="img" aria-label="Abstract systems diagram, no client data">
+    <defs><marker id="ar-care" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="oklch(0.56 0.17 40)"/></marker></defs>
+    <g fill="none" stroke="oklch(0.22 0.01 60 / .35)" stroke-width="1.4" marker-end="url(#ar-care)">
+      <path d="M120,60 L250,60"/><path d="M120,60 L250,150"/><path d="M370,60 L500,105"/><path d="M370,150 L500,125"/>
+    </g>
+    <g font-family="Geist Mono, monospace" font-size="12" fill="oklch(0.30 0.01 60)">
+      <g><rect x="24" y="42" width="96" height="36" rx="7" fill="oklch(0.955 0.003 70)" stroke="oklch(0.22 0.01 60 / .3)"/><text x="72" y="64" text-anchor="middle">INTAKE</text></g>
+      <g><rect x="252" y="42" width="118" height="36" rx="7" fill="oklch(0.955 0.003 70)" stroke="oklch(0.22 0.01 60 / .3)"/><text x="311" y="64" text-anchor="middle">SCHEDULING</text></g>
+      <g><rect x="252" y="132" width="118" height="36" rx="7" fill="oklch(0.955 0.003 70)" stroke="oklch(0.22 0.01 60 / .3)"/><text x="311" y="154" text-anchor="middle">RECORDS</text></g>
+      <g><rect x="500" y="88" width="118" height="36" rx="7" fill="oklch(0.66 0.185 42 / .12)" stroke="oklch(0.56 0.17 40)"/><text x="559" y="110" text-anchor="middle" fill="oklch(0.40 0.13 40)">AUTOMATION</text></g>
+    </g>
+  </svg>
+  <figcap>FIG.1 — Abstract delivery map. Generated, no client or care-recipient data.</figcap>
+</figure>
+
+**Role.** I designed and built the digital and operational systems involved, working close to how the team actually delivers care day to day.
+
+**Craft.** Practical software delivery, process design, and automation applied to a real operational setting, where reliability matters more than novelty.
+
+<p class="flag"><strong>⚑ Outcome — pending approval.</strong> Awaiting a board-approved outcome statement for this anonymised client. No metric is shown until Waseem confirms what can be said. Placeholder draft (qualitative, no numbers): &ldquo;Cleaner operational systems that reduced manual overhead for the team.&rdquo;</p>
