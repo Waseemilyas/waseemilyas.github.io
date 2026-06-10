@@ -11,7 +11,7 @@ datasheet:
   - { k: "SECTOR", v: "UK domiciliary care (client anonymised)" }
   - { k: "ROLE", v: "Designed &amp; built the operational systems" }
   - { k: "CRAFT", v: "Software delivery · process design · automation" }
-  - { k: "OUTCOME", v: "⚑ Pending board-approved statement" }
+  - { k: "OUTCOME", v: "Operational systems delivered into day-to-day use" }
   - { k: "CONSTRAINTS", v: "Client never named · no repo links · no screenshots · abstract diagram only" }
 ---
 **Context.** A UK domiciliary care provider needed better digital and operational systems to support the day-to-day work of delivering care. The brief was practical, not glamorous: less manual overhead, more reliable process.
@@ -36,4 +36,4 @@ datasheet:
 
 **Craft.** Practical software delivery, process design, and automation applied to a real operational setting, where reliability matters more than novelty.
 
-<p class="flag"><strong>⚑ Outcome — pending approval.</strong> Awaiting a board-approved outcome statement for this anonymised client. No metric is shown until Waseem confirms what can be said. Placeholder draft (qualitative, no numbers): &ldquo;Cleaner operational systems that reduced manual overhead for the team.&rdquo;</p>
+<p><strong>Outcome.</strong> Cleaner operational systems that reduced manual overhead for the team, delivered through practical software and automation. Qualitative by design — no client figures are published for this anonymised engagement.</p>

@@ -9,7 +9,7 @@ description: "iCommit is a live, publicly reachable digital product. Web and pro
 datasheet:
   - { k: "REF", v: "CS·ICOMMIT" }
   - { k: "SECTOR", v: "Public product / web" }
-  - { k: "ROLE", v: "⚑ Pending confirmed wording" }
+  - { k: "ROLE", v: "Contributed to building &amp; shipping the product" }
   - { k: "CRAFT", v: "Web / product delivery" }
   - { k: "OUTCOME", v: "A live, publicly reachable product" }
   - { k: "LINK", v: "<a href='https://icommit.globaldiversitypractice.com' rel='noopener'>icommit.globaldiversitypractice.com ↗</a>" }
@@ -31,7 +31,7 @@ datasheet:
   <figcap>FIG.1 — Abstract product composition. Generated, no private data.</figcap>
 </figure>
 
-**Role.** <span class="flag" style="display:inline-block">⚑ Pending confirmation — Waseem's exact role/contribution wording for iCommit, and whether a public screenshot may be used. Placeholder: contributed to building and shipping iCommit.</span>
+**Role.** Contributed to building and shipping iCommit.
 
 **Craft.** Web and product delivery.
 
