@@ -13,9 +13,9 @@ GitHub Pages. Live domain: <https://waseemilyas.uk>.
 ## Develop
 
 ```bash
-npm install
-npm run serve     # local dev server with live reload
-npm run build     # static build → _site/
+pnpm install
+pnpm run serve     # local dev server with live reload
+pnpm run build     # static build → _site/
 ```
 
 ## Structure
