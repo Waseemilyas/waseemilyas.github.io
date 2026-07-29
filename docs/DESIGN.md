@@ -56,7 +56,7 @@ typography:
   label:
     fontFamily: "Geist Mono, ui-monospace, SF Mono, Menlo, monospace"
     fontSize: "clamp(0.78rem, 0.75rem + 0.15vw, 0.86rem)"
-    # `.label` (styles.css:76) sets family, size, tracking, uppercase and colour
+    # `.label` (styles.css) sets family, size, tracking, uppercase and colour
     # only. The 500 weight comes from the `.mono` class every template pairs it
     # with; line-height is inherited from body. Neither is declared on `.label`.
     fontWeight: 500
@@ -161,7 +161,7 @@ system.
 
 ### What is actually tokenised
 
-`:root` (`styles.css:24-72`) declares **37** custom properties and no others:
+`:root` (`styles.css`) declares **37** custom properties and no others:
 
 - 15 colours — the console, essay and signal tables below, plus `--on-signal`.
 - 2 families — `--sans`, `--mono`.
@@ -200,7 +200,8 @@ for reduced motion. The capability map is server-rendered with the first node's
 copy already in place, so it reads fine with JS disabled.
 
 **The mobile nav drawer is the exception.** Below 720px `.nav` is fixed and
-translated off-screen (`styles.css:100`); only `data-open="true"` reveals it, and
+translated off-screen (the `.nav` rule in the 720px media query, `styles.css`);
+only `data-open="true"` reveals it, and
 that attribute is set exclusively by `src/assets/js/site.js`. With JS disabled the
 drawer cannot be opened and the toggle is inert — the footer nav (`.foot .fnav`,
 on every page) is the fallback. Do not describe the mobile nav as working without
@@ -248,21 +249,24 @@ splitting the source of truth away from the CSS.
 There is **one accent colour**. The surface pairing is `--signal` on console,
 `--signal-deep` on essay (see `.essay .section-head .ref`, `.prose a`, `.casenav a`).
 Two deliberate exceptions are global rather than per-surface and use `--signal` on
-both: the `:focus-visible` ring (`styles.css:78`) and the `.skip` link (`:81`). The
-essay-only `.flag` is tinted with the signal hue at 6% (`:213`) — but as the
-hard-coded literal `oklch(0.66 0.185 42 / .06)`, **not** `var(--signal)`. It is the
-third colour literal in the stylesheet, alongside the two `on-signal` literals.
+both: the `:focus-visible` ring and the `.skip` link (both `styles.css`). The
+essay-only `.flag` is tinted with the signal hue at 6% (`.prose p.flag, .flag`,
+`styles.css`) — but as the hard-coded literal `oklch(0.66 0.185 42 / .06)`,
+**not** `var(--signal)`. Since AUT-3993 tokenised both `on-signal` literals, it is
+the **only** colour literal left in the stylesheet outside `:root`.
 
 `--trace` is amber and exists to distinguish an active *connection* from an active
-*node*. It is used in the capability SVG (`src/index.njk`), and the same hue is
-hard-coded as the resting connector stroke in `partials/diagram-workflow.njk:9`,
-which renders on `/` and `/automancer/`.
+*node*. It is used in the capability SVG (`src/index.njk`), and it also strokes the
+resting connectors in `partials/diagram-workflow.njk`, which renders on `/` and
+`/automancer/`.
 
-**That literal is not the token value.** It is `oklch(0.80 0.130 78 / .55)` — the
-`--trace` hue at **55% alpha** — whereas `--trace` (`styles.css:41`) is fully
-opaque. `var(--trace)` is therefore *not* a drop-in replacement: swapping it in
-darkens the resting connectors on both routes. If the partial is ever tokenised,
-the equivalent is `color-mix(in oklch, var(--trace) 55%, transparent)`.
+**The connector stroke carries 55% alpha, and that is load-bearing.** AUT-3993
+tokenised it: the partial's trace group is now `class="wf-trace"` with no `stroke`
+attribute, and the colour comes from `.diagram-panel .wf-trace` (`styles.css`) as
+`color-mix(in oklch, var(--trace) 55%, transparent)`. The `color-mix` is not
+decoration — `--trace` itself is fully opaque, so a bare `var(--trace)` would
+**darken the resting connectors on both routes**. Do not "simplify" this rule to
+`var(--trace)`.
 
 Do not promote amber to a second brand colour.
 
@@ -283,7 +287,7 @@ Two families, one fluid scale, six steps.
 | `--step-4` | `2.7rem → 5.4rem` | Hero titles — `.hero h1`, on `/` and `/404` |
 
 Sizes outside the scale are all **inside SVG**, plus one display element:
-`.email-big` has its own clamp (`styles.css:265`) because the address is a display
+`.email-big` has its own clamp (`styles.css`) because the address is a display
 element; the capability-map labels are fixed at `11px` (`.node text`) and `10px`
 (`.hub text`); and every inline diagram label is `12px`
 (`partials/diagram-workflow.njk:16` and the `figure` SVG in each of the three case
@@ -295,8 +299,8 @@ almost always the nearest step rather than a new one.
   **metadata rather than prose** — refs, keys, eyebrows, datasheet terms, timeline
   eras, the email link, and `.label` (uppercase, `0.08em` tracking). Note the rule
   is narrower than it sounds: mono also carries a few short UI affordances, among
-  them the `.workcard .go` arrow (`styles.css:192`), `.casenav` links (`:223`) and
-  the `.proof` bullet glyph (`:242`). There are 20 `var(--mono)` consumers in all;
+  them the `.workcard .go` arrow, `.casenav a` links and the `.proof li::before`
+  bullet glyph (all `styles.css`). There are 20 `var(--mono)` consumers in all;
   the constraint that actually holds is **never body copy**.
 - Headings tighten as they grow: the global rule is `font-weight: 700`,
   `line-height: 1.04`, `letter-spacing: -0.03em`, `text-wrap: balance`; the hero
@@ -389,7 +393,7 @@ extend rather than fork.
 | `.topbar` / `.nav` | console | every route | Sticky blurred bar. Collapses to a full-width drawer below 720px via `.nav-toggle` + `data-open` (**requires JS**). `aria-current="page"` paints the active link `--signal`. |
 | `.foot` | console | every route | Global footer, inside `base.njk`. Two-column grid collapsing at 620px; `.fnav` is the no-JS nav fallback. |
 | `.hero` | console | `/`, `/404` | Full-bleed intro band. `.hero h1` is the only `--step-4` consumer; carries `.reg` marks. Two-column on `/`, collapsing at 860px. |
-| `.section-head` | console | home sections, `/work/`, `/lab/`, `/automancer/`, `/contact/`, `/about/` | Baseline-aligned row: mono `.ref` + title + optional right-aligned `p`. Heading is `h1` or `h2` per the contract above. Essay-surface styling exists (`styles.css:158-160`) but no template currently uses it there. |
+| `.section-head` | console | home sections, `/work/`, `/lab/`, `/automancer/`, `/contact/`, `/about/` | Baseline-aligned row: mono `.ref` + title + optional right-aligned `p`. Heading is `h1` or `h2` per the contract above. Essay-surface styling exists (the `.essay .section-head` rules, `styles.css`) but no template currently uses it there. |
 | `.casehead` | essay | case studies, notes (index and detail), `/about/` | Detail-page counterpart: `.ref`, title, optional `.kick` lede, hairline rule below. `/about/` carries `.ref` + title only — its lede is a separate `.lede-essay` *outside* the casehead (`src/about.njk:14`). |
 | `.workcard` in `.worklist` | console | home, `/work/` | Three-column grid (ref · title+kick · go arrow) inside a 1px-gap list that fakes dividers via `background: var(--line-dark)`. Collapses to one column below 620px and drops the arrow. |
 | `.lab-card` in `.lab-grid` | console | home, `/lab/` | `auto-fit minmax(15rem, 1fr)`. Hover lifts 2px and borders in `--signal`. |
@@ -400,7 +404,7 @@ extend rather than fork.
 | `.datasheet` | essay | case studies, `/about/` | Sticky `top: 4.5rem` sidebar `dl`. |
 | `.prose` | essay | case studies, notes, `/about/` | Long-form container, `70ch`. |
 | `.casenav` | essay | case-study and note detail pages | Footer nav **inside** the `<article>`, not under it. A fixed pair — back-to-index link + `mailto` — **not** prev/next: no prev/next plumbing exists in `eleventy.config.js`. Mono in `--signal-deep`. |
-| `.btn` (`-primary` / `-ghost`) | console | `/`, `/404`, `/automancer/`, `/contact/` | Every button ships on console. `.essay .btn-ghost` (`styles.css:138-139`) restates the ghost variant in ink, but no essay template uses a button — reserved, not shipped. |
+| `.btn` (`-primary` / `-ghost`) | console | `/`, `/404`, `/automancer/`, `/contact/` | Every button ships on console. `.essay .btn-ghost` (+ hover) (`styles.css`) restates the ghost variant in ink, but no essay template uses a button — reserved, not shipped. |
 | `.ref` | both | every content route | Mono section/page reference. `--signal` on console, `--signal-deep` on essay. |
 
 Single-route components are in the stylesheet but deliberately not listed here:
@@ -409,17 +413,18 @@ homepage status panel), `.casegrid` (case detail), `.about-grid` (`/about/`),
 `.notes-list` / `.note-item` (notes index). Two more are worth knowing about:
 
 - `.label` / `.mono` — mono metadata primitives, currently used only on `/` and
-  `/404`. `.essay .label` (`styles.css:198`) is styled but unused.
+  `/404`. `.essay .label` (`styles.css`) is styled but unused.
 - `.reg` — corner registration marks. Not hero-only: the top console section of
   `/work/`, `/lab/`, `/automancer/` and `/contact/` carries them too. `/` , `/404`,
   `/automancer/` and `/contact/` use all four (`.tl/.tr/.bl/.br`); `/work/` and
   `/lab/` use `.tl`/`.tr` only.
 - `.figure` + `figcaption` — inline SVG artefacts on `--paper-sink`, case studies.
   The caption is a real `<figcaption>` element styled by the descendant selector
-  `.figure figcaption` (`styles.css:216`) — there is no `.figcap` class. AUT-3986
+  `.figure figcaption` (`styles.css`) — there is no `.figcap` class. AUT-3986
   removed it; do not reintroduce a caption class.
-- `.flag` — dashed callout for content pending approval. Styled at `styles.css:213`
-  but **used by no template today**; it is reserved, not shipped.
+- `.flag` — dashed callout for content pending approval. Styled at
+  `.prose p.flag, .flag` (`styles.css`) but **used by no template today**; it is
+  reserved, not shipped.
 
 `.essay`-scoped overrides are a small, closed set — `.essay .btn-ghost` (+ hover),
 `.essay .section-head .ref`, `.essay .section-head h1, h2`, `.essay .section-head p`,
