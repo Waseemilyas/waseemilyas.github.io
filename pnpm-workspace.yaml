@@ -1,2 +1,3 @@
 overrides:
-  '@11ty/recursive-copy': 5.0.2
+  # Remove once @11ty/eleventy declares @11ty/recursive-copy: ^5.
+  '@11ty/recursive-copy': ^5.0.2

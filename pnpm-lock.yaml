@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@11ty/recursive-copy': 5.0.2
+  '@11ty/recursive-copy': ^5.0.2
 
 importers:
 
