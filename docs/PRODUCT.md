@@ -4,8 +4,11 @@
   PUBLICATION BOUNDARY — read before editing.
 
   This file lives in a PUBLIC repository and exists to give design tooling the
-  minimum context it needs to make on-brand decisions. Every statement below is
-  already published on the live site at https://waseemilyas.uk.
+  minimum context it needs to make on-brand decisions. Nothing below discloses
+  anything beyond what the live site at https://waseemilyas.uk already publishes.
+  (Some of it — the anti-references, the audience ordering, the design
+  principles — is design interpretation rather than published copy. That is in
+  bounds; the test is disclosure, not provenance.)
 
   Do NOT add: client names or identifying detail, fees, rates, contract values,
   pipeline or prospects, revenue, headcount, infrastructure or account names, or
@@ -93,12 +96,14 @@ Design directions this project deliberately rejects:
 
 ## Design Principles
 
-1. **Two surfaces, no blending.** Console for identity and index; paper for reading.
-   A route picks one. The contrast between them carries the art direction.
+1. **Two surfaces, never blended.** Console for identity and index; paper for
+   reading. Each *section* picks one — a route may stack both, and `/about/` does.
+   The contrast between them carries the art direction.
 2. **One accent, used sparingly.** A single vermilion signal marks what is live,
    active, or actionable. When everything is highlighted, nothing is.
-3. **Content works without JavaScript.** Motion, the capability map, and the mobile
-   nav are progressive enhancement. Nothing that matters is gated behind a script.
+3. **Content works without JavaScript.** Motion and the capability map are
+   progressive enhancement. The one exception is the mobile nav drawer, which
+   needs JS to open; the footer nav is its fallback, so no content is unreachable.
 4. **Accessibility is part of the design.** Visible focus, one `<h1>` per document,
    no skipped heading levels, honoured reduced-motion, keyboard-operable
    interactives. Treated as a hard constraint, not a later pass.

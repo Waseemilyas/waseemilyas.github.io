@@ -1,6 +1,9 @@
 ---
 name: waseemilyas.uk
 description: Two-surface static portfolio — warm-graphite console meets near-white paper essay.
+# Every key below maps 1:1 to a `--name` custom property on `:root` in
+# src/assets/css/styles.css, EXCEPT `on-signal` (see its note), and the whole of
+# the `rounded:` and `spacing:` groups (see their notes).
 colors:
   graphite-900: "oklch(0.17 0.008 65)"
   graphite-800: "oklch(0.21 0.009 65)"
@@ -16,6 +19,9 @@ colors:
   signal: "oklch(0.66 0.185 42)"
   signal-deep: "oklch(0.56 0.170 40)"
   trace: "oklch(0.80 0.130 78)"
+  # NOT a custom property. Hard-coded at styles.css:81 (.skip) and :134
+  # (.btn-primary). `var(--on-signal)` does not resolve — write the literal, or
+  # tokenise it first.
   on-signal: "oklch(0.16 0.02 40)"
 typography:
   display:
@@ -51,9 +57,15 @@ typography:
   label:
     fontFamily: "Geist Mono, ui-monospace, SF Mono, Menlo, monospace"
     fontSize: "clamp(0.78rem, 0.75rem + 0.15vw, 0.86rem)"
+    # `.label` (styles.css:76) sets family, size, tracking, uppercase and colour
+    # only. The 500 weight comes from the `.mono` class every template pairs it
+    # with; line-height is inherited from body. Neither is declared on `.label`.
     fontWeight: 500
-    lineHeight: 1.4
+    lineHeight: 1.55
     letterSpacing: "0.08em"
+# Documented conventions, NOT custom properties. There is no `--rounded-*` or
+# `--space-*` on `:root` — every value below is a repeated literal at its use
+# site. Match the rung by hand; `var(--rounded-lg)` does not resolve.
 rounded:
   xs: "2px"
   sm: "8px"
@@ -73,6 +85,7 @@ components:
     backgroundColor: "{colors.signal}"
     textColor: "{colors.on-signal}"
     typography: "{typography.body}"
+    fontWeight: 500
     rounded: "{rounded.sm}"
     padding: "0.7rem 1.15rem"
   button-primary-hover:
@@ -82,10 +95,11 @@ components:
     backgroundColor: "transparent"
     textColor: "{colors.bone}"
     typography: "{typography.body}"
+    fontWeight: 500
     rounded: "{rounded.sm}"
     padding: "0.7rem 1.15rem"
   panel:
-    backgroundColor: "{colors.graphite-800}"
+    background: "linear-gradient(180deg, {colors.graphite-800}, {colors.graphite-900})"
     textColor: "{colors.bone}"
     rounded: "{rounded.lg}"
     padding: "1.15rem 1.2rem 1.3rem"
@@ -106,7 +120,8 @@ components:
     textColor: "{colors.ink}"
     rounded: "{rounded.lg}"
   flag:
-    backgroundColor: "{colors.paper-sink}"
+    backgroundColor: "oklch(0.66 0.185 42 / 0.06)"
+    borderColor: "{colors.signal-deep}"
     textColor: "{colors.ink-mute}"
     rounded: "{rounded.sm}"
     padding: "0.8rem 0.95rem"
@@ -119,13 +134,16 @@ components:
   Read AGENTS.md §1 before adding anything: no client names, no commercial
   detail, no infrastructure specifics. Tokens, type, and component structure
   only. Internal positioning and planning material stays in Paperclip.
+
+  This file is a binding reference: agents change code on the strength of it.
+  Do not assert a rule you have not checked against src/assets/css/styles.css
+  and the templates. An over-strong claim here becomes a wrong edit later.
 -->
 
 ## Overview
 
-A single-author portfolio built as a **two-surface system**. Every route picks one
-surface and commits to it; the contrast between them is the art direction, not
-decoration.
+A single-author portfolio built as a **two-surface system**. The contrast between
+the surfaces is the art direction, not decoration.
 
 - **Console** (`.console`) — warm graphite, near-black but never neutral-black
   (hue 65, chroma 0.008–0.010). Carries the identity: the hero, capability map,
@@ -135,15 +153,45 @@ decoration.
 - **Essay** (`.essay`) — near-white paper (L 0.985, not cream) for long-form
   reading: case studies, about, notes. Ink on paper, generous measure, no grid.
 
-The stack is Eleventy + hand-written CSS — **no framework, no utility classes, one
-stylesheet** (`src/assets/css/styles.css`, ~300 lines). Every token is a CSS custom
-property on `:root`. Typefaces are self-hosted variable Geist and Geist Mono; there
-is no CDN dependency and no runtime style system.
+The surface is chosen **per section**, not per route — see *Surface rule* below.
 
-Motion is an enhancement, never a gate: `[data-cal]` elements are visible by default
-and the `.in` reveal only animates when JS runs and the user has not asked for reduced
-motion. The same holds for the capability map and mobile nav — content works with JS
-disabled.
+The stack is Eleventy + hand-written CSS — **no framework, no utility classes, one
+stylesheet** (`src/assets/css/styles.css`, ~300 lines). Typefaces are self-hosted
+variable Geist and Geist Mono; there is no CDN dependency and no runtime style
+system.
+
+### What is actually tokenised
+
+`:root` (`styles.css:24-55`) declares **24** custom properties and no others:
+
+- 14 colours — the console, essay and signal tables below.
+- 2 families — `--sans`, `--mono`.
+- 6 type steps — `--step--1` … `--step-4`.
+- `--ease` and `--maxw`.
+
+Everything else in the frontmatter is a **documented convention, not a `var()`**.
+There are no radius or spacing custom properties: all six `rounded` rungs and all
+six `spacing` values are repeated literals at each use site, and `on-signal` is a
+literal too. Reaching for `var(--rounded-lg)` or `var(--on-signal)` produces
+invalid CSS. Either write the literal and keep it consistent with the rung, or
+tokenise the group properly first — do not assume the property exists.
+
+`--ease` (`cubic-bezier(0.16, 1, 0.3, 1)`) is the single easing curve: it drives
+every transition and all three keyframe animations. New motion uses it.
+
+### Progressive enhancement, and its one exception
+
+Motion is an enhancement, never a gate: `[data-cal]` elements are visible by
+default and the `.in` reveal only animates when JS runs and the user has not asked
+for reduced motion. The capability map is server-rendered with the first node's
+copy already in place, so it reads fine with JS disabled.
+
+**The mobile nav drawer is the exception.** Below 720px `.nav` is fixed and
+translated off-screen (`styles.css:100`); only `data-open="true"` reveals it, and
+that attribute is set exclusively by `src/assets/js/site.js`. With JS disabled the
+drawer cannot be opened and the toggle is inert — the footer nav (`.foot .fnav`,
+on every page) is the fallback. Do not describe the mobile nav as working without
+JS, and do not add anything else that depends on a script to reach content.
 
 ## Colors
 
@@ -179,31 +227,45 @@ splitting the source of truth away from the CSS.
 
 | Token | Value | Role |
 | --- | --- | --- |
-| `--signal` | `oklch(0.66 0.185 42)` | The single accent — vermilion. Console use. |
+| `--signal` | `oklch(0.66 0.185 42)` | The single accent — vermilion. Console, plus the global focus ring and skip link. |
 | `--signal-deep` | `oklch(0.56 0.170 40)` | The same accent on paper, darkened for contrast |
-| `--trace` | `oklch(0.80 0.130 78)` | Active connection lines in the capability map only |
+| `--trace` | `oklch(0.80 0.130 78)` | Amber connection lines: active traces in the capability map |
+| *(literal)* `oklch(0.16 0.02 40)` | — | `on-signal` — text on a `--signal` fill. Not a custom property. |
 
-There is **one accent colour**. `--signal` on console, `--signal-deep` on essay —
-that pairing is the rule, not a preference (see `.essay .section-head .ref`,
-`.prose a`, `.casenav a`). `--trace` is amber and exists solely to distinguish an
-active trace from an active node in the capability SVG; do not promote it to a
-second brand colour.
+There is **one accent colour**. The surface pairing is `--signal` on console,
+`--signal-deep` on essay (see `.essay .section-head .ref`, `.prose a`, `.casenav a`).
+Two deliberate exceptions are global rather than per-surface and use `--signal` on
+both: the `:focus-visible` ring (`styles.css:78`) and the `.skip` link (`:81`). The
+essay-only `.flag` is also tinted with raw `--signal` at 6% (`:213`).
+
+`--trace` is amber and exists to distinguish an active *connection* from an active
+*node*. It is used in the capability SVG (`src/index.njk`), and the same amber is
+hard-coded as the resting connector stroke in `partials/diagram-workflow.njk:9`,
+which renders on `/` and `/automancer/` — that literal should become `var(--trace)`
+if the partial is touched. Do not promote amber to a second brand colour.
 
 Translucent lines are deliberately alpha-on-surface rather than solid greys, so a
 hairline stays correct if the surface beneath it changes.
 
 ## Typography
 
-Two families, one fluid scale, six steps. Nothing outside the scale.
+Two families, one fluid scale, six steps.
 
 | Token | Range | Used for |
 | --- | --- | --- |
-| `--step--1` | `0.78rem → 0.86rem` | Mono labels, refs, captions, datasheet, footer |
-| `--step-0` | `0.98rem → 1.08rem` | Body, nav, buttons |
-| `--step-1` | `1.18rem → 1.45rem` | Hero lede, case kicker, `h3`, lab-card titles |
-| `--step-2` | `1.5rem → 2.1rem` | Work card titles, prose `h2`, note titles |
+| `--step--1` | `0.78rem → 0.86rem` | Mono labels, refs, captions, datasheet, footer, nav links |
+| `--step-0` | `0.98rem → 1.08rem` | Body, buttons, wordmark, nav links inside the mobile drawer |
+| `--step-1` | `1.18rem → 1.45rem` | Hero lede, case kicker, lab-card titles, and `h3` in `.prose` / `.capread` / `.milestone` |
+| `--step-2` | `1.5rem → 2.1rem` | Work card titles (at either heading level), prose `h2`, note titles, the `/about/` lede |
 | `--step-3` | `2.1rem → 3.4rem` | Section titles, case-study titles |
-| `--step-4` | `2.7rem → 5.4rem` | Homepage hero only |
+| `--step-4` | `2.7rem → 5.4rem` | Hero titles — `.hero h1`, on `/` and `/404` |
+
+Three sizes sit **outside** the scale, deliberately: `.email-big` has its own
+clamp (`styles.css:265`) because the address is a display element, and the
+capability-map SVG labels are fixed at `11px` (`.node text`) and `10px`
+(`.hub text`) because they scale with the viewBox, not the page. Everything else
+uses a step — if a value is not in the scale, the answer is almost always the
+nearest step rather than a new one.
 
 - `--sans` (Geist) sets everything structural. `--mono` (Geist Mono) is reserved for
   **metadata, not prose**: refs, keys, eyebrows, datasheet terms, timeline eras,
@@ -211,9 +273,10 @@ Two families, one fluid scale, six steps. Nothing outside the scale.
 - Headings tighten as they grow: the global rule is `font-weight: 700`,
   `line-height: 1.04`, `letter-spacing: -0.03em`, `text-wrap: balance`; the hero
   goes further to `800` / `-0.038em`.
-- Measure is capped per context and those caps are load-bearing: hero `16ch`,
-  hero lede `46ch`, section-head copy `42ch`, case title `20ch`, prose `68ch`
-  (container `70ch`), about lede `24ch`.
+- Measure is capped per context and those caps are load-bearing. Among them: hero
+  `16ch`, hero lede `46ch`, section-head copy `42ch`, case title `20ch`, prose
+  `68ch` (container `70ch`), about lede `24ch`. Other blocks carry their own caps —
+  check the rule before adding a new one.
 - Body line-height is `1.55`; long-form prose relaxes to `1.62`.
 
 ### Heading hierarchy contract
@@ -228,6 +291,7 @@ document has exactly one `<h1>` and skips no level.
 | **Simple route** (`/automancer/`, `/contact/`) | The `.section-head` title | Subsections, if any | — |
 | **Essay/detail** (case studies, notes, `/about/`) | The `.casehead` title | `.prose h2`, or `.section-head h2` for a following section | `.prose h3`, `.milestone h3` |
 | **Notes index** | `.casehead` title ("Notes") | `.note-item` titles | — |
+| **Error route** (`/404.html`) | The `.hero` title | — | — |
 
 The rule that makes this work: **a card's heading level depends on its page, not on
 its class.** The same `.workcard` is an `<h3>` on the homepage (nested under a section
@@ -236,6 +300,21 @@ matches both levels — `.workcard h2, .workcard h3`, `.lab-card h2, .lab-card h
 `.section-head h1, .section-head h2`, `.casehead h1, .casehead h2` — so promoting a
 heading for semantics costs nothing visually. Never fork a component to change its
 heading level; widen the selector instead.
+
+## Surface rule
+
+The surface is a property of the **section**, not the route. `<section class="console">`
+and `<section class="essay">` may both appear in one document, and one route does
+exactly that: `/about/` opens with an essay `.casehead` (`src/about.njk:7`) and then
+stacks a console "career arc" section (`:38`). That is deliberate — do not "fix" it.
+
+Two pieces of **console chrome are global** and appear on every route regardless of
+its content surface: the sticky `.topbar` and the `.foot` footer
+(`src/_includes/base.njk`). Essay routes therefore always carry console chrome.
+
+What the rule actually forbids is *blending within one section* — paper type on a
+graphite fill, or a console readout inside `.prose`. Pick a surface for a section
+and commit to it, and let the join between sections be a clean edge.
 
 ## Elevation
 
@@ -259,61 +338,94 @@ drop shadows for cards or modals.
 The one true overlay is `.topbar`: sticky, `color-mix` to 88% opacity over the page
 background, `backdrop-filter: saturate(1.2) blur(6px)`, hairline bottom border.
 
-Radii ladder: `2px` focus ring · `8px` buttons and small flags · `10px` proof lists ·
-`12px` panels, lab cards, figures, datasheet · `14px` the largest frames (worklist,
-capability figure) · `999px` the nav CTA pill.
+Radii ladder, with a representative use for each rung (not an exhaustive list of
+consumers): `2px` focus ring · `8px` buttons, small flags, the nav toggle · `10px`
+proof lists · `12px` panels, lab cards, figures, datasheet, capread · `14px` the
+largest frames (worklist, capability figure, diagram panel) · `999px` the nav CTA
+pill. Circles (`50%`) on dots and blips sit outside the ladder.
 
 ## Components
 
-Shared across routes — treat these as the inventory and extend rather than fork.
+Components used on **two or more routes** — treat these as the shared inventory and
+extend rather than fork.
 
 | Component | Surface | Where it appears | Notes |
 | --- | --- | --- | --- |
 | `.shell` | both | every route | The only container. `max-width: 78rem`, fluid inline padding. |
-| `.topbar` / `.nav` | console | every route | Sticky blurred bar. Collapses to a full-width drawer below 720px via `.nav-toggle` + `data-open`. `aria-current="page"` paints the active link `--signal`. |
-| `.section-head` | both | home sections, `/work/`, `/lab/`, `/automancer/`, `/contact/` | Baseline-aligned row: mono `.ref` + title + optional right-aligned `p`. Heading is `h1` or `h2` per the contract above. |
-| `.casehead` | essay | case studies, notes, `/about/` | Detail-page counterpart: `.ref`, title, `.kick` lede, hairline rule below. |
+| `.section` | both | every route | The vertical rhythm unit: `padding-block: clamp(3.5rem, 8vh, 6rem)`. Pairs with `.console` / `.essay`. |
+| `.topbar` / `.nav` | console | every route | Sticky blurred bar. Collapses to a full-width drawer below 720px via `.nav-toggle` + `data-open` (**requires JS**). `aria-current="page"` paints the active link `--signal`. |
+| `.foot` | console | every route | Global footer, inside `base.njk`. Two-column grid collapsing at 620px; `.fnav` is the no-JS nav fallback. |
+| `.hero` | console | `/`, `/404` | Full-bleed intro band. `.hero h1` is the only `--step-4` consumer; carries `.reg` marks. Two-column on `/`, collapsing at 860px. |
+| `.section-head` | console | home sections, `/work/`, `/lab/`, `/automancer/`, `/contact/`, `/about/` | Baseline-aligned row: mono `.ref` + title + optional right-aligned `p`. Heading is `h1` or `h2` per the contract above. Essay-surface styling exists (`styles.css:158-160`) but no template currently uses it there. |
+| `.casehead` | essay | case studies, notes (index and detail), `/about/` | Detail-page counterpart: `.ref`, title, `.kick` lede, hairline rule below. |
 | `.workcard` in `.worklist` | console | home, `/work/` | Three-column grid (ref · title+kick · go arrow) inside a 1px-gap list that fakes dividers via `background: var(--line-dark)`. Collapses to one column below 620px and drops the arrow. |
 | `.lab-card` in `.lab-grid` | console | home, `/lab/` | `auto-fit minmax(15rem, 1fr)`. Hover lifts 2px and borders in `--signal`. |
-| `.panel` / `.readout` | console | home hero | The live status panel. `dt` is mono `--signal`, hairline between rows. |
-| `.capfig` + `.capread` | console | home | Interactive capability map. Nodes are focusable, respond to hover/focus/click/Enter/Space, and write into `[data-bind]` targets. |
-| `.datasheet` | essay | case studies | Sticky `top: 4.5rem` sidebar `dl`. |
-| `.prose` | essay | case studies, notes, about | Long-form container, `70ch`. |
-| `.figure` / `.figcap` | essay | case studies | Inline SVG artefacts on `--paper-sink`. |
+| `.amancer` + `.diagram-panel` | console | home, `/automancer/` | Two-column copy + diagram block. The diagram is the shared partial `partials/diagram-workflow.njk`. |
+| `.contact-cta` / `.email-big` | console | home, `/contact/` | The primary CTA. `.email-big` is mono and display-scale, underlined in `--signal`; it is one of the sizes outside the type scale. |
 | `.milestone` in `.arc-line` | console | home, `/about/` | Timeline. `.key` milestones get a signal dot with glow. |
-| `.btn` (`-primary` / `-ghost`) | both | throughout | `.essay .btn-ghost` restates the ghost variant in ink — the only surface-specific override. |
-| `.label` / `.ref` / `.mono` | both | throughout | Mono metadata primitives. |
-| `.flag` | essay | case studies | Dashed-border callout for content pending approval. |
-| `.reg` | console | hero | Corner registration marks, `.tl/.tr/.bl/.br`. |
+| `.proof` | console | home, `/about/` | Bordered `→` list on `--graphite-800`; the 10px radius rung. |
+| `.datasheet` | essay | case studies, `/about/` | Sticky `top: 4.5rem` sidebar `dl`. |
+| `.prose` | essay | case studies, notes, `/about/` | Long-form container, `70ch`. |
+| `.casenav` | essay | case-study and note detail pages | Prev/next row under the article, mono in `--signal-deep`. |
+| `.btn` (`-primary` / `-ghost`) | both | throughout | `.essay .btn-ghost` restates the ghost variant in ink — one of a handful of `.essay`-scoped overrides (see below). |
+| `.ref` | both | every content route | Mono section/page reference. `--signal` on console, `--signal-deep` on essay. |
+
+Single-route components are in the stylesheet but deliberately not listed here:
+`.capfig` / `.capread` (the homepage capability map), `.panel` / `.readout` (the
+homepage status panel), `.casegrid` (case detail), `.about-grid` (`/about/`),
+`.notes-list` / `.note-item` (notes index). Two more are worth knowing about:
+
+- `.label` / `.mono` — mono metadata primitives, currently used only on `/` and
+  `/404`. `.essay .label` (`styles.css:198`) is styled but unused.
+- `.reg` — corner registration marks. Not hero-only: the top console section of
+  `/work/`, `/lab/`, `/automancer/` and `/contact/` carries them too. `/` , `/404`,
+  `/automancer/` and `/contact/` use all four (`.tl/.tr/.bl/.br`); `/work/` and
+  `/lab/` use `.tl`/`.tr` only.
+- `.figure` / `.figcap` — inline SVG artefacts on `--paper-sink`, case studies.
+  Note the caption class is currently unreachable in the markup; tracked in
+  AUT-3986, do not "fix" it here.
+- `.flag` — dashed callout for content pending approval. Styled at `styles.css:213`
+  but **used by no template today**; it is reserved, not shipped.
+
+`.essay`-scoped overrides are a small, closed set — `.essay .btn-ghost` (+ hover),
+`.essay .section-head .ref`, `.essay .section-head h1, h2`, `.essay .section-head p`,
+`.essay .label`. Prefer widening a base rule to adding a seventh.
 
 Accessibility baked into the components: a `.skip` link precedes the header,
 `:focus-visible` is a `2px --signal` outline at `3px` offset on every focusable
-element, the nav toggle maintains `aria-expanded`, and each `<article>` is labelled
-by its own title id (`aria-labelledby="case-title"` / `"note-title"`).
+element, and the nav toggle maintains `aria-expanded`. Each **detail-page**
+`<article>` is labelled by its own title id (`case.njk` → `aria-labelledby="case-title"`,
+`note.njk` → `"note-title"`); the `.note-item` articles on the notes index are not
+labelled this way.
 
 ## Do's and Don'ts
 
 **Do**
 
-- Pick one surface per route and commit. Console or essay, never blended.
+- Pick one surface per **section** and commit to it. A route may stack sections of
+  both surfaces — `/about/` does — but never blend them inside one section.
 - Use the six-step type scale and the `:root` tokens. If a value is not in the
   scale, the answer is usually the nearest step, not a new value.
+- Check that a token is a real custom property before writing `var(--x)` — radius,
+  spacing and `on-signal` are literals, not variables.
 - Reserve mono for metadata. Refs, keys, eras, captions, labels — never body copy.
 - Follow the heading-hierarchy contract when adding a route, and widen an existing
   selector (`.foo h2, .foo h3`) rather than forking a component to change its level.
-- Keep content visible without JS. Add `data-cal` for the reveal; never rely on it.
-- Honour `prefers-reduced-motion` for anything new that moves.
+- Keep content reachable without JS. Add `data-cal` for the reveal; never rely on it.
+- Honour `prefers-reduced-motion` for anything new that moves, and use `--ease`.
 - Cap the measure on new text blocks — an uncapped paragraph reads as a bug here.
 
 **Don't**
 
 - Don't add a second accent colour. `--signal` / `--signal-deep` is the whole
-  system; `--trace` belongs to the capability map alone.
+  system; amber (`--trace`) belongs to connection lines alone.
 - Don't add drop shadows to cards, panels, or modals. Use a border or a surface step.
 - Don't introduce a CSS framework, utility classes, a build step for styles, or a
   second stylesheet. One hand-written file is a settled decision.
 - Don't load fonts from a CDN. Geist and Geist Mono are self-hosted deliberately.
-- Don't use pure black or pure neutral grey. Every neutral carries warm hue 60–75.
+- Don't use pure black. The greys carry warm hue 60–75 — the one exception is
+  `--line-dark`, a white alpha hairline (`oklch(1 0 0 / 0.12)`) that takes its colour
+  from whatever sits beneath it.
 - Don't hard-code hex where a token exists, and don't convert the OKLCH tokens to hex.
 - Don't skip a heading level to get a size — set the level semantically and let the
   widened selector handle the size.
