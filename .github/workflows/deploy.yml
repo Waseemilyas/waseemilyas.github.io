@@ -1,9 +1,13 @@
 # Build the Eleventy site and deploy it to GitHub Pages.
-# NOTE: deployment is gated. This workflow only runs on demand (workflow_dispatch)
-# until the board/Waseem approve replacing the live site (WI-PF1, AUT-414).
+# Deployment is UNGATED: the site is public by design and agent-maintained, so a
+# push to main publishes (Waseem, 2026-07-29, AUT-3857). The pre-launch
+# manual-only gate (AUT-414) retired when the site went live (AUT-416).
+# The content rules that replace that gate live in AGENTS.md.
 name: Build & deploy site
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
