@@ -9,14 +9,14 @@ permalink: "/work/"
   <div class="shell">
     <div class="section-head" data-cal>
       <span class="ref">WORK</span>
-      <h2>Selected work</h2>
+      <h1>Selected work</h1>
       <p>A few projects where the mix mattered more than any single skill. Some are public. Some are anonymised to protect client privacy.</p>
     </div>
     <div class="worklist" data-cal>
       {%- for cs in collections.casestudies %}
       <a class="workcard" href="{{ cs.url }}">
         <span class="ref">{{ cs.data.ref }}</span>
-        <span><h3>{{ cs.data.title }}</h3><span class="kick">{{ cs.data.kicker }}</span></span>
+        <span><h2>{{ cs.data.title }}</h2><span class="kick">{{ cs.data.kicker }}</span></span>
         <span class="go">Read →</span>
       </a>
       {%- endfor %}
