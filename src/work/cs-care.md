@@ -29,7 +29,7 @@ datasheet:
       <g><rect x="500" y="88" width="118" height="36" rx="7" fill="oklch(0.66 0.185 42 / .12)" stroke="oklch(0.56 0.17 40)"/><text x="559" y="110" text-anchor="middle" fill="oklch(0.40 0.13 40)">AUTOMATION</text></g>
     </g>
   </svg>
-  <figcap>FIG.1 — Abstract delivery map. Generated, no client or care-recipient data.</figcap>
+  <figcaption>FIG.1 — Abstract delivery map. Generated, no client or care-recipient data.</figcaption>
 </figure>
 
 **Role.** I designed and built the digital and operational systems involved, working close to how the team actually delivers care day to day.

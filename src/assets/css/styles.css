@@ -213,7 +213,7 @@ h1, h2, h3 { font-weight: 700; line-height: 1.04; letter-spacing: -0.03em; text-
 .prose p.flag, .flag { border: 1px dashed var(--signal-deep); background: oklch(0.66 0.185 42 / .06); padding: .8rem .95rem; border-radius: 8px; color: var(--ink-mute); font-size: var(--step--1); }
 .figure { margin: 1.6rem 0; border: 1px solid var(--line-light); border-radius: 12px; background: var(--paper-sink); padding: .4rem; }
 .figure svg { display: block; width: 100%; height: auto; }
-.figcap { font-family: var(--mono); font-size: var(--step--1); color: var(--ink-mute); padding: .6rem .8rem 0; letter-spacing: .02em; }
+.figure figcaption { font-family: var(--mono); font-size: var(--step--1); color: var(--ink-mute); padding: .6rem .8rem 0; letter-spacing: .02em; }
 .datasheet { border: 1px solid var(--line-light); border-radius: 12px; background: var(--paper-sink); position: sticky; top: 4.5rem; }
 .datasheet .dh { font-family: var(--mono); font-size: var(--step--1); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-mute); padding: .9rem 1.1rem; border-bottom: 1px solid var(--line-light); }
 .datasheet dl { display: grid; grid-template-columns: 1fr; padding: .4rem 1.1rem 1.1rem; }
