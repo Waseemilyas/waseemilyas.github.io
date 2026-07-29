@@ -1,10 +1,13 @@
 ---
 name: waseemilyas.uk
 description: Two-surface static portfolio — warm-graphite console meets near-white paper essay.
-# Every key below maps 1:1 to a `--name` custom property on `:root` in
-# src/assets/css/styles.css. `colors:` and the `rounded:`/`spacing:` groups are
-# `--<key>`, `--rounded-<key>` and `--space-<key>` respectively; the type steps
-# are `--step--1` … `--step-4`. `var()` resolves for all of them.
+# The `colors:`, `rounded:` and `spacing:` groups map 1:1 to custom properties on
+# `:root` in src/assets/css/styles.css — `--<key>`, `--rounded-<key>` and
+# `--space-<key>` respectively — and `var()` resolves for every one of them.
+# `typography:` and `components:` do not: they describe the type scale and
+# component intent, and have no custom property to reach for. (The six `fontSize`
+# clamps repeat the values of `--step--1` … `--step-4`, which the stylesheet
+# declares; there is no `steps:` group here.)
 colors:
   graphite-900: "oklch(0.17 0.008 65)"
   graphite-800: "oklch(0.21 0.009 65)"
@@ -190,12 +193,15 @@ Two deliberate limits on that claim:
   (`styles.css`), which is how `diagram-workflow.njk` reaches its tokens: `--trace`
   at 55% alpha via `color-mix(in oklch, var(--trace) 55%, transparent)`, plus
   `--signal` (`.wf-arrowhead`, `.wf-node-live`), `--graphite-700` / `--bone`
-  (`.wf-node`) and `--line-dark` (`.wf-ticks`). Two values in that partial stay
-  literal because no token matches them: the node hairline `oklch(1 0 0 / 0.18)`
-  (`--line-dark` is 12%, and alpha cannot be scaled *up* with `color-mix`) and the
-  live node's label `oklch(0.80 0.13 50)`. Both remain presentation attributes, so
-  the live node deliberately does **not** carry `.wf-node` — any CSS rule would beat
-  that attribute.
+  (`.wf-node`) and `--line-dark` (`.wf-ticks`). Two colour values in that partial
+  stay literal because no token matches them: the node hairline
+  `oklch(1 0 0 / 0.18)` (`--line-dark` is 12%, and alpha cannot be scaled *up*
+  with `color-mix`) and the live node's label `oklch(0.80 0.13 50)`. Both stay as
+  presentation attributes. The hairline survives on `.wf-node` rects because
+  `.wf-node rect` sets only `fill`; the label does not, which is why the live node
+  deliberately does **not** carry `.wf-node` — `.wf-node text` would beat that
+  attribute. (Family, size and tracking on the label group are literal too, for
+  the same SVG reason.)
 
 `--ease` (`cubic-bezier(0.16, 1, 0.3, 1)`) is the single easing curve: it drives
 every transition and all three keyframe animations. New motion uses it.
@@ -301,9 +307,10 @@ Sizes outside the scale are all **inside SVG**, plus one display element:
 element; the capability-map labels are fixed at `11px` (`.node text`) and `10px`
 (`.hub text`); and every inline diagram label is `12px`
 (the `font-size="12"` on the node group in `partials/diagram-workflow.njk`, and the
-`figure` SVG in each of the three case studies). The SVG sizes are fixed because they scale with the viewBox, not the
-page. Outside SVG, use a step — if a value is not in the scale, the answer is
-almost always the nearest step rather than a new one.
+`figure` SVG in each of the three case studies). The SVG sizes are fixed because
+they scale with the viewBox, not the page. Outside SVG, use a step — if a value
+is not in the scale, the answer is almost always the nearest step rather than a
+new one.
 
 - `--sans` (Geist) sets everything structural. `--mono` (Geist Mono) is for
   **metadata rather than prose** — refs, keys, eyebrows, datasheet terms, timeline
@@ -352,8 +359,10 @@ heading level; widen the selector instead.
 
 The surface is a property of the **section**, not the route. `<section class="console">`
 and `<section class="essay">` may both appear in one document, and one route does
-exactly that: `/about/` opens with an essay `.casehead` (`src/about.njk:7`) and then
-stacks a console "career arc" section (`:38`). That is deliberate — do not "fix" it.
+exactly that: `/about/` opens with an essay `.casehead` (the first
+`<section class="essay">` in `src/about.njk`) and then stacks a console "career
+arc" section (`<section class="console">`, same file). That is deliberate — do
+not "fix" it.
 
 Two pieces of **console chrome are global** and appear on every route regardless of
 its content surface: the sticky `.topbar` and the `.foot` footer
@@ -404,7 +413,7 @@ extend rather than fork.
 | `.foot` | console | every route | Global footer, inside `base.njk`. Two-column grid collapsing at 620px; `.fnav` is the no-JS nav fallback. |
 | `.hero` | console | `/`, `/404` | Full-bleed intro band. `.hero h1` is the only `--step-4` consumer; carries `.reg` marks. Two-column on `/`, collapsing at 860px. |
 | `.section-head` | console | home sections, `/work/`, `/lab/`, `/automancer/`, `/contact/`, `/about/` | Baseline-aligned row: mono `.ref` + title + optional right-aligned `p`. Heading is `h1` or `h2` per the contract above. Essay-surface styling exists (the `.essay .section-head` rules, `styles.css`) but no template currently uses it there. |
-| `.casehead` | essay | case studies, notes (index and detail), `/about/` | Detail-page counterpart: `.ref`, title, optional `.kick` lede, hairline rule below. `/about/` carries `.ref` + title only — its lede is a separate `.lede-essay` *outside* the casehead (`src/about.njk:14`). |
+| `.casehead` | essay | case studies, notes (index and detail), `/about/` | Detail-page counterpart: `.ref`, title, optional `.kick` lede, hairline rule below. `/about/` carries `.ref` + title only — its lede is a separate `.lede-essay` paragraph that follows the closing `</div>` of the casehead (`src/about.njk`). |
 | `.workcard` in `.worklist` | console | home, `/work/` | Three-column grid (ref · title+kick · go arrow) inside a 1px-gap list that fakes dividers via `background: var(--line-dark)`. Collapses to one column below 620px and drops the arrow. |
 | `.lab-card` in `.lab-grid` | console | home, `/lab/` | `auto-fit minmax(15rem, 1fr)`. Hover lifts 2px and borders in `--signal`. |
 | `.amancer` + `.diagram-panel` | console | home, `/automancer/` | Two-column copy + diagram block. The diagram is the shared partial `partials/diagram-workflow.njk`. |
