@@ -99,5 +99,13 @@ design decision.
 
 1. `AGENTS.md` — this file. Guardrails. Binding.
 2. `README.md` — stack, build, structure.
-3. The WI-PF1 project record in Paperclip — internal spec, copy deck, art
+3. `docs/DESIGN.md` — the design system: tokens, type scale, component
+   inventory, and the heading-hierarchy contract. Read before any UI change.
+4. `docs/PRODUCT.md` — register, audience, and design principles. Restates only
+   what is already published on the live site; section 1 applies to it in full.
+5. The WI-PF1 project record in Paperclip — internal spec, copy deck, art
    direction, hygiene decisions, and live object ids.
+
+`docs/DESIGN.md` and `docs/PRODUCT.md` are the public, design-only design-system
+context. Root `/DESIGN.md` and `/PRODUCT.md` stay gitignored for internal
+planning material and must not be un-ignored.
