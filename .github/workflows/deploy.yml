@@ -27,7 +27,10 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # pnpm 11 (pinned in package.json packageManager) needs Node >= 22.13.
+          # Node 20 here silently broke the deploy from the pnpm migration until
+          # push-triggered deploys surfaced it (AUT-3857).
+          node-version: 22
           cache: pnpm
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
