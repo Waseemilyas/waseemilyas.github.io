@@ -236,13 +236,22 @@ There is **one accent colour**. The surface pairing is `--signal` on console,
 `--signal-deep` on essay (see `.essay .section-head .ref`, `.prose a`, `.casenav a`).
 Two deliberate exceptions are global rather than per-surface and use `--signal` on
 both: the `:focus-visible` ring (`styles.css:78`) and the `.skip` link (`:81`). The
-essay-only `.flag` is also tinted with raw `--signal` at 6% (`:213`).
+essay-only `.flag` is tinted with the signal hue at 6% (`:213`) — but as the
+hard-coded literal `oklch(0.66 0.185 42 / .06)`, **not** `var(--signal)`. It is the
+third colour literal in the stylesheet, alongside the two `on-signal` literals.
 
 `--trace` is amber and exists to distinguish an active *connection* from an active
-*node*. It is used in the capability SVG (`src/index.njk`), and the same amber is
+*node*. It is used in the capability SVG (`src/index.njk`), and the same hue is
 hard-coded as the resting connector stroke in `partials/diagram-workflow.njk:9`,
-which renders on `/` and `/automancer/` — that literal should become `var(--trace)`
-if the partial is touched. Do not promote amber to a second brand colour.
+which renders on `/` and `/automancer/`.
+
+**That literal is not the token value.** It is `oklch(0.80 0.130 78 / .55)` — the
+`--trace` hue at **55% alpha** — whereas `--trace` (`styles.css:41`) is fully
+opaque. `var(--trace)` is therefore *not* a drop-in replacement: swapping it in
+darkens the resting connectors on both routes. If the partial is ever tokenised,
+the equivalent is `color-mix(in oklch, var(--trace) 55%, transparent)`.
+
+Do not promote amber to a second brand colour.
 
 Translucent lines are deliberately alpha-on-surface rather than solid greys, so a
 hairline stays correct if the surface beneath it changes.
@@ -260,16 +269,22 @@ Two families, one fluid scale, six steps.
 | `--step-3` | `2.1rem → 3.4rem` | Section titles, case-study titles |
 | `--step-4` | `2.7rem → 5.4rem` | Hero titles — `.hero h1`, on `/` and `/404` |
 
-Three sizes sit **outside** the scale, deliberately: `.email-big` has its own
-clamp (`styles.css:265`) because the address is a display element, and the
-capability-map SVG labels are fixed at `11px` (`.node text`) and `10px`
-(`.hub text`) because they scale with the viewBox, not the page. Everything else
-uses a step — if a value is not in the scale, the answer is almost always the
-nearest step rather than a new one.
+Sizes outside the scale are all **inside SVG**, plus one display element:
+`.email-big` has its own clamp (`styles.css:265`) because the address is a display
+element; the capability-map labels are fixed at `11px` (`.node text`) and `10px`
+(`.hub text`); and every inline diagram label is `12px`
+(`partials/diagram-workflow.njk:16` and the `figure` SVG in each of the three case
+studies). The SVG sizes are fixed because they scale with the viewBox, not the
+page. Outside SVG, use a step — if a value is not in the scale, the answer is
+almost always the nearest step rather than a new one.
 
-- `--sans` (Geist) sets everything structural. `--mono` (Geist Mono) is reserved for
-  **metadata, not prose**: refs, keys, eyebrows, datasheet terms, timeline eras,
-  the email link, and `.label` (uppercase, `0.08em` tracking).
+- `--sans` (Geist) sets everything structural. `--mono` (Geist Mono) is for
+  **metadata rather than prose** — refs, keys, eyebrows, datasheet terms, timeline
+  eras, the email link, and `.label` (uppercase, `0.08em` tracking). Note the rule
+  is narrower than it sounds: mono also carries a few short UI affordances, among
+  them the `.workcard .go` arrow (`styles.css:192`), `.casenav` links (`:223`) and
+  the `.proof` bullet glyph (`:242`). There are 20 `var(--mono)` consumers in all;
+  the constraint that actually holds is **never body copy**.
 - Headings tighten as they grow: the global rule is `font-weight: 700`,
   `line-height: 1.04`, `letter-spacing: -0.03em`, `text-wrap: balance`; the hero
   goes further to `800` / `-0.038em`.
@@ -292,6 +307,11 @@ document has exactly one `<h1>` and skips no level.
 | **Essay/detail** (case studies, notes, `/about/`) | The `.casehead` title | `.prose h2`, or `.section-head h2` for a following section | `.prose h3`, `.milestone h3` |
 | **Notes index** | `.casehead` title ("Notes") | `.note-item` titles | — |
 | **Error route** (`/404.html`) | The `.hero` title | — | — |
+
+The two notes rows describe the content model, not current output: the only note is
+`draft: true` and drafts get `permalink: false`, so today `/notes/` builds the
+`.notes-empty` branch with a single `<h1>` and no `<h2>`, and no note-detail page is
+built at all. The rows become live when the first real note publishes.
 
 The rule that makes this work: **a card's heading level depends on its page, not on
 its class.** The same `.workcard` is an `<h3>` on the homepage (nested under a section
@@ -357,7 +377,7 @@ extend rather than fork.
 | `.foot` | console | every route | Global footer, inside `base.njk`. Two-column grid collapsing at 620px; `.fnav` is the no-JS nav fallback. |
 | `.hero` | console | `/`, `/404` | Full-bleed intro band. `.hero h1` is the only `--step-4` consumer; carries `.reg` marks. Two-column on `/`, collapsing at 860px. |
 | `.section-head` | console | home sections, `/work/`, `/lab/`, `/automancer/`, `/contact/`, `/about/` | Baseline-aligned row: mono `.ref` + title + optional right-aligned `p`. Heading is `h1` or `h2` per the contract above. Essay-surface styling exists (`styles.css:158-160`) but no template currently uses it there. |
-| `.casehead` | essay | case studies, notes (index and detail), `/about/` | Detail-page counterpart: `.ref`, title, `.kick` lede, hairline rule below. |
+| `.casehead` | essay | case studies, notes (index and detail), `/about/` | Detail-page counterpart: `.ref`, title, optional `.kick` lede, hairline rule below. `/about/` carries `.ref` + title only — its lede is a separate `.lede-essay` *outside* the casehead (`src/about.njk:14`). |
 | `.workcard` in `.worklist` | console | home, `/work/` | Three-column grid (ref · title+kick · go arrow) inside a 1px-gap list that fakes dividers via `background: var(--line-dark)`. Collapses to one column below 620px and drops the arrow. |
 | `.lab-card` in `.lab-grid` | console | home, `/lab/` | `auto-fit minmax(15rem, 1fr)`. Hover lifts 2px and borders in `--signal`. |
 | `.amancer` + `.diagram-panel` | console | home, `/automancer/` | Two-column copy + diagram block. The diagram is the shared partial `partials/diagram-workflow.njk`. |
@@ -366,8 +386,8 @@ extend rather than fork.
 | `.proof` | console | home, `/about/` | Bordered `→` list on `--graphite-800`; the 10px radius rung. |
 | `.datasheet` | essay | case studies, `/about/` | Sticky `top: 4.5rem` sidebar `dl`. |
 | `.prose` | essay | case studies, notes, `/about/` | Long-form container, `70ch`. |
-| `.casenav` | essay | case-study and note detail pages | Prev/next row under the article, mono in `--signal-deep`. |
-| `.btn` (`-primary` / `-ghost`) | both | throughout | `.essay .btn-ghost` restates the ghost variant in ink — one of a handful of `.essay`-scoped overrides (see below). |
+| `.casenav` | essay | case-study and note detail pages | Footer nav **inside** the `<article>`, not under it. A fixed pair — back-to-index link + `mailto` — **not** prev/next: no prev/next plumbing exists in `eleventy.config.js`. Mono in `--signal-deep`. |
+| `.btn` (`-primary` / `-ghost`) | console | `/`, `/404`, `/automancer/`, `/contact/` | Every button ships on console. `.essay .btn-ghost` (`styles.css:138-139`) restates the ghost variant in ink, but no essay template uses a button — reserved, not shipped. |
 | `.ref` | both | every content route | Mono section/page reference. `--signal` on console, `--signal-deep` on essay. |
 
 Single-route components are in the stylesheet but deliberately not listed here:
