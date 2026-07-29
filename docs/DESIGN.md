@@ -2,8 +2,9 @@
 name: waseemilyas.uk
 description: Two-surface static portfolio — warm-graphite console meets near-white paper essay.
 # Every key below maps 1:1 to a `--name` custom property on `:root` in
-# src/assets/css/styles.css, EXCEPT `on-signal` (see its note), and the whole of
-# the `rounded:` and `spacing:` groups (see their notes).
+# src/assets/css/styles.css. `colors:` and the `rounded:`/`spacing:` groups are
+# `--<key>`, `--rounded-<key>` and `--space-<key>` respectively; the type steps
+# are `--step--1` … `--step-4`. `var()` resolves for all of them.
 colors:
   graphite-900: "oklch(0.17 0.008 65)"
   graphite-800: "oklch(0.21 0.009 65)"
@@ -19,9 +20,7 @@ colors:
   signal: "oklch(0.66 0.185 42)"
   signal-deep: "oklch(0.56 0.170 40)"
   trace: "oklch(0.80 0.130 78)"
-  # NOT a custom property. Hard-coded at styles.css:81 (.skip) and :134
-  # (.btn-primary). `var(--on-signal)` does not resolve — write the literal, or
-  # tokenise it first.
+  # `--on-signal` — text on a `--signal` fill. Used by .skip and .btn-primary.
   on-signal: "oklch(0.16 0.02 40)"
 typography:
   display:
@@ -63,9 +62,7 @@ typography:
     fontWeight: 500
     lineHeight: 1.55
     letterSpacing: "0.08em"
-# Documented conventions, NOT custom properties. There is no `--rounded-*` or
-# `--space-*` on `:root` — every value below is a repeated literal at its use
-# site. Match the rung by hand; `var(--rounded-lg)` does not resolve.
+# `--rounded-<key>` on `:root`. Pick a rung, never a fresh number.
 rounded:
   xs: "2px"
   sm: "8px"
@@ -73,6 +70,8 @@ rounded:
   lg: "12px"
   xl: "14px"
   pill: "999px"
+# `--space-<key>` on `:root`. These are the *recurring* measures only — one-off
+# paddings and gaps stay literal rather than being forced onto a rung.
 spacing:
   section-block: "clamp(3.5rem, 8vh, 6rem)"
   shell-inline: "clamp(1.1rem, 4vw, 3rem)"
@@ -162,19 +161,33 @@ system.
 
 ### What is actually tokenised
 
-`:root` (`styles.css:24-55`) declares **24** custom properties and no others:
+`:root` (`styles.css:24-72`) declares **37** custom properties and no others:
 
-- 14 colours — the console, essay and signal tables below.
+- 15 colours — the console, essay and signal tables below, plus `--on-signal`.
 - 2 families — `--sans`, `--mono`.
 - 6 type steps — `--step--1` … `--step-4`.
+- 6 radius rungs — `--rounded-xs` … `--rounded-pill`.
+- 6 spacing measures — `--space-section-block` … `--space-head-below`.
 - `--ease` and `--maxw`.
 
-Everything else in the frontmatter is a **documented convention, not a `var()`**.
-There are no radius or spacing custom properties: all six `rounded` rungs and all
-six `spacing` values are repeated literals at each use site, and `on-signal` is a
-literal too. Reaching for `var(--rounded-lg)` or `var(--on-signal)` produces
-invalid CSS. Either write the literal and keep it consistent with the rung, or
-tokenise the group properly first — do not assume the property exists.
+Every key in the frontmatter resolves as a `var()`. Use the variable, not the
+literal: `border-radius: var(--rounded-lg)`, `color: var(--on-signal)`.
+
+Two deliberate limits on that claim:
+
+- **The spacing group covers recurring measures, not every gap.** One-off values
+  (`.hero`'s `clamp(3.5rem, 9vh, 6.5rem)` padding, `.about-grid`'s
+  `clamp(1.6rem, 4vw, 3.4rem)` gap, card paddings) stay literal on purpose —
+  they are not rungs, and tokenising them would imply a rhythm that is not there.
+  `--space-head-gap` / `--space-head-below` apply to heads (`.section-head`,
+  `.casehead`, `.about-grid`'s top margin); a `1rem` gap elsewhere is unrelated.
+- **`var()` does not resolve in SVG presentation attributes.** `fill="var(--x)"`
+  and `stroke="var(--x)"` silently fail in every browser. Inline SVG that needs a
+  token must be styled from CSS — see `.diagram-panel .wf-trace` (`styles.css`),
+  which is how `diagram-workflow.njk` gets `--trace` at 55% alpha via
+  `color-mix(in oklch, var(--trace) 55%, transparent)`. The rest of that partial's
+  colours are still literal duplicates of `--signal`, `--graphite-700` and
+  `--bone`; they need the same treatment.
 
 `--ease` (`cubic-bezier(0.16, 1, 0.3, 1)`) is the single easing curve: it drives
 every transition and all three keyframe animations. New motion uses it.
@@ -230,7 +243,7 @@ splitting the source of truth away from the CSS.
 | `--signal` | `oklch(0.66 0.185 42)` | The single accent — vermilion. Console, plus the global focus ring and skip link. |
 | `--signal-deep` | `oklch(0.56 0.170 40)` | The same accent on paper, darkened for contrast |
 | `--trace` | `oklch(0.80 0.130 78)` | Amber connection lines: active traces in the capability map |
-| *(literal)* `oklch(0.16 0.02 40)` | — | `on-signal` — text on a `--signal` fill. Not a custom property. |
+| `--on-signal` | `oklch(0.16 0.02 40)` | Text on a `--signal` fill: `.skip`, `.btn-primary` |
 
 There is **one accent colour**. The surface pairing is `--signal` on console,
 `--signal-deep` on essay (see `.essay .section-head .ref`, `.prose a`, `.casenav a`).
@@ -427,8 +440,10 @@ labelled this way.
   both surfaces — `/about/` does — but never blend them inside one section.
 - Use the six-step type scale and the `:root` tokens. If a value is not in the
   scale, the answer is usually the nearest step, not a new value.
-- Check that a token is a real custom property before writing `var(--x)` — radius,
-  spacing and `on-signal` are literals, not variables.
+- Reach for the token, not the number. Colour, radius and the recurring spacing
+  measures are all `var()`s; a new literal in the stylesheet should be a
+  deliberate one-off, not a rung you retyped. In inline SVG, style from CSS —
+  `var()` does not work in presentation attributes.
 - Reserve mono for metadata. Refs, keys, eras, captions, labels — never body copy.
 - Follow the heading-hierarchy contract when adding a route, and widen an existing
   selector (`.foo h2, .foo h3`) rather than forking a component to change its level.
