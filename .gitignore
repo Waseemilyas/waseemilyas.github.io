@@ -29,9 +29,18 @@ openclaw.json
 
 # Agent runtime state
 .omc/
+# Local agent settings carry internal paths and ids — never publish (AGENTS.md §1.3).
+.claude/
 
 # Internal WI-PF1 planning docs — kept OUT of this PUBLIC repo (privacy boundary).
 # Canonical record lives in the Paperclip AUT-412 plan document.
+#
+# These ROOT paths stay ignored. Do not un-ignore them (AGENTS.md §4).
+# The PUBLIC, design-only Impeccable context lives in docs/ instead:
+#   docs/DESIGN.md   — tokens, type scale, components, heading contract
+#   docs/PRODUCT.md  — register/audience, restated only from published site copy
+# Impeccable resolves the project root first and docs/ second, so a private
+# root DESIGN.md/PRODUCT.md dropped in locally still wins and stays unpublished.
 /DESIGN.md
 /PRODUCT.md
 /ops/
