@@ -30,7 +30,7 @@ datasheet:
       <g><rect x="500" y="88" width="120" height="36" rx="7" fill="oklch(0.66 0.185 42 / .12)" stroke="oklch(0.56 0.17 40)"/><text x="560" y="110" text-anchor="middle" fill="oklch(0.40 0.13 40)">SYSTEM</text></g>
     </g>
   </svg>
-  <figcap>FIG.1 — Abstract delivery model. Generated, no client data.</figcap>
+  <figcaption>FIG.1 — Abstract delivery model. Generated, no client data.</figcaption>
 </figure>
 
 **Role.** Founder and practitioner. I scope, design, and build the systems myself.
