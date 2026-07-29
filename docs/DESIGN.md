@@ -381,9 +381,10 @@ homepage status panel), `.casegrid` (case detail), `.about-grid` (`/about/`),
   `/work/`, `/lab/`, `/automancer/` and `/contact/` carries them too. `/` , `/404`,
   `/automancer/` and `/contact/` use all four (`.tl/.tr/.bl/.br`); `/work/` and
   `/lab/` use `.tl`/`.tr` only.
-- `.figure` / `.figcap` — inline SVG artefacts on `--paper-sink`, case studies.
-  Note the caption class is currently unreachable in the markup; tracked in
-  AUT-3986, do not "fix" it here.
+- `.figure` + `figcaption` — inline SVG artefacts on `--paper-sink`, case studies.
+  The caption is a real `<figcaption>` element styled by the descendant selector
+  `.figure figcaption` (`styles.css:216`) — there is no `.figcap` class. AUT-3986
+  removed it; do not reintroduce a caption class.
 - `.flag` — dashed callout for content pending approval. Styled at `styles.css:213`
   but **used by no template today**; it is reserved, not shipped.
 
