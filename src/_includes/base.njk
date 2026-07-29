@@ -43,6 +43,18 @@
 <link rel="preload" href="/assets/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/styles.css">
 
+{% if monitoring.sentryLoaderUrl %}
+<!-- Error monitoring is configured only in production builds via SENTRY_DSN. -->
+<script>
+  window.sentryOnLoad = function () {
+    Sentry.init({ dsn: {{ monitoring.sentryDsnJson | safe }} });
+    Sentry.setTag("site", "waseemilyas.uk");
+    Sentry.setTag("deployment", "github-pages");
+  };
+</script>
+<script src="{{ monitoring.sentryLoaderUrl }}" crossorigin="anonymous" data-lazy="no"></script>
+{% endif %}
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
