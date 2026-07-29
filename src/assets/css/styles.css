@@ -266,8 +266,17 @@ h1, h2, h3 { font-weight: 700; line-height: 1.04; letter-spacing: -0.03em; text-
 .amancer .actions { margin-top: 1.6rem; display: flex; gap: .9rem; flex-wrap: wrap; }
 .diagram-panel { border: 1px solid var(--line-dark); border-radius: var(--rounded-xl); background: radial-gradient(120% 120% at 20% 10%, var(--graphite-800), var(--graphite-900)); padding: .6rem; }
 .diagram-panel svg { display: block; width: 100%; height: auto; }
-/* var() does not resolve in SVG presentation attributes — style the traces here */
+/* var() does not resolve in SVG presentation attributes — style the diagram here.
+   Two values stay literal in the partial: the node hairline (white at 18%, no token
+   matches — --line-dark is 12%) and the live node's label (oklch(0.80 0.13 50)). */
 .diagram-panel .wf-trace { stroke: color-mix(in oklch, var(--trace) 55%, transparent); }
+.diagram-panel .wf-arrowhead { fill: var(--signal); }
+.diagram-panel .wf-node rect { fill: var(--graphite-700); }
+.diagram-panel .wf-node text { fill: var(--bone); }
+/* the live node is deliberately NOT .wf-node — its label keeps a literal fill, and any
+   CSS rule would beat that presentation attribute */
+.diagram-panel .wf-node-live rect { fill: color-mix(in oklch, var(--signal) 16%, transparent); stroke: var(--signal); }
+.diagram-panel .wf-ticks { stroke: var(--line-dark); }
 
 /* ---------- lab (console) ---------- */
 .lab-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: 1.1rem; }

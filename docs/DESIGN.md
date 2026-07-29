@@ -170,8 +170,11 @@ system.
 - 6 spacing measures — `--space-section-block` … `--space-head-below`.
 - `--ease` and `--maxw`.
 
-Every key in the frontmatter resolves as a `var()`. Use the variable, not the
-literal: `border-radius: var(--rounded-lg)`, `color: var(--on-signal)`.
+Every key in the colour, radius and spacing groups — and every `--step-*` — resolves
+as a `var()`. Use the variable, not the literal: `border-radius: var(--rounded-lg)`,
+`color: var(--on-signal)`. (The `typography` sub-keys — `fontFamily`, `fontSize`,
+`fontWeight`, `lineHeight`, `letterSpacing` — describe the scale; they are not
+custom properties and there is no `var()` to reach for.)
 
 Two deliberate limits on that claim:
 
@@ -183,11 +186,16 @@ Two deliberate limits on that claim:
   `.casehead`, `.about-grid`'s top margin); a `1rem` gap elsewhere is unrelated.
 - **`var()` does not resolve in SVG presentation attributes.** `fill="var(--x)"`
   and `stroke="var(--x)"` silently fail in every browser. Inline SVG that needs a
-  token must be styled from CSS — see `.diagram-panel .wf-trace` (`styles.css`),
-  which is how `diagram-workflow.njk` gets `--trace` at 55% alpha via
-  `color-mix(in oklch, var(--trace) 55%, transparent)`. The rest of that partial's
-  colours are still literal duplicates of `--signal`, `--graphite-700` and
-  `--bone`; they need the same treatment.
+  token must be styled from CSS — see the `.diagram-panel .wf-*` rules
+  (`styles.css`), which is how `diagram-workflow.njk` reaches its tokens: `--trace`
+  at 55% alpha via `color-mix(in oklch, var(--trace) 55%, transparent)`, plus
+  `--signal` (`.wf-arrowhead`, `.wf-node-live`), `--graphite-700` / `--bone`
+  (`.wf-node`) and `--line-dark` (`.wf-ticks`). Two values in that partial stay
+  literal because no token matches them: the node hairline `oklch(1 0 0 / 0.18)`
+  (`--line-dark` is 12%, and alpha cannot be scaled *up* with `color-mix`) and the
+  live node's label `oklch(0.80 0.13 50)`. Both remain presentation attributes, so
+  the live node deliberately does **not** carry `.wf-node` — any CSS rule would beat
+  that attribute.
 
 `--ease` (`cubic-bezier(0.16, 1, 0.3, 1)`) is the single easing curve: it drives
 every transition and all three keyframe animations. New motion uses it.
@@ -253,7 +261,9 @@ both: the `:focus-visible` ring and the `.skip` link (both `styles.css`). The
 essay-only `.flag` is tinted with the signal hue at 6% (`.prose p.flag, .flag`,
 `styles.css`) — but as the hard-coded literal `oklch(0.66 0.185 42 / .06)`,
 **not** `var(--signal)`. Since AUT-3993 tokenised both `on-signal` literals, it is
-the **only** colour literal left in the stylesheet outside `:root`.
+the **only** colour literal left in the stylesheet outside `:root`, discounting the
+two `#000` mask-gradient stops on `.console::before` (`-webkit-mask-image` /
+`mask-image`), which are alpha stops rather than design colours.
 
 `--trace` is amber and exists to distinguish an active *connection* from an active
 *node*. It is used in the capability SVG (`src/index.njk`), and it also strokes the
@@ -290,8 +300,8 @@ Sizes outside the scale are all **inside SVG**, plus one display element:
 `.email-big` has its own clamp (`styles.css`) because the address is a display
 element; the capability-map labels are fixed at `11px` (`.node text`) and `10px`
 (`.hub text`); and every inline diagram label is `12px`
-(`partials/diagram-workflow.njk:16` and the `figure` SVG in each of the three case
-studies). The SVG sizes are fixed because they scale with the viewBox, not the
+(the `font-size="12"` on the node group in `partials/diagram-workflow.njk`, and the
+`figure` SVG in each of the three case studies). The SVG sizes are fixed because they scale with the viewBox, not the
 page. Outside SVG, use a step — if a value is not in the scale, the answer is
 almost always the nearest step rather than a new one.
 
