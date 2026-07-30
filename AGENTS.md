@@ -41,14 +41,15 @@ it into this repo.
    WI-PF1 project for Waseem to rule on. Silence is always the safe default and
    is never a failure.
 
-### Pre-existing content is frozen
+### Pre-existing content is grandfathered
 
 Some published content predates these guardrails and shipped under a QA privacy
-review and board release approval in June 2026. It is under board review as of
-2026-07-29 (AUT-3857). Until Waseem rules: **do not remove it, do not rewrite
-it, and do not extend its pattern to anything new.** New and changed content
-follows section 1 with no exceptions. The specifics are recorded in Paperclip,
-not here.
+review and board release approval in June 2026. It has been ruled on and it
+stays: **do not remove it and do not rewrite it.** This is a closed carve-out
+for specific existing content, not a precedent — **do not extend its pattern to
+anything new.** New and changed content follows section 1 with no exceptions,
+and `src/work/cs-care.md` remains the reference implementation. The specifics
+are recorded in Paperclip, not here.
 
 ## 2. What agents are here to do
 
