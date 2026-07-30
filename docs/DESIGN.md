@@ -266,7 +266,7 @@ Two deliberate exceptions are global rather than per-surface and use `--signal` 
 both: the `:focus-visible` ring and the `.skip` link (both `styles.css`). The
 essay-only `.flag` is tinted with the signal hue at 6% (`.prose p.flag, .flag`,
 `styles.css`) — but as the hard-coded literal `oklch(0.66 0.185 42 / .06)`,
-**not** `var(--signal)`. Since AUT-3993 tokenised both `on-signal` literals, it is
+**not** `var(--signal)`. Both `on-signal` literals are now tokenised, so it is
 the **only** colour literal left in the stylesheet outside `:root`, discounting the
 two `#000` mask-gradient stops on `.console::before` (`-webkit-mask-image` /
 `mask-image`), which are alpha stops rather than design colours.
@@ -276,8 +276,8 @@ two `#000` mask-gradient stops on `.console::before` (`-webkit-mask-image` /
 resting connectors in `partials/diagram-workflow.njk`, which renders on `/` and
 `/automancer/`.
 
-**The connector stroke carries 55% alpha, and that is load-bearing.** AUT-3993
-tokenised it: the partial's trace group is now `class="wf-trace"` with no `stroke`
+**The connector stroke carries 55% alpha, and that is load-bearing.** It is
+tokenised: the partial's trace group is `class="wf-trace"` with no `stroke`
 attribute, and the colour comes from `.diagram-panel .wf-trace` (`styles.css`) as
 `color-mix(in oklch, var(--trace) 55%, transparent)`. The `color-mix` is not
 decoration — `--trace` itself is fully opaque, so a bare `var(--trace)` would
@@ -330,7 +330,7 @@ new one.
 
 ### Heading hierarchy contract
 
-Fixed by the AUT-3958 accessibility fix and **binding on new routes**. Every rendered
+Fixed by an earlier accessibility pass and **binding on new routes**. Every rendered
 document has exactly one `<h1>` and skips no level.
 
 | Route archetype | `<h1>` | `<h2>` | `<h3>` |
@@ -439,8 +439,8 @@ homepage status panel), `.casegrid` (case detail), `.about-grid` (`/about/`),
   `/lab/` use `.tl`/`.tr` only.
 - `.figure` + `figcaption` — inline SVG artefacts on `--paper-sink`, case studies.
   The caption is a real `<figcaption>` element styled by the descendant selector
-  `.figure figcaption` (`styles.css`) — there is no `.figcap` class. AUT-3986
-  removed it; do not reintroduce a caption class.
+  `.figure figcaption` (`styles.css`) — there is no `.figcap` class. It was
+  removed deliberately; do not reintroduce a caption class.
 - `.flag` — dashed callout for content pending approval. Styled at
   `.prose p.flag, .flag` (`styles.css`) but **used by no template today**; it is
   reserved, not shipped.

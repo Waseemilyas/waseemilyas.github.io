@@ -33,7 +33,7 @@ openclaw.json
 .claude/
 
 # Internal WI-PF1 planning docs — kept OUT of this PUBLIC repo (privacy boundary).
-# Canonical record lives in the Paperclip AUT-412 plan document.
+# Canonical record lives in the WI-PF1 plan document in Paperclip.
 #
 # These ROOT paths stay ignored. Do not un-ignore them (AGENTS.md §4).
 # The PUBLIC, design-only Impeccable context lives in docs/ instead:

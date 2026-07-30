@@ -1,7 +1,7 @@
 # Build the Eleventy site and deploy it to GitHub Pages.
 # Deployment is UNGATED: the site is public by design and agent-maintained, so a
-# push to main publishes (Waseem, 2026-07-29, AUT-3857). The pre-launch
-# manual-only gate (AUT-414) retired when the site went live (AUT-416).
+# push to main publishes. The pre-launch manual-only gate retired when the site
+# went live.
 # The content rules that replace that gate live in AGENTS.md.
 name: Build & deploy site
 
@@ -29,7 +29,7 @@ jobs:
         with:
           # pnpm 11 (pinned in package.json packageManager) needs Node >= 22.13.
           # Node 20 here silently broke the deploy from the pnpm migration until
-          # push-triggered deploys surfaced it (AUT-3857).
+          # push-triggered deploys surfaced it.
           node-version: 22
           cache: pnpm
       - run: corepack enable

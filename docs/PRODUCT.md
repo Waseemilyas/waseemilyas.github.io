@@ -28,12 +28,12 @@ the work legible and the author credible, not on task throughput.
 
 ## Target Users
 
-Three audiences read this site, in rough order of commercial weight:
+Three audiences read this site, in the order the site prioritises them:
 
-1. **Small-business owners weighing up AI and automation.** Non-technical, sceptical
-   of hype, short on time. They want to know whether this is worth it for a business
-   their size, and what working with someone like this would actually be like. The
-   site's own framing of this conversation is the `/contact/` copy.
+1. **Small-business owners weighing up AI and automation.** They want to know whether
+   this is worth it for a business their size, and what working with someone like
+   this would actually be like. The site's own framing of this conversation is the
+   `/contact/` copy.
 2. **Prospective collaborators and peers** — people assessing depth and range across
    web, design, instructional design, and product delivery. They read `/work/` and
    `/about/` and want evidence, not adjectives.
@@ -52,7 +52,7 @@ a list of jobs, and make the current work — automation and practical digital s
 for small businesses — easy to understand and easy to start a conversation about.
 
 The job to be done, per audience: *"decide whether to email this person."* Every
-route funnels there, and the email address is treated as the primary call to action
+route leads there, and the email address is treated as the primary call to action
 throughout — including as a display-scale element on `/contact/`.
 
 Secondary purpose: be a working demonstration. A site that is fast, accessible,
