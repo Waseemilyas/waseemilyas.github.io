@@ -16,8 +16,8 @@ datasheet:
 ---
 **Context.** A UK domiciliary care provider needed better digital and operational systems to support the day-to-day work of delivering care. The brief was practical, not glamorous: less manual overhead, more reliable process.
 
-<figure class="figure" aria-label="Abstract diagram: intake feeding scheduling and records, with an automation layer reducing manual steps. No real data.">
-  <svg viewBox="0 0 640 230" role="img" aria-label="Abstract systems diagram, no client data">
+<figure class="figure">
+  <svg viewBox="0 0 640 230" role="img" aria-label="Abstract delivery map: intake feeding scheduling and records, with an automation layer reducing manual steps. Generated, no client data.">
     <defs><marker id="ar-care" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="oklch(0.56 0.17 40)"/></marker></defs>
     <g fill="none" stroke="oklch(0.22 0.01 60 / .35)" stroke-width="1.4" marker-end="url(#ar-care)">
       <path d="M120,60 L250,60"/><path d="M120,60 L250,150"/><path d="M370,60 L500,105"/><path d="M370,150 L500,125"/>

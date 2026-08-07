@@ -10,7 +10,7 @@ description: "Waseem Ilyas runs Automancer, a UK automation consultancy helping 
   <span class="reg bl" aria-hidden="true"></span><span class="reg br" aria-hidden="true"></span>
   <div class="shell">
     <div>
-      <p class="eyebrow" data-cal><span class="dot" aria-hidden="true"></span><span class="mono label" style="text-transform:none">WASEEM ILYAS / UK</span></p>
+      <p class="eyebrow" data-cal><span class="dot" aria-hidden="true"></span><span class="mono label">WASEEM ILYAS / UK</span></p>
       <h1 data-cal>Technologist who designs, builds, teaches, and <em>automates</em>.</h1>
       <p class="lede" data-cal>I run Automancer, a UK automation consultancy helping small businesses get real value from AI and practical digital systems. Before that: front-end web, instructional design, and fifteen-plus years of making digital things.</p>
       <div class="actions" data-cal>
@@ -21,8 +21,8 @@ description: "Waseem Ilyas runs Automancer, a UK automation consultancy helping 
 
     <aside class="panel" data-cal aria-label="Current status">
       <div class="phead">
-        <span class="mono label" style="color:var(--bone)">STATUS</span>
-        <span class="live mono" style="font-size:var(--step--1)"><span class="blip" aria-hidden="true"></span>LIVE</span>
+        <span class="mono label">STATUS</span>
+        <span class="live mono"><span class="blip" aria-hidden="true"></span>LIVE</span>
       </div>
       <dl>
         <div class="readout"><dt>NOW</dt><dd>Building Automancer · AI + automation for small businesses</dd></div>
@@ -88,7 +88,7 @@ description: "Waseem Ilyas runs Automancer, a UK automation consultancy helping 
       {%- for cs in collections.casestudies %}
       <a class="workcard" href="{{ cs.url }}">
         <span class="ref">{{ cs.data.ref }}</span>
-        <span><h3>{{ cs.data.title }}</h3><span class="kick">{{ cs.data.kicker }}</span></span>
+        <div><h3>{{ cs.data.title }}</h3><span class="kick">{{ cs.data.kicker }}</span></div>
         <span class="go">Read →</span>
       </a>
       {%- endfor %}
@@ -182,9 +182,9 @@ description: "Waseem Ilyas runs Automancer, a UK automation consultancy helping 
       <h2>Get in touch</h2>
     </div>
     <div class="contact-cta" data-cal>
-      <p class="contact-close" style="color:var(--bone-mute);max-width:52ch">The fastest way to reach me is email. If you run a small business and want to know whether AI or automation is worth it for you, that is exactly the conversation I like having.</p>
+      <p class="contact-close">The fastest way to reach me is email. If you run a small business and want to know whether AI or automation is worth it for you, that is exactly the conversation I like having.</p>
       <a class="email-big" href="mailto:{{ site.email }}">{{ site.email }}</a>
-      <p class="contact-close">No funnel, no pitch deck. Just send a note. · <a href="{{ site.github }}" rel="me noopener" style="color:var(--bone)">GitHub ↗</a></p>
+      <p class="contact-close">No funnel, no pitch deck. Just send a note. · <a href="{{ site.github }}" rel="me noopener">GitHub ↗</a></p>
     </div>
   </div>
 </section>

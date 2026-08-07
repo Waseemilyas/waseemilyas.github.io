@@ -16,7 +16,7 @@ permalink: "/work/"
       {%- for cs in collections.casestudies %}
       <a class="workcard" href="{{ cs.url }}">
         <span class="ref">{{ cs.data.ref }}</span>
-        <span><h2>{{ cs.data.title }}</h2><span class="kick">{{ cs.data.kicker }}</span></span>
+        <div><h2>{{ cs.data.title }}</h2><span class="kick">{{ cs.data.kicker }}</span></div>
         <span class="go">Read →</span>
       </a>
       {%- endfor %}

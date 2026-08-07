@@ -16,8 +16,8 @@ datasheet:
 ---
 **Context.** Small businesses keep hearing that AI will help them, with little practical guidance on where it actually fits.
 
-<figure class="figure" aria-label="Abstract automation workflow: input flows through scope and design into a running system. Generated, no client data.">
-  <svg viewBox="0 0 640 230" role="img" aria-label="Abstract automation diagram, no client data">
+<figure class="figure">
+  <svg viewBox="0 0 640 230" role="img" aria-label="Abstract delivery model: a problem and its data flow through scope and design into a running system. Generated, no client data.">
     <defs><marker id="ar-auto" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="oklch(0.56 0.17 40)"/></marker></defs>
     <g fill="none" stroke="oklch(0.22 0.01 60 / .35)" stroke-width="1.4" marker-end="url(#ar-auto)">
       <path d="M120,60 L250,60"/><path d="M370,60 L500,105"/><path d="M120,150 L250,150"/><path d="M370,150 L500,125"/>

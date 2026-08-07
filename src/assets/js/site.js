@@ -18,6 +18,13 @@
         toggle.setAttribute("aria-expanded", "false");
       }
     });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && nav.getAttribute("data-open") === "true") {
+        nav.setAttribute("data-open", "false");
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.focus();
+      }
+    });
   }
 
   /* ---- calibration reveal ---- */
