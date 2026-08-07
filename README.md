@@ -41,8 +41,11 @@ least one non-draft post is published.
 
 ## Deployment
 
-Deployment is gated. `.github/workflows/deploy.yml` builds `_site/` and publishes to
-GitHub Pages, but runs **on demand only** (`workflow_dispatch`) until the live-site
-replacement is approved. Set the Pages source to "GitHub Actions" at cut-over.
+Deployment is automatic. `.github/workflows/deploy.yml` builds `_site/` and publishes it
+to GitHub Pages on **every push to `main`**, and can also be started by hand
+(`workflow_dispatch`). The pre-launch manual-only gate was retired when the site went
+live, and the Pages source is already set to "GitHub Actions". Anything merged to `main`
+is public within a few minutes, so review content before pushing; the content rules that
+replaced the deployment gate are in `AGENTS.md`.
 
 Contact: `waseem@automancer.uk`
