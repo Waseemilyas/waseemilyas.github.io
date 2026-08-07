@@ -21,7 +21,7 @@ colors:
   ink-mute: "oklch(0.46 0.010 60)"
   line-light: "oklch(0.22 0.01 60 / 0.14)"
   signal: "oklch(0.66 0.185 42)"
-  signal-deep: "oklch(0.56 0.170 40)"
+  signal-deep: "oklch(0.53 0.170 40)"
   trace: "oklch(0.80 0.130 78)"
   # `--on-signal` — text on a `--signal` fill. Used by .skip and .btn-primary.
   on-signal: "oklch(0.16 0.02 40)"
@@ -256,7 +256,7 @@ splitting the source of truth away from the CSS.
 | Token | Value | Role |
 | --- | --- | --- |
 | `--signal` | `oklch(0.66 0.185 42)` | The single accent — vermilion. Console, plus the global focus ring and skip link. |
-| `--signal-deep` | `oklch(0.56 0.170 40)` | The same accent on paper, darkened for contrast |
+| `--signal-deep` | `oklch(0.53 0.170 40)` | The same accent on paper, darkened for contrast |
 | `--trace` | `oklch(0.80 0.130 78)` | Amber connection lines: active traces in the capability map |
 | `--on-signal` | `oklch(0.16 0.02 40)` | Text on a `--signal` fill: `.skip`, `.btn-primary` |
 
