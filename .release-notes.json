@@ -1,0 +1,9 @@
+{
+  "product": "Waseem's personal portfolio site",
+  "audience": "visitors to the site",
+  "tagPrefix": "v",
+  "changelog": "CHANGELOG.md",
+  "productionRef": "main",
+  "publishGithub": true,
+  "glossary": []
+}
