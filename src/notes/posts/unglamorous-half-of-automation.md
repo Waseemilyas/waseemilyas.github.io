@@ -40,9 +40,10 @@ is otherwise boring and deterministic, and when a wrong answer is visible and
 correctable rather than quietly authoritative. AI makes a good component and a
 poor foundation.
 
-**How you know it worked.** A system that landed well stops coming up. There is
-no adoption push to sustain, because the friction it removed has stopped being a
-topic, and people spend their time talking about the work rather than the tool.
+**How you know it worked.** A system that landed well stops coming up. The
+adoption push stops being necessary, because the friction it removed has stopped
+being a topic, and people spend their time talking about the work rather than
+the tool.
 That is a harder outcome to put in a headline than a percentage, and it is the
 one worth aiming at.
 
