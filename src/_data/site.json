@@ -18,6 +18,7 @@
     { "label": "Work", "url": "/work/" },
     { "label": "Automancer", "url": "/automancer/" },
     { "label": "Lab", "url": "/lab/" },
+    { "label": "Notes", "url": "/notes/" },
     { "label": "Contact", "url": "/contact/" }
   ]
 }

@@ -27,7 +27,7 @@ src/
   assets/       css/ js/ fonts/ img/
   static/       passthrough to site root (CNAME, robots, manifest, favicons)
   work/         case studies (one Markdown file each)
-  notes/        notes content model (route + feed; zero posts at launch)
+  notes/        notes route + feed, with the posts in notes/posts/
   *.njk         Home, About, Work, Automancer, Lab, Contact
 eleventy.config.js
 ```
@@ -36,8 +36,10 @@ eleventy.config.js
 
 Add a post by dropping a Markdown file in `src/notes/posts/` with front matter
 (`title`, `date`, `summary`, optional `tags`, `draft`). The `/notes/` route, layout, and
-Atom feed (`/notes/feed.xml`) already exist. Reveal **Notes** in the primary nav once at
-least one non-draft post is published.
+Atom feed (`/notes/feed.xml`) already exist, **Notes** is in the primary nav, and
+`summary` becomes the page's meta description unless the post sets `description`
+explicitly. A post with `draft: true` is never written to disk, so an unfinished note can
+sit in `posts/` safely.
 
 ## Deployment
 
