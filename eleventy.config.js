@@ -11,7 +11,7 @@ export default function (eleventyConfig) {
     api.getFilteredByTag("casestudy").sort((a, b) => (a.data.order || 0) - (b.data.order || 0))
   );
 
-  // Notes collection — published (non-draft) posts only. Empty at launch by design.
+  // Notes collection — published (non-draft) posts, newest first.
   eleventyConfig.addCollection("notes", (api) =>
     api
       .getFilteredByTag("note")
