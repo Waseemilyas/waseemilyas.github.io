@@ -342,10 +342,13 @@ document has exactly one `<h1>` and skips no level.
 | **Notes index** | `.casehead` title ("Notes") | `.note-item` titles | — |
 | **Error route** (`/404.html`) | The `.hero` title | — | — |
 
-The two notes rows describe the content model, not current output: the only note is
-`draft: true` and drafts get `permalink: false`, so today `/notes/` builds the
-`.notes-empty` branch with a single `<h1>` and no `<h2>`, and no note-detail page is
-built at all. The rows become live when the first real note publishes.
+Both notes rows are live output as of the first published note (August 2026): `/notes/`
+renders the `.notes-list` branch with an `<h2>` per `.note-item`, and each post builds a
+note-detail page. `.notes-empty` is the fallback branch and only renders if every note
+in `src/notes/posts/` is `draft: true` (drafts get `permalink: false`), so it is styled
+and remains in the template but is not currently rendered. A note-detail page carries
+a single `<h1>` and `.prose h2`/`h3` only if the post's Markdown uses them; the first
+note does not.
 
 The rule that makes this work: **a card's heading level depends on its page, not on
 its class.** The same `.workcard` is an `<h3>` on the homepage (nested under a section

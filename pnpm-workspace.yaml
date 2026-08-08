@@ -1,3 +1,9 @@
 overrides:
   # Remove once @11ty/eleventy declares @11ty/recursive-copy: ^5.
   '@11ty/recursive-copy': ^5.0.2
+  # Build-time advisories in Eleventy's transitive tree (GHSA-5p4m-2wfm-xmqj,
+  # GHSA-rgw5-rvv9-x895). Nothing here ships to the browser, but the patched
+  # versions are drop-in, so we take them. Remove once Eleventy ships them itself.
+  'js-yaml@^3': ^3.15.1
+  'js-yaml@^4': ^4.3.1
+  'brace-expansion@^5': ^5.0.9
