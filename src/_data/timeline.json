@@ -31,7 +31,13 @@
     {
       "era": "Automancer",
       "label": "AI artisan & automation practitioner",
-      "body": "AI artisan and automation practitioner. Turning new AI capabilities into real business workflows."
+      "body": "AI artisan and automation practitioner. Turning new AI capabilities into real business workflows.",
+      "proof": [
+        "Founded the practice and run it end to end: scoping, design, build, and support.",
+        "Delivered operational systems into day-to-day use for an anonymised UK care provider.",
+        "Designed and shipped public websites end to end — Automancer's own, and this one.",
+        "Run Automancer's own delivery on agentic and automated workflows."
+      ]
     }
   ]
 }
