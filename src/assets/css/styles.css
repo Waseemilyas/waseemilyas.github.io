@@ -299,7 +299,8 @@ h1, h2, h3 { font-weight: 700; line-height: 1.04; letter-spacing: -0.03em; text-
 .lab-card .tag { font-family: var(--mono); font-size: var(--step--1); color: var(--signal); letter-spacing: .05em; }
 .lab-card h2, .lab-card h3 { font-size: var(--step-1); letter-spacing: -0.02em; }
 .lab-card p { color: var(--bone-mute); font-size: var(--step-0); }
-.lab-card .ext { font-family: var(--mono); font-size: var(--step--1); color: var(--bone-mute); margin-top: auto; }
+/* Long URLs are single unbreakable tokens; without this they spill past the card. */
+.lab-card .ext { font-family: var(--mono); font-size: var(--step--1); color: var(--bone-mute); margin-top: auto; overflow-wrap: anywhere; }
 .lab-card:hover .ext { color: var(--bone); }
 
 /* ---------- contact ---------- */
