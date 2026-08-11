@@ -52,13 +52,14 @@ happens to the queue when the register changes, which fields have to agree, what
 the system does when a job is done by somebody it was not assigned to, and which
 of the eleven things that could happen next is the one this business actually
 does. Those joins are the shape of how a particular organisation works, and they
-are the reason two businesses in the same sector cannot share a system without
-one of them being annoyed by it.
+are the reason two businesses in the same sector rarely fit the same system
+without one of them having to give something up.
 
 **What is not on the list.** Dashboards, mostly — a dashboard is a view of the
 record and cannot be built before it. Also an app, usually. Also AI as a
-foundation rather than a component, which I have argued about at length
-elsewhere. These all arrive as requirements and turn out to be preferences.
+foundation rather than a component, which I have argued elsewhere. These often
+arrive stated as requirements and turn out, once the need behind them is
+tested, to be preferences.
 
 **Why buying does not delete the list.** A bought platform is not an alternative
 to the inventory. It is a decision about which parts you take as given and which

@@ -43,9 +43,9 @@ bought product does not have fields for. Framed as *build a system*, it looks
 expensive. Framed as *build the join*, it is often a few days of work and one
 small thing that does one job.
 
-**When to build the whole thing anyway.** Two cases. First, when the commodity
-option would impose a process you would spend years fighting — the fight costs
-more than the build. Second, when the ten percent turns out not to be ten
+**When to build the whole thing anyway.** Two cases. First, when the bought
+option in that second bucket would impose a process you would spend years
+fighting — the fight costs more than the build. Second, when the ten percent turns out not to be ten
 percent. If you find yourself designing around the bought product on every
 screen, the sorting was wrong; go back to the buckets.
 
