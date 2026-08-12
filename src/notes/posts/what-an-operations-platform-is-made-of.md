@@ -3,7 +3,6 @@ title: "What an operations platform is actually made of"
 date: 2026-08-11
 summary: "The phrase suggests something large and clever. The useful version is a short list of unremarkable parts, and the cost sits almost entirely in the joins between them."
 tags: ["note", "operations"]
-draft: true
 ---
 When someone asks for an operations platform, they usually have a picture in
 mind, and the picture is bigger than the thing they need. It has dashboards in
@@ -66,7 +65,8 @@ to the inventory. It is a decision about which parts you take as given and which
 joins you keep ownership of. That is a genuinely good trade in most cases, and
 it is worth making deliberately rather than discovering eight months in. Which
 part is worth building yourself, and which part you should simply pay for, is
-the more interesting question — and one for another note.
+the more interesting question — and one I have
+[taken up separately](/notes/buy-build-or-the-missing-ten-percent/).
 
 The practical version: before scoping a platform, write the six lines above for
 your own business, in your own nouns, on one page. Most of what looks like a
