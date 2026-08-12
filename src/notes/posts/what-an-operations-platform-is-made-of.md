@@ -3,6 +3,7 @@ title: "What an operations platform is actually made of"
 date: 2026-08-11
 summary: "The phrase suggests something large and clever. The useful version is a short list of unremarkable parts, and the cost sits almost entirely in the joins between them."
 tags: ["note", "operations"]
+draft: true
 ---
 When someone asks for an operations platform, they usually have a picture in
 mind, and the picture is bigger than the thing they need. It has dashboards in

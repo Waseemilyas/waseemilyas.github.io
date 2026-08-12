@@ -3,6 +3,7 @@ title: "Buy, build, or build the missing ten percent"
 date: 2026-08-12
 summary: "The standard advice is buy, don't build, and it is mostly right. It fails in a specific way for small businesses, and the fix is smaller than either option."
 tags: ["note", "operations"]
+draft: true
 ---
 The standard advice is buy, don't build. It is good advice and I give it more
 often than the opposite. Software you buy is maintained by someone else, tested
