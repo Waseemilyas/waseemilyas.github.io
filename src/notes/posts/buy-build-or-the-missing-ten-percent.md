@@ -1,9 +1,8 @@
 ---
 title: "Buy, build, or build the missing ten percent"
-date: 2026-08-11
+date: 2026-08-12
 summary: "The standard advice is buy, don't build, and it is mostly right. It fails in a specific way for small businesses, and the fix is smaller than either option."
 tags: ["note", "operations"]
-draft: true
 ---
 The standard advice is buy, don't build. It is good advice and I give it more
 often than the opposite. Software you buy is maintained by someone else, tested
@@ -41,7 +40,9 @@ schedule, reliably, with a record of what it did. It is the report that exists
 in nobody's export format. It is the form that has to ask the four questions the
 bought product does not have fields for. Framed as *build a system*, it looks
 expensive. Framed as *build the join*, it is often a few days of work and one
-small thing that does one job.
+small thing that does one job. (The [parts of an operations
+platform](/notes/what-an-operations-platform-is-made-of/) are mostly settled
+already; the joins are where the specific work always turns out to live.)
 
 **When to build the whole thing anyway.** Two cases. First, when the bought
 option in that second bucket would impose a process you would spend years
