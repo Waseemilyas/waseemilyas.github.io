@@ -36,6 +36,6 @@ datasheet:
 
 **Craft.** Practical software delivery, process design, and automation applied to a real operational setting, where reliability matters more than novelty.
 
-**Later phases.** What started as a discrete piece of work became a longer programme. Successive phases replaced paper routines with digital ones that hold up to scrutiny: training records captured and reported digitally rather than on sign-in sheets, requisitions tracked from request through approval to completion, and care records signed off electronically while staying auditable as needs change. Further work — a broader operations platform, learning delivery, and payroll capture — is still in progress, and is not claimed here as delivered.
+**Later phases.** What started as a discrete piece of work became a longer programme. Successive phases replaced paper routines with digital ones that hold up to scrutiny: training records, requisitions and approvals, and care-record sign-off that stays auditable as needs change. A broader operations platform, learning delivery, and payroll capture remain in progress.
 
 <p><strong>Outcome.</strong> Cleaner operational systems that reduced manual overhead for the team, delivered through practical software and automation. Qualitative by design — no client figures are published for this anonymised engagement.</p>
