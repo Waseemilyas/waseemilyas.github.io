@@ -11,7 +11,7 @@ datasheet:
   - { k: "SECTOR", v: "UK domiciliary care (client anonymised)" }
   - { k: "ROLE", v: "Designed &amp; built the operational systems" }
   - { k: "CRAFT", v: "Software delivery · process design · automation" }
-  - { k: "OUTCOME", v: "Operational systems delivered into day-to-day use" }
+  - { k: "OUTCOME", v: "Operational systems in day-to-day use · paper routines replaced with auditable digital ones" }
   - { k: "CONSTRAINTS", v: "Client never named · no repo links · no screenshots · abstract diagram only" }
 ---
 **Context.** A UK domiciliary care provider needed better digital and operational systems to support the day-to-day work of delivering care. The brief was practical, not glamorous: less manual overhead, more reliable process.
@@ -35,5 +35,7 @@ datasheet:
 **Role.** I designed and built the digital and operational systems involved, working close to how the team actually delivers care day to day.
 
 **Craft.** Practical software delivery, process design, and automation applied to a real operational setting, where reliability matters more than novelty.
+
+**Later phases.** What started as a discrete piece of work became a longer programme. Successive phases replaced paper routines with digital ones that hold up to scrutiny: training records captured and reported digitally rather than on sign-in sheets, requisitions tracked from request through approval to completion, and care records signed off electronically while staying auditable as needs change. Further work — a broader operations platform, learning delivery, and payroll capture — is still in progress, and is not claimed here as delivered.
 
 <p><strong>Outcome.</strong> Cleaner operational systems that reduced manual overhead for the team, delivered through practical software and automation. Qualitative by design — no client figures are published for this anonymised engagement.</p>
