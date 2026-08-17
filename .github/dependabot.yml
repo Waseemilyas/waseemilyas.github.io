@@ -4,3 +4,11 @@ updates:
     directory: /
     schedule:
       interval: weekly
+  # Actions in .github/workflows are pinned to immutable commit SHAs, so the
+  # major-version tags no longer float upstream and nothing refreshes them by
+  # itself. Dependabot bumps the pinned SHA and rewrites the trailing version
+  # comment; without this block the pins silently rot.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
