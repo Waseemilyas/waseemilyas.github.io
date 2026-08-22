@@ -3,6 +3,11 @@
 # push to main publishes. The pre-launch manual-only gate retired when the site
 # went live.
 # The content rules that replace that gate live in AGENTS.md.
+#
+# After every deploy, production is verified to serve EXACTLY the revision that
+# was just shipped: /revision.txt (emitted by the build from GITHUB_SHA via
+# SITE_REVISION) is fetched cache-busted with bounded retries and its body is
+# compared byte-for-byte against github.sha. A timeout or mismatch goes red.
 name: Build & deploy site
 
 on:
@@ -10,10 +15,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+# No workflow-level grants: each job asks for exactly what it needs (least
+# privilege). Build only reads the repo; only deploy may write Pages.
+permissions: {}
 
 concurrency:
   group: pages
@@ -23,6 +27,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read # checkout only; the build writes nothing back
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
@@ -35,11 +41,17 @@ jobs:
           cache: pnpm
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run build
+      - name: Production build
+        run: pnpm run build
         env:
           # Public browser DSN; kept in Actions so non-production builds do not
           # emit a monitoring loader.
           SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          # The revision being built, set AT the build step so the generator
+          # itself sees it: /revision.txt carries exactly this value. The
+          # generator cross-checks it against GITHUB_SHA and fails the build on
+          # any invalid or contradictory input.
+          SITE_REVISION: ${{ github.sha }}
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: _site
@@ -48,9 +60,41 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read # checkout of the verifier script
+      pages: write # deploy-pages publishes the artifact
+      id-token: write # deploy-pages OIDC deployment token
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false # verification only; no git push from this job
       - id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+      - name: Verify production serves the deployed revision
+        # Cache-busted GET of /revision.txt after the Pages deployment step,
+        # bounded retries for CDN propagation; the response BODY must equal
+        # github.sha exactly (status alone certifies nothing). Failure here is
+        # red. No secrets are read or printed by the verifier.
+        #
+        # Retry budget — derived from this job's 10-minute (600 s) timeout,
+        # not from any claimed measurement of Pages propagation:
+        #   worst case = attempts × timeout + (attempts − 1) × backoff
+        #              = 8 × 10 s + 7 × 3 s = 101 s
+        # ≈ 17% of the job budget, leaving ample headroom for checkout and the
+        # deploy step itself. If propagation ever exceeds ~100 s the run goes
+        # red and the budget gets revisited explicitly rather than padded.
+        # The verifier validates these controls before its retry loop; the
+        # test suite asserts these exact configured values are accepted.
+        run: |
+          node scripts/verify-deploy.mjs \
+            --url "${PRODUCTION_URL}/revision.txt" \
+            --revision "${SITE_REVISION}" \
+            --attempts 8 \
+            --backoff-ms 3000 \
+            --timeout-ms 10000
+        env:
+          PRODUCTION_URL: https://waseemilyas.uk
+          SITE_REVISION: ${{ github.sha }}

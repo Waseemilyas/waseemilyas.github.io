@@ -1,0 +1,91 @@
+# CI safety net for waseemilyas.uk.
+#
+# Runs on every pull request and every push to main (deploy.yml remains the
+# publisher). Two independent jobs so a secret-scan failure can never be
+# blurred into a build failure:
+#
+#   secret-scan — official gitleaks action, SHA-pinned to the release commit
+#                 resolved from the gitleaks/gitleaks-action repository
+#                 (v3.0.0 = e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e).
+#                 Full history is fetched so push builds are scanned whole.
+#                 GITHUB_TOKEN below is the workflow's own automatic token;
+#                 no user credentials or license secrets are required for a
+#                 personal-account repo. PR commenting stays off so the job
+#                 needs no write permissions at all.
+#
+#   site-check  — frozen install, focused tests (concurrency 1), production
+#                 build, then the rendered-site contract checker over the
+#                 built output. The build's SITE_REVISION (github.sha, set at
+#                 the build step) is what the checker expects /revision.txt to
+#                 carry. No SENTRY_DSN is set here: the monitoring loader is
+#                 env-gated and emits nothing in non-production builds, and
+#                 the checker validates the rendered output as built in
+#                 exactly this configuration.
+#
+# House rules honoured: pull_request trigger; push filtered to main;
+# cancel-in-progress concurrency; timeout-minutes on every job; GitHub-hosted
+# runner (public repo); every action pinned to an immutable commit SHA
+# (Dependabot keeps the pins fresh); least-privilege permissions.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secret-scan:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # scan full history on push events
+      - name: Secret scan (gitleaks)
+        uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatic token; not a user credential
+          GITLEAKS_ENABLE_COMMENTS: "false"
+
+  site-check:
+    name: Tests, build and rendered-site contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6.0.10
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          # pnpm 11 (pinned in package.json packageManager) needs Node >= 22.13,
+          # matching deploy.yml.
+          node-version: 22
+          cache: pnpm
+      - run: corepack enable
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+      - name: Focused tests (node:test, concurrency 1)
+        run: pnpm run test
+      - name: Production build
+        run: pnpm run build
+        env:
+          # Revision under build, set AT the build step: the emitted
+          # /revision.txt must carry exactly this value.
+          SITE_REVISION: ${{ github.sha }}
+        # No SENTRY_DSN on purpose: non-production builds emit no monitoring loader.
+      - name: Rendered-site contract checks
+        # Expected revision defaults to SITE_REVISION/GITHUB_SHA — identical to
+        # what the build above just emitted.
+        run: node scripts/site-check.mjs

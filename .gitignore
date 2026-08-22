@@ -45,4 +45,8 @@ openclaw.json
 /PRODUCT.md
 /ops/
 
+# Working notes at the repo root are temporary internal planning material,
+# never published. The public programme plan lives in docs/ and IS tracked.
+/notes.md
+
 .DS_Store
