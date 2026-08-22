@@ -1051,14 +1051,21 @@ test("teeth: a same-bytes rewrite with restored mtime is caught by inode/timesta
   await tick();
   const targetRel = "assets/img/og-card.png";
   const targetAbs = join(fx.siteDir, targetRel);
+  // Pin the target's mtime to a WHOLE second before the baseline snapshot:
+  // sub-second timestamp precision differs per filesystem (GitHub runners
+  // round differently from ext4), so restoring a float-millisecond mtime is
+  // not exact everywhere. A whole second restores exactly on any filesystem,
+  // keeping this test about the legacy view's blindness, not fs granularity.
+  const pinnedSec = Math.floor(Date.now() / 1000) - 10;
+  utimesSync(targetAbs, pinnedSec, pinnedSec);
   const before = snapshot(fx.siteDir);
   const originalBytes = readFileSync(targetAbs);
 
   // Sabotage: rewrite identical bytes, then restore the old mtime so a
   // size+mtime check sees nothing at all.
   writeFileSync(targetAbs, originalBytes);
+  utimesSync(targetAbs, pinnedSec, pinnedSec);
   const st = before.find((e) => e.path === targetRel);
-  utimesSync(targetAbs, st.mtimeMs / 1000, st.mtimeMs / 1000);
 
   const after = snapshot(fx.siteDir);
 
