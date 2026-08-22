@@ -20,3 +20,29 @@ else
 fi
 
 echo -e "${green}✓ pre-push checks passed${nc}"
+
+# Release-notes guard — managed policy, hand-merged because this repo owns its
+# hooksPath. Escape hatch for a genuine emergency:  RELEASE_NOTES_SKIP=1 git push
+if [ "${RELEASE_NOTES_SKIP:-0}" != "1" ]; then
+  rn=/opt/automancer/auto/scripts/release-notes.mjs
+  repo="$(git rev-parse --show-toplevel)"
+  deploy_refs="$(node "$rn" deploy-refs --repo "$repo" 2>/dev/null || echo main)"
+  seen=0
+  while read -r _local_ref local_sha remote_ref _remote_sha; do
+    [ -n "$local_sha" ] && seen=$((seen + 1))
+    [ "$local_sha" = "0000000000000000000000000000000000000000" ] && continue
+    for name in $deploy_refs; do
+      [ "$remote_ref" = "refs/heads/$name" ] || continue
+      node "$rn" guard --repo "$repo" --ref "$local_sha" || exit 1
+    done
+  done
+  # git always feeds a pre-push at least one ref line. Zero means an earlier
+  # check in this hook already read stdin, so this guard inspected nothing and
+  # was about to pass every deploy for ever. Fail loudly instead: a guard that
+  # cannot see the refs must not report a clear one.
+  if [ "$seen" -eq 0 ]; then
+    echo "release-notes: this guard received no refs — an earlier check in this pre-push consumed stdin." >&2
+    echo "  Move the release-notes block ABOVE it, or capture the ref list once and replay it to both." >&2
+    exit 1
+  fi
+fi
