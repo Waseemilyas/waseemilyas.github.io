@@ -1,0 +1,11 @@
+---
+# Machine-readable build-revision artifact served at /revision.txt.
+# `siteRevision` is resolved in eleventy.config.js from SITE_REVISION,
+# GITHUB_SHA (GitHub Actions) or `git rev-parse HEAD` (local builds); an
+# invalid, missing or contradictory input fails the build before this renders.
+# The body is exactly the full 40-character commit SHA plus one newline;
+# scripts/verify-deploy.mjs compares it byte-for-byte after every deploy.
+permalink: "/revision.txt"
+eleventyExcludeFromCollections: true
+---
+{{ siteRevision }}
