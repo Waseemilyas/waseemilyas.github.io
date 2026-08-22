@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 # naz-hardening pre-commit
+#
+# DELIBERATELY LIVE — do not turn this off, and do not "fix" it back to a
+# warning. Waseem's decision, 2026-08-22.
+#
+# This hook went from reporting clean to actually blocking on 2026-08-22, when
+# .gitleaks.toml gained [extend].useDefault. Without that line gitleaks REPLACES
+# its built-in ruleset with this file's (empty) one, so every scan passed no
+# matter what was staged. Nothing was broken by switching it on; it simply
+# started doing the job its name claimed.
+#
+# If this hook blocks a commit, there is probably a secret in it. Deal with the
+# secret, not with the hook.
 red='\033[0;31m'; green='\033[0;32m'; nc='\033[0m'
 blocked_paths_regex='(^|/)(\.openclaw/|memory/|MEMORY\.md$|USER\.md$|openclaw\.json$|.*\.token$|.*token.*|.*secret.*|.*credential.*|ms-graph-token\.json$|msgraph-calendar-token\.json$)'
 staged_files=$(git diff --cached --name-only --diff-filter=ACM || true)
@@ -11,8 +23,35 @@ if [[ -n "$staged_files" ]] && echo "$staged_files" | grep -E "$blocked_paths_re
 fi
 if command -v gitleaks >/dev/null 2>&1; then
   gitleaks git --staged --redact --config .gitleaks.toml --no-banner >/dev/null 2>&1 || { echo -e "${red}✗ Commit blocked:${nc} gitleaks found potential secrets."; exit 1; }
+else
+  # Say so. A silent skip means this hook prints its green tick having run only
+  # the regex fallback below, which is far weaker — and a green tick you have
+  # read is not a check that ran.
+  echo -e "${red}!${nc} gitleaks is not installed on this device — only the regex fallback ran."
+  echo "  Install it before trusting this hook: https://github.com/gitleaks/gitleaks/releases"
 fi
 patch=$(git diff --cached -U0 || true)
-secret_regex='(sk-[A-Za-z0-9_-]{20,}|xox[baprs]-[A-Za-z0-9-]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|-----BEGIN (RSA|EC|OPENSSH|PRIVATE) KEY-----|OPENROUTER_API_KEY\s*=|(?i)(api[_-]?key|secret|token|password)\s*[:=]\s*['"'"']?[A-Za-z0-9_\-]{16,})'
-echo "$patch" | grep -E "$secret_regex" >/dev/null && { echo -e "${red}✗ Commit blocked:${nc} regex scanner detected possible secret material."; exit 1; }
+# Two patterns, not one. The single combined regex this replaces carried a
+# `(?i)` inline flag, which grep -E does not implement — it treats it as the
+# literal characters `(?i`, and warns `? at start of expression`. That made the
+# whole generic-assignment arm unreachable: a plain assignment of a long opaque
+# value to a name like SECRET or api_key went straight through while the hook
+# printed its green tick. (The obvious example is not written out here — this
+# file is scanned by the very tool below, and it flagged it. Twice-proven.)
+# Case-sensitivity
+# is now a property of which grep runs, which is the only way ERE can express it.
+#
+# Token shapes stay case-sensitive on purpose: AKIA... is an AWS key and akia...
+# is not.
+token_regex='(sk-[A-Za-z0-9_-]{20,}|xox[baprs]-[A-Za-z0-9-]{20,}|AKIA[0-9A-Z]{16}|ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|-----BEGIN (RSA|EC|OPENSSH|PRIVATE) KEY-----|OPENROUTER_API_KEY[[:space:]]*=)'
+# A long opaque value assigned to a secret-shaped name, in any case.
+# The quote class is ["'] — the pattern this replaces spelled it ['], matching a
+# single quote only, so a double-quoted value could never have matched even if
+# the (?i) had worked.
+assign_regex='(api[_-]?key|secret|token|password)[[:space:]]*[:=][[:space:]]*["'"'"']?[A-Za-z0-9_-]{16,}'
+if echo "$patch" | grep -E "$token_regex" >/dev/null \
+  || echo "$patch" | grep -Ei "$assign_regex" >/dev/null; then
+  echo -e "${red}✗ Commit blocked:${nc} regex scanner detected possible secret material."
+  exit 1
+fi
 echo -e "${green}✓ pre-commit checks passed${nc}"
