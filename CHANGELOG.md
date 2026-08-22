@@ -1,5 +1,10 @@
 # Release notes
 
+## v2026.08.22.1 — 22 August 2026
+
+This release improves the reliability of updates to the portfolio site.
+
+
 ## v2026.08.15.1 — 15 August 2026
 
 Two new notes on how operations software is actually put together.
