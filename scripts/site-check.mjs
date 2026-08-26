@@ -634,6 +634,7 @@ export function runSiteChecks({
   // Per-page contracts -------------------------------------------------------
   for (const page of pages) {
     const html = readFileSync(join(siteDir, page), "utf8");
+    failures.push(...checkRevisionMeta(page, html, expectedRevision));
     failures.push(...checkHeadings(page, html));
     failures.push(...checkMetadata(page, html, siteUrl));
     failures.push(...checkJsonLd(page, html));
@@ -778,6 +779,28 @@ export function runSiteChecks({
     failures,
     stats: { pages: pages.length, sitemapUrls: sitemapUrlCount, revision: expectedRevision },
   };
+}
+
+/** Every rendered HTML document identifies the exact build that emitted it. */
+export function checkRevisionMeta(page, html, expectedRevision) {
+  const markers = extractTagAttrs(html, "meta").filter(
+    (attrs) => (attrs.name ?? "").toLowerCase() === "waseemilyas-revision",
+  );
+  if (markers.length !== 1) {
+    return [{
+      check: "revision-meta",
+      file: page,
+      message: `contract revision-meta/one: found ${markers.length}, expected exactly one <meta name="waseemilyas-revision">`,
+    }];
+  }
+  if (markers[0].content !== expectedRevision) {
+    return [{
+      check: "revision-meta",
+      file: page,
+      message: `contract revision-meta/exact: marker carries ${markers[0].content ?? "no content"}, but this build is ${expectedRevision}`,
+    }];
+  }
+  return [];
 }
 
 /**

@@ -78,6 +78,7 @@ function pageHtml(urlPath, body) {
 <meta charset="utf-8">
 <title>Fixture</title>
 <meta name="description" content="fixture description">
+<meta name="waseemilyas-revision" content="${FIXTURE_SHA}">
 <link rel="canonical" href="${SITE_URL}${urlPath}">
 <meta property="og:title" content="Fixture">
 <meta property="og:description" content="fixture description">
@@ -234,6 +235,35 @@ for (const [label, sha] of [
 test("runSiteChecks refuses to run without an expected revision (programmer error)", () => {
   const fx = makeFixture(test);
   assert.throws(() => runSiteChecks({ siteDir: fx.siteDir, postsDir: fx.postsDir, siteUrl: SITE_URL }), /expectedRevision/);
+});
+
+test("mutation: missing HTML revision marker fails revision-meta/one", () => {
+  const fx = makeFixture(test);
+  const page = join(fx.siteDir, "about", "index.html");
+  writeFileSync(
+    page,
+    readFileSync(page, "utf8").replace(
+      `<meta name="waseemilyas-revision" content="${FIXTURE_SHA}">`,
+      "",
+    ),
+  );
+  const { failures } = runChecks(fx);
+  const hits = ofCheck(failures, "revision-meta");
+  assert.equal(hits.length, 1, JSON.stringify(failures));
+  assert.match(hits[0].message, /revision-meta\/one/);
+});
+
+test("mutation: stale HTML revision marker fails revision-meta/exact", () => {
+  const fx = makeFixture(test);
+  const page = join(fx.siteDir, "about", "index.html");
+  writeFileSync(
+    page,
+    readFileSync(page, "utf8").replace(FIXTURE_SHA, "cd".repeat(20)),
+  );
+  const { failures } = runChecks(fx);
+  const hits = ofCheck(failures, "revision-meta");
+  assert.equal(hits.length, 1, JSON.stringify(failures));
+  assert.match(hits[0].message, /revision-meta\/exact/);
 });
 
 // ---------------------------------------------------------------------------

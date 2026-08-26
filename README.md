@@ -50,6 +50,9 @@ Every production build stamps its output with the exact commit it was built from
 
 - **Artifact.** `_site/revision.txt` (served at `/revision.txt`) contains **exactly**
   the full 40-character commit SHA followed by one newline. Nothing else is written.
+- **HTML metadata.** Every rendered page also carries
+  `<meta name="waseemilyas-revision" content="<full-sha>">`, checked against the
+  same expected build revision as `/revision.txt`.
 - **Revision source.** `SITE_REVISION` is selected first, and only when it is valid
   (exactly 40 lowercase hex) and consistent with any `GITHUB_SHA` also present;
   otherwise `GITHUB_SHA` (the authority on GitHub Actions); otherwise a local build
