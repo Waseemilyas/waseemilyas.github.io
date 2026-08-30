@@ -7,22 +7,38 @@
   var toggle = document.querySelector(".nav-toggle");
   var nav = document.getElementById("primary-nav");
   if (toggle && nav) {
+    var drawerQ = window.matchMedia("(max-width: 720px)");
+    var setDrawer = function (open) {
+      var hide = drawerQ.matches && !open;
+      nav.setAttribute("data-open", String(open));
+      toggle.setAttribute("aria-expanded", String(open));
+      /* Hide the closed off-screen drawer from tab order and the a11y tree. */
+      if (hide) {
+        nav.setAttribute("aria-hidden", "true");
+        nav.inert = true;
+      } else {
+        nav.removeAttribute("aria-hidden");
+        nav.inert = false;
+      }
+    };
+    setDrawer(false);
+    if (drawerQ.addEventListener) {
+      drawerQ.addEventListener("change", function () {
+        setDrawer(nav.getAttribute("data-open") === "true");
+      });
+    }
     toggle.addEventListener("click", function () {
-      var open = nav.getAttribute("data-open") === "true";
-      nav.setAttribute("data-open", String(!open));
-      toggle.setAttribute("aria-expanded", String(!open));
+      setDrawer(nav.getAttribute("data-open") !== "true");
     });
     nav.addEventListener("click", function (e) {
       if (e.target.tagName === "A") {
-        nav.setAttribute("data-open", "false");
-        toggle.setAttribute("aria-expanded", "false");
+        setDrawer(false);
       }
     });
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && nav.getAttribute("data-open") === "true") {
-        nav.setAttribute("data-open", "false");
-        toggle.setAttribute("aria-expanded", "false");
         toggle.focus();
+        setDrawer(false);
       }
     });
   }

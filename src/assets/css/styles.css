@@ -121,8 +121,8 @@ h1, h2, h3 { font-weight: 700; line-height: 1.04; letter-spacing: -0.03em; text-
 .nav-toggle[aria-expanded="true"] svg path:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 @media (max-width: 720px) {
   .nav-toggle { display: inline-flex; }
-  .nav { position: fixed; inset: 3.5rem 0 auto 0; flex-direction: column; align-items: stretch; gap: 0; background: var(--graphite-800); border-bottom: 1px solid var(--line-dark); padding: .5rem var(--space-shell-inline) 1rem; transform: translateY(-120%); transition: transform .3s var(--ease); }
-  .nav[data-open="true"] { transform: translateY(0); }
+  .nav { position: fixed; inset: 3.5rem 0 auto 0; flex-direction: column; align-items: stretch; gap: 0; background: var(--graphite-800); border-bottom: 1px solid var(--line-dark); padding: .5rem var(--space-shell-inline) 1rem; transform: translateY(-120%); visibility: hidden; transition: transform .3s var(--ease), visibility 0s linear .3s; }
+  .nav[data-open="true"] { transform: translateY(0); visibility: visible; transition: transform .3s var(--ease), visibility 0s; }
   .nav a { padding: .7rem 0; border-bottom: 1px solid var(--line-dark); font-size: var(--step-0); }
   .nav .cta { border-radius: var(--rounded-sm); margin-top: .7rem; text-align: center; }
 }
