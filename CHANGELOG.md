@@ -1,5 +1,10 @@
 # Release notes
 
+## v2026.08.30.1 — 30 August 2026
+
+Each page now carries its release information, making the published version easier to identify.
+
+
 ## v2026.08.22.1 — 22 August 2026
 
 This release improves the reliability of updates to the portfolio site.
