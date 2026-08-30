@@ -44,8 +44,8 @@ description: "Waseem Ilyas runs Automancer, a UK automation consultancy helping 
     </div>
 
     <div class="cap" data-cal>
-      <figure class="capfig">
-        <svg viewBox="0 0 720 440" role="img" aria-label="Capability map: five domains wired to one practice hub. Activate a node to read its description.">
+      <figure class="capfig" aria-label="Capability map: five domains wired to one practice hub. Activate a node to read its description.">
+        <svg viewBox="0 0 720 440">
           <g id="traces" stroke-linecap="round">
             {%- for n in capabilities.nodes %}
             <path class="trace" data-for="{{ n.key }}" d="{{ n.trace }}"/>
