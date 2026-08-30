@@ -1,5 +1,10 @@
 # Release notes
 
+## v2026.08.30.2 — 30 August 2026
+
+When closed, the mobile navigation stays out of the way for keyboard and screen-reader users, while the five capability-map options are easier to reach and use.
+
+
 ## v2026.08.30.1 — 30 August 2026
 
 Each page now carries its release information, making the published version easier to identify.
