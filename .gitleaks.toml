@@ -7,7 +7,7 @@ title = "repo-local-policy"
 [extend]
 useDefault = true
 
-[allowlist]
+[[allowlists]]
 description = "Allow benign placeholders"
 regexes = [
   '''YOUR_(API|TOKEN|SECRET)_HERE''',
