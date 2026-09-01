@@ -1,8 +1,5 @@
 # AGENTS.md — waseemilyas.uk
 
-**Read this before you change anything in this repo.** It is binding on every
-agent, on every run, and it outranks convenience, tidiness, and your own taste.
-
 This is Waseem Ilyas's **public** personal portfolio. Anything committed here is
 published to the open internet at <https://waseemilyas.uk> and is indexed,
 archived, and screenshotted by parties nobody controls. There is no staging gate
@@ -67,18 +64,19 @@ Out of scope without an explicit instruction: redesigns, art-direction changes,
 new top-level sections, changing the stack, and anything recorded as a settled
 design decision.
 
-## 3. Deploys are ungated. Outbound is not.
+## 3. Publishing is ungated; telling people about it is not
+
+The estate's decision policy applies here unchanged. What is specific to this
+repo is where the line falls:
 
 - **Publishing is ungated.** Push to `main`; GitHub Actions builds and deploys
-  to GitHub Pages. No board approval is needed to publish a content change that
-  satisfies section 1. Do not ask for one.
-- **Reaching out to people is gated**, always. Sending email, DMs, or messages;
-  filling in a contact form; submitting the site to a directory, newsletter,
-  aggregator, or awards list; posting it to social media; contacting any person
-  or company on Waseem's behalf — all of that is outbound communication and
-  needs Waseem's explicit approval. Publishing a page is not outreach; telling
-  someone about it is.
-- **Spend is gated.** No paid services, domains, plans, or upgrades.
+  to GitHub Pages. Publish a content change that satisfies section 1 on your own
+  authority.
+- **Anything that reaches a person is outbound**, and needs Waseem's approval
+  first: email, DMs, messages, a contact form, submitting the site to a
+  directory, newsletter, aggregator, or awards list, posting it to social media,
+  or contacting anyone on Waseem's behalf. Publishing a page is not outreach;
+  telling someone about it is.
 
 ## 4. Working rules
 
@@ -87,25 +85,25 @@ design decision.
 - `grep` the diff for client names and codes before committing. If the change
   touches `src/work/`, `src/_data/`, `src/about.njk`, `src/index.njk`, or
   `src/lab.njk`, re-read section 1 first.
-- Never commit a credential. The browser error-reporting DSN is the only key
-  that may legitimately appear in built output; everything else stays in the
-  host secret store.
-- `.gitignore` keeps internal planning docs out of this public repo on purpose.
-  Do not commit them, and do not un-ignore them.
-- Do not commit `_site/` or `node_modules/`.
+- Credentials stay in the host secret store. The browser error-reporting DSN is
+  the only key that may legitimately appear in built output.
+- `.gitignore` keeps internal planning docs, `_site/`, and `node_modules/` out of
+  this public repo on purpose. Leave those rules in place and commit only what
+  they already allow.
 - Keep the site static and GitHub Pages-compatible unless Waseem approves
   otherwise.
 
 ## 5. Docs, in reading order
 
-1. `AGENTS.md` — this file. Guardrails. Binding.
-2. `README.md` — stack, build, structure.
-3. `docs/DESIGN.md` — the design system: tokens, type scale, component
+1. `README.md` — stack, build, structure. Read before your first build here.
+2. `docs/DESIGN.md` — the design system: tokens, type scale, component
    inventory, and the heading-hierarchy contract. Read before any UI change.
-4. `docs/PRODUCT.md` — register, audience, and design principles. Restates only
-   what is already published on the live site; section 1 applies to it in full.
-5. The WI-PF1 project record in Paperclip — internal spec, copy deck, art
-   direction, hygiene decisions, and live object ids.
+3. `docs/PRODUCT.md` — register, audience, and design principles. Read before
+   writing or rewriting site copy. It restates only what is already published on
+   the live site; section 1 applies to it in full.
+4. The WI-PF1 project record in Paperclip — internal spec, copy deck, art
+   direction, hygiene decisions, and live object ids. Read it before any content
+   change, and copy nothing from it into this repo.
 
 `docs/DESIGN.md` and `docs/PRODUCT.md` are the public, design-only design-system
 context. Root `/DESIGN.md` and `/PRODUCT.md` stay gitignored for internal
