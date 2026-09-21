@@ -29,9 +29,11 @@ Public, names other people businesses, and open since 7 August. Two linked calls
 
 ### Three prayer-time audio files are published on the portfolio site and nothing links to them
 
-*campaign id `q-personal-961d` · kind `review` · source ref: discovery-portfolio*
+*campaign id `q-personal-961d` · kind `review` · source ref: discovery-portfolio · status: resolved 2026-09-21*
 
 Discovery item 6. audio/adhan.mp3, iftar.mp3 and sehri.mp3 (about 800KB, dated 1 July) are tracked, passthrough-copied to the site root by eleventy.config.js:16, referenced by nothing anywhere in src/ (grep returns zero), and all three currently serve HTTP 200 on the live domain. They look like a stray inclusion from another project. This is waseem rather than do because removing content already published on a site under his identity is publishing, which is a gated outbound action - an agent must not quietly delete them. Done means he says keep or remove. An agent may prepare the change and must not ship it.
+
+**Resolved 2026-09-21**: Waseem confirmed that the prayer-time audio files are intentional — they feed a personal Home Assistant automation over HTTP, are deliberately unlinked from the site, and must remain in the repo. Added `audio/README.md` explaining this, linked from `eleventy.config.js`, and recorded in `AGENTS.md`. Item resolved; do not reopen or remove files.
 
 
 ## p3
@@ -41,4 +43,7 @@ Discovery item 6. audio/adhan.mp3, iftar.mp3 and sehri.mp3 (about 800KB, dated 1
 *campaign id `q-personal-069b` · kind `hygiene` · source ref: orch-personal, 08:10Z*
 
 Met while cloning for a lane, and it cost me a failed clone. The local directory is /opt/automancer/projects/personal/portfolio but the GitHub repository is Waseemilyas/waseemilyas.github.io - the user-pages repo, which is why the site is served by GitHub Pages at all. git clone https://github.com/Waseemilyas/portfolio.git fails with "Repository not found". This unit has a standing rule against guessing a DEPLOY url after an orchestrator probed a strangers pages.dev site; the same rule applies to a CLONE url and nothing wrote it down. Also met and NOT chased: origin carries 21 branches, 17 of them agent/AUT-*, of which exactly two are covered by existing items (aa0e and 2f8f, both abandoned-with-reason). The other 15 have never been judged. Done means (a) the real origin is recorded where a reader meeting the directory will see it - MANIFEST, the repo handover or its AGENTS.md - and (b) somebody decides whether the 15 unjudged agent branches are pending work or litter, WITHOUT deleting any of them: this repo publishes under Waseems identity and one of the two already-judged branches would have un-published two live notes if merged. Treat every one of those branches as a possible trap, not as a backlog.
+
+**Note 2026-09-21**: Part (a) is resolved: the real origin clone URL (`https://github.com/Waseemilyas/waseemilyas.github.io.git`) is recorded in `AGENTS.md`. Part (b) (deciding whether the 15 unjudged agent branches are pending work or litter, without deleting any) remains open.
+
 
