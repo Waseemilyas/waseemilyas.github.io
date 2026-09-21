@@ -10,6 +10,13 @@ only; the project record in Paperclip holds the internal specifics (client
 codes, credential sources, live object ids). Read that too — never copy any of
 it into this repo.
 
+**Repository origin & clone URL:** The remote origin is
+`https://github.com/Waseemilyas/waseemilyas.github.io.git`.
+The local directory is named `portfolio`, but the GitHub repository is
+`Waseemilyas/waseemilyas.github.io` (the GitHub Pages user repository).
+Cloning `Waseemilyas/portfolio.git` fails with "Repository not found"; always clone
+or reference `https://github.com/Waseemilyas/waseemilyas.github.io.git`.
+
 ---
 
 ## 1. Standing content guardrails (never negotiable)
@@ -92,6 +99,11 @@ repo is where the line falls:
   they already allow.
 - Keep the site static and GitHub Pages-compatible unless Waseem approves
   otherwise.
+- **Prayer-time audio files (`audio/`)**: `audio/adhan.mp3`, `audio/iftar.mp3`, and
+  `audio/sehri.mp3` are intentional assets fetched over HTTP by an external Home
+  Assistant automation. They are deliberately not linked anywhere on the site, but
+  must remain in this repository and must not be deleted or renamed. See
+  `audio/README.md`.
 
 ## 5. Docs, in reading order
 
