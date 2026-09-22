@@ -158,7 +158,7 @@ the surfaces is the art direction, not decoration.
 The surface is chosen **per section**, not per route — see *Surface rule* below.
 
 The stack is Eleventy + hand-written CSS — **no framework, no utility classes, one
-stylesheet** (`src/assets/css/styles.css`, 346 lines as of 2026-09-22). Typefaces are self-hosted
+stylesheet** (`src/assets/css/styles.css`, ~350 lines). Typefaces are self-hosted
 variable Geist and Geist Mono; there is no CDN dependency and no runtime style
 system.
 
