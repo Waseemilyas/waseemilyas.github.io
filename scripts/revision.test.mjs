@@ -8,6 +8,7 @@
 
 import test from "node:test";
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 
 import { assertRevision, REVISION_RE, resolveRevision } from "./revision.mjs";
 
@@ -91,7 +92,13 @@ test("genuinely unset keys still fall through (blank detection has no false posi
   assert.deepEqual(r, { revision: SHA_A, source: "git HEAD" });
 });
 
-test("build-facing control: the real Eleventy build fails on a blank SITE_REVISION", async () => {
+// Without an install this control would die on MODULE_NOT_FOUND and the
+// regex assertion would report a baffling mismatch; skip loudly instead.
+test("build-facing control: the real Eleventy build fails on a blank SITE_REVISION", {
+  skip: existsSync("node_modules/@11ty/eleventy/cmd.cjs")
+    ? false
+    : "eleventy not installed — run pnpm install",
+}, async () => {
   const { execFile } = await import("node:child_process");
   const { promisify } = await import("node:util");
   const { mkdtempSync, rmSync } = await import("node:fs");
