@@ -20,7 +20,8 @@ pnpm run build     # static build → _site/
 
 ### Checks and git hooks
 
-The repo carries a dependency-free safety net:
+The repo's safety net is a focused node:test suite — dependency-free except for
+jsdom, which loads the real built page to exercise the mobile nav drawer:
 
 ```bash
 pnpm run test      # focused node:test suite (concurrency 1) — checker + hook-setup logic
