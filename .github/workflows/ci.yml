@@ -59,6 +59,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatic token; not a user credential
           GITLEAKS_ENABLE_COMMENTS: "false"
 
+  estate-checks:
+    name: estate checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: Automancer-Ltd/estate-checks@v1
+
   site-check:
     name: Tests, build and rendered-site contracts
     runs-on: ubuntu-latest
