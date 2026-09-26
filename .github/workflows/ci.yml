@@ -13,14 +13,15 @@
 #                 personal-account repo. PR commenting stays off so the job
 #                 needs no write permissions at all.
 #
-#   site-check  — frozen install, focused tests (concurrency 1), production
-#                 build, then the rendered-site contract checker over the
-#                 built output. The build's SITE_REVISION (github.sha, set at
-#                 the build step) is what the checker expects /revision.txt to
-#                 carry. No SENTRY_DSN is set here: the monitoring loader is
-#                 env-gated and emits nothing in non-production builds, and
-#                 the checker validates the rendered output as built in
-#                 exactly this configuration.
+#   site-check  — frozen install, focused tests (concurrency 1), content
+#                 guardrails (AGENTS.md §1), production build, then the
+#                 rendered-site contract checker over the built output. The
+#                 build's SITE_REVISION (github.sha, set at the build step)
+#                 is what the checker expects /revision.txt to carry. No
+#                 SENTRY_DSN is set here: the monitoring loader is env-gated
+#                 and emits nothing in non-production builds, and the
+#                 checker validates the rendered output as built in exactly
+#                 this configuration.
 #
 # House rules honoured: pull_request trigger; push filtered to main;
 # cancel-in-progress concurrency; timeout-minutes on every job; GitHub-hosted
@@ -78,6 +79,8 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Focused tests (node:test, concurrency 1)
         run: pnpm run test
+      - name: Content guardrails (AGENTS.md §1)
+        run: node scripts/content-guard.mjs
       - name: Production build
         run: pnpm run build
         env:

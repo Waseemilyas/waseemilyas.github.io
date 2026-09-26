@@ -37,7 +37,7 @@ import os from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { imageSize, runSiteChecks, validateXml } from "./site-check.mjs";
+import { checkRenderedText, imageSize, runSiteChecks, validateXml } from "./site-check.mjs";
 
 const SCRIPT = join(dirname(fileURLToPath(import.meta.url)), "site-check.mjs");
 const SITE_URL = "https://fixture.example";
@@ -515,6 +515,68 @@ for (const { prop, tag, diagRe } of REQUIRED_METAS) {
     assert.match(hits[0].message, /found 2/);
   });
 }
+
+// ---------------------------------------------------------------------------
+// negative controls — rendered-text contract (leak literals + empty elements)
+
+for (const [label, literal] of [
+  ["TODO", "TODO: write intro"],
+  ["FIXME", "FIXME check this"],
+  ["lorem ipsum", "Lorem ipsum dolor sit amet"],
+  ["bare lorem", "Section with lorem content"],
+  ["object Object", "Data was [object Object] rendered"],
+]) {
+  test(`mutation: page containing ${label} literal fails rendered-text/leak-literal`, () => {
+    const fx = makeFixture(test);
+    const p = join(fx.siteDir, "about", "index.html");
+    writeFileSync(
+      p,
+      readFileSync(p, "utf8").replace("<h2>Detail</h2>", `<h2>Detail</h2><p>${literal}</p>`)
+    );
+    const { failures } = runChecks(fx);
+    const hits = ofCheck(failures, "rendered-text");
+    assert.equal(hits.length, 1, JSON.stringify(failures));
+    assert.match(hits[0].message, /rendered-text\/leak-literal/);
+  });
+}
+
+for (const [tag, element] of [
+  ["h1", "<h1></h1>"],
+  ["h2", "<h2></h2>"],
+  ["h3", "<h3>   </h3>"],
+  ["p", "<p></p>"],
+  ["whitespace-only p", "<p>   \n  </p>"],
+  ["nbsp-only p", "<p>&nbsp;&nbsp;</p>"],
+  ["empty nested tag in p", "<p><span>   </span></p>"],
+]) {
+  test(`mutation: page containing empty ${tag} fails rendered-text/empty-element`, () => {
+    const fx = makeFixture(test);
+    const p = join(fx.siteDir, "about", "index.html");
+    writeFileSync(
+      p,
+      readFileSync(p, "utf8").replace("<h2>Detail</h2>", `<h2>Detail</h2>${element}`)
+    );
+    const { failures } = runChecks(fx);
+    const hits = ofCheck(failures, "rendered-text");
+    assert.equal(hits.length, 1, JSON.stringify(failures));
+    assert.match(hits[0].message, /rendered-text\/empty-element/);
+  });
+}
+
+test("control: paragraph containing media (image/svg) without text passes rendered-text", () => {
+  const fx = makeFixture(test);
+  const p = join(fx.siteDir, "about", "index.html");
+  writeFileSync(
+    p,
+    readFileSync(p, "utf8").replace(
+      "<h2>Detail</h2>",
+      '<h2>Detail</h2><p><img src="/assets/img/og-card.png" alt="Card"></p>'
+    )
+  );
+  const { failures } = runChecks(fx);
+  const hits = ofCheck(failures, "rendered-text");
+  assert.equal(hits.length, 0, JSON.stringify(hits));
+});
 
 // ---------------------------------------------------------------------------
 // negative controls — sitemap parity (origin + both directions)
