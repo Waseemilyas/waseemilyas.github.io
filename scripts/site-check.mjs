@@ -10,6 +10,8 @@
 //   jsonld     every application/ld+json block parses with an @context
 //   links      root-relative and relative href/src targets resolve to
 //              built files (dir-style URLs resolve to index.html)
+//   rendered-text  no leak literals (TODO, FIXME, lorem, [object Object]) and
+//              no empty <h1–h3> or <p> content elements
 //   sitemap-parity  sitemap URLs ↔ built pages, both directions
 //              (/404.html deliberately absent from the sitemap)
 //   xml        sitemap.xml + notes/feed.xml pass structural checks — exactly
@@ -83,6 +85,7 @@ function decodeEntities(s) {
     .replace(/&apos;/g, "'")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
+    .replace(/&nbsp;/g, "\u00A0")
     .replace(/&amp;/g, "&");
 }
 
@@ -187,6 +190,48 @@ export function checkHeadings(page, html) {
     }
     prev = level;
   }
+  return failures;
+}
+
+export function checkRenderedText(page, html) {
+  const failures = [];
+
+  // Leak literals (TODO, FIXME, lorem, [object Object])
+  const LEAK_LITERAL_PATTERNS = [
+    { name: "TODO", re: /\bTODO\b/ },
+    { name: "FIXME", re: /\bFIXME\b/ },
+    { name: "lorem", re: /\blorem(?:\s+ipsum)?\b/i },
+    { name: "[object Object]", re: /\[object Object\]/ },
+  ];
+
+  for (const { name, re } of LEAK_LITERAL_PATTERNS) {
+    if (re.test(html)) {
+      failures.push({
+        check: "rendered-text",
+        file: page,
+        message: `contract rendered-text/leak-literal: document contains forbidden leak literal "${name}"`,
+      });
+    }
+  }
+
+  // Empty heading and paragraph elements (<h1-h3>, <p>)
+  const ELEMENT_RE = /<(h[1-3]|p)\b([^>]*)>([\s\S]*?)<\/\1>/gi;
+  for (const match of html.matchAll(ELEMENT_RE)) {
+    const tag = match[1].toLowerCase();
+    const inner = match[3];
+    const visibleText = decodeEntities(inner.replace(/<[^>]+>/g, ""))
+      .replace(/[\s\u00A0]+/g, " ")
+      .trim();
+    const hasMedia = /<(?:img|svg|canvas|picture|video|audio|iframe)\b/i.test(inner);
+    if (visibleText.length === 0 && !hasMedia) {
+      failures.push({
+        check: "rendered-text",
+        file: page,
+        message: `contract rendered-text/empty-element: document contains empty <${tag}> element`,
+      });
+    }
+  }
+
   return failures;
 }
 
@@ -639,6 +684,7 @@ export function runSiteChecks({
     failures.push(...checkMetadata(page, html, siteUrl));
     failures.push(...checkJsonLd(page, html));
     failures.push(...checkLinks(page, html, siteDir));
+    failures.push(...checkRenderedText(page, html));
 
     const ogImage = extractTagAttrs(html, "meta").find(
       (a) => (a.property ?? "").toLowerCase() === "og:image"
@@ -935,7 +981,7 @@ function main() {
     process.exit(1);
   }
   console.log(
-    `site-check: OK — ${stats.pages} HTML pages, ${stats.sitemapUrls} sitemap URLs; revision artifact matches build ${stats.revision}; headings, metadata, JSON-LD, links, feeds, drafts and og-image all pass their contracts`
+    `site-check: OK — ${stats.pages} HTML pages, ${stats.sitemapUrls} sitemap URLs; revision artifact matches build ${stats.revision}; headings, metadata, JSON-LD, links, rendered-text, feeds, drafts and og-image all pass their contracts`
   );
 }
 

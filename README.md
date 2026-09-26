@@ -24,17 +24,27 @@ The repo's safety net is a focused node:test suite — dependency-free except fo
 jsdom, which loads the real built page to exercise the mobile nav drawer:
 
 ```bash
-pnpm run test      # focused node:test suite (concurrency 1) — checker + hook-setup logic
+pnpm run test      # focused node:test suite (concurrency 1) — checker, guard + hook-setup logic
 pnpm run build     # production build → _site/
-pnpm run check     # tests, then a fresh production build, then rendered-site contract checks over _site/
+pnpm run check     # tests, content guardrails over src/, production build, then rendered-site contracts over _site/
 ```
+
+`scripts/content-guard.mjs` scans source files under `src/` to enforce the standing
+guardrails in `AGENTS.md` §1: no commercially sensitive fees, currency amounts, day/hourly
+rates, contract terms, profit margins or commercial revenue statements; no internal
+filesystem paths (`/opt`, `/home`, `/Users`, `C:\`); no IP addresses or internal mesh domains
+(`*.ts.net`, `.internal`, `.local`, `.lan`); no non-allowlisted emails; and no credentials or
+secrets in code or comments. Pre-existing approved content carries scoped closed-carve-out
+exemptions.
 
 `scripts/site-check.mjs` verifies the **built** output against the site's published
 contracts and fails with file-named diagnostics when any of them break: exactly one
 `<h1>` per page with no skipped heading levels; each required description/canonical/OG
 metadata property present exactly once (with `og:url` matching the canonical); JSON-LD
 present, parseable and carrying an `@context`; every root-relative or relative `href`/
-`src` resolving into `_site/`;
+`src` resolving into `_site/`; rendered text carrying no leak literals (`TODO`, `FIXME`,
+`lorem`, `[object Object]`) and no empty `<h1>`–`<h3>` or `<p>` content elements (preventing
+silent data-loop drift);
 sitemap ↔ built-page parity in both directions, with every `<loc>` on the site's own
 origin; structurally valid sitemap/Atom XML (single root element, balanced tags,
 whitespace-separated quoted attributes, no bare `&` in text or attribute values)
