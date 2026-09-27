@@ -15,7 +15,7 @@
 // Grandfathered content:
 // Pre-existing content predating June 2026 rules (recorded in AGENTS.md §1 as
 // a closed carve-out) carries scoped per-file exemptions for known grandfathered
-// items in `src/_data/timeline.json` and `src/work/cs-icommit.md`.
+// items in `src/_data/timeline.json`.
 //
 // Usage: node scripts/content-guard.mjs [--dir src]
 // Exits 0 on clean scan; exits 1 listing every violation with file and line.
@@ -45,8 +45,6 @@ export const ALLOWED_EMAIL_DOMAINS = ["automancer.uk", "waseemilyas.uk"];
 export const GRANDFATHERED_EXEMPTIONS = {
   "_data/timeline.json": new Set(["guard/commercial-revenue"]),
   "src/_data/timeline.json": new Set(["guard/commercial-revenue"]),
-  "work/cs-icommit.md": new Set(["guard/commercial-terms"]),
-  "src/work/cs-icommit.md": new Set(["guard/commercial-terms"]),
 };
 
 function getExemptions(relPath) {

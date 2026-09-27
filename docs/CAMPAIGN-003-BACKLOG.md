@@ -29,7 +29,7 @@ Git state needs resolving before this repo can be closed: the local default bran
 ### The portfolio still names past clients under grandfathered terms
 
 *campaign id `q-personal-ee71` · kind `decision` · source ref: PERSONAL-28*
-**Status: still open** — Checked current tree: `src/_data/timeline.json` (lines 15–28) continues to name past clients (`SportsShoes`, `Global Diversity Practice`, `Shell`), and `src/work/cs-icommit.md` links to `https://icommit.globaldiversitypractice.com`. Under `AGENTS.md` lines 50–56, pre-existing content remains grandfathered ("do not remove it and do not rewrite it"). No decision or outbound client consent ruling has been made to alter or trim these references.
+**Status: resolved 2026-09-27 (AUT-7827)** — Waseem ruled option B on 26 Sep: trim client naming in the case studies to sector only and keep the work. The public product case study is now anonymised as `src/work/cs-product.md`, with its outbound product link removed and the home and lab cards pointed at the case study instead. The care study was already sector-only, and the Automancer study describes Waseem's own practice. The timeline and about page were outside that ruling and were not changed.
 
 Public, names other people businesses, and open since 7 August. Two linked calls: keep, trim or pull, and whether those clients ever consented to being named. An agent makes the change afterwards, but contacting a past client is outbound and needs his sign-off first.
 

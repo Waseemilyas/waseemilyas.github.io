@@ -68,7 +68,7 @@ screenshots of every route at 1280px and 390px, before and after.
   decision in DESIGN.md), the 54px measurement-grid background (the core
   console art direction), and the `.note-line` 2px signal `border-left`
   (an intentional callout component, not a card accent). No action.
-- **`cs-auto.md` / `cs-icommit.md`** end on a plain `**Outcome.**` Markdown
+- **`cs-auto.md` / `cs-product.md`** end on a plain `**Outcome.**` Markdown
   paragraph while `cs-care.md` wraps its final paragraph in explicit
   `<p><strong>` — cosmetic markup inconsistency only, renders identically.
 - **Mobile nav drawer still requires JS** — documented, deliberate exception
