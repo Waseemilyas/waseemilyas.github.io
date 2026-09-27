@@ -2,19 +2,19 @@
 layout: case.njk
 tags: casestudy
 order: 3
-ref: "CS·ICOMMIT"
-title: "iCommit"
-kicker: "Public product / project work"
-description: "iCommit is a live, publicly reachable digital product. Web and product delivery work."
+ref: "CS·PRODUCT"
+title: "A public web product for a professional-services firm"
+kicker: "Anonymised client delivery · public product / web"
+description: "Web and product delivery on a live, publicly reachable digital product for an anonymised professional-services firm. Client never named."
 datasheet:
-  - { k: "REF", v: "CS·ICOMMIT" }
-  - { k: "SECTOR", v: "Public product / web" }
+  - { k: "REF", v: "CS·PRODUCT" }
+  - { k: "SECTOR", v: "Professional services (client anonymised)" }
   - { k: "ROLE", v: "Contributed to building &amp; shipping the product" }
   - { k: "CRAFT", v: "Web / product delivery" }
   - { k: "OUTCOME", v: "A live, publicly reachable product" }
-  - { k: "LINK", v: "<a href='https://icommit.globaldiversitypractice.com' rel='noopener'>icommit.globaldiversitypractice.com ↗</a>" }
+  - { k: "CONSTRAINTS", v: "Client never named · no product link · abstract diagram only" }
 ---
-**Context.** A digital product built and shipped to a public homepage.
+**Context.** A digital product built and shipped to a public homepage for a professional-services firm.
 
 <figure class="figure">
   <svg viewBox="0 0 640 210" role="img" aria-label="Abstract product composition: interface, logic, and data layers composing a shipped product. Generated, no private data.">
@@ -31,10 +31,8 @@ datasheet:
   <figcaption>FIG.1 — Abstract product composition. Generated, no private data.</figcaption>
 </figure>
 
-**Role.** Contributed to building and shipping iCommit.
+**Role.** Contributed to building and shipping the product.
 
 **Craft.** Web and product delivery.
 
 **Outcome.** A live, publicly reachable product.
-
-[Visit iCommit →](https://icommit.globaldiversitypractice.com)
