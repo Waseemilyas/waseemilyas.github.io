@@ -157,4 +157,18 @@ live, and the Pages source is already set to "GitHub Actions". Anything merged t
 is public within a few minutes, so review content before pushing; the content rules that
 replaced the deployment gate are in `AGENTS.md`.
 
+### Release notes
+
+`CHANGELOG.md`, the `v`-prefixed tags and the GitHub releases are written after a change
+is live, not by the deploy. The deploy runs entirely on GitHub's runners, and the notes
+writer does not run there. `.release-notes.json` declares `"deployTrigger": "push"` so
+the hourly release catch-up picks this repository up. When `main` is ahead of the last
+release tag, it writes the notes, commits `CHANGELOG.md` to `main` as
+`release: <version>`, pushes the tag and publishes the matching GitHub release. That
+commit changes only `CHANGELOG.md`, and the deploy it triggers is an ordinary one.
+
+Without that key the catch-up skipped this repository, so changes shipped after
+`v2026.08.31.1` had no notes until October 2026. Do not rewrite a published release
+body, and do not label a user-facing commit as internal to keep it out of the notes.
+
 Contact: `waseem@automancer.uk`
