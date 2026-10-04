@@ -1,5 +1,15 @@
 # Release notes
 
+## v2026.10.04.1 — 4 October 2026
+
+The product case study now identifies its client by sector only.
+
+### Case studies
+
+- The product case study describes its client as a professional-services firm and no longer links to the product. Its address is now /work/cs-product/.
+- The product cards on the home and lab pages now open this case study instead of an external site.
+
+
 ## v2026.08.31.1 — 31 August 2026
 
 The release process now confirms deployment details before reporting a successful release.
