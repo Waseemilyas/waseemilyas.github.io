@@ -5,9 +5,10 @@ published to the open internet at <https://waseemilyas.uk> and is indexed,
 archived, and screenshotted by parties nobody controls. There is no staging gate
 between a commit and the public site. Treat every edit as a press release.
 
-Tracked in Paperclip as **WI-PF1**. This file is public, so it states the rules
-only; the project record in Paperclip holds the internal specifics (client
-codes, credential sources, live object ids). Read that too — never copy any of
+Tracked as **WI-PF1** in the tracker. This file is public, so it states the
+rules only. The internal specifics (client codes, credential sources, live
+object ids) were recorded in Paperclip, now retired; the private Brain document
+`06-paperclip.md` says where that record is kept. Read it too — never copy any of
 it into this repo.
 
 **Repository origin & clone URL:** The remote origin is
@@ -53,7 +54,7 @@ stays: **do not remove it and do not rewrite it.** This is a closed carve-out
 for specific existing content, not a precedent — **do not extend its pattern to
 anything new.** New and changed content follows section 1 with no exceptions,
 and `src/work/cs-care.md` remains the reference implementation. The specifics
-are recorded in Paperclip, not here.
+are in that private record, not here.
 
 ## 2. What agents are here to do
 
@@ -113,8 +114,8 @@ repo is where the line falls:
 3. `docs/PRODUCT.md` — register, audience, and design principles. Read before
    writing or rewriting site copy. It restates only what is already published on
    the live site; section 1 applies to it in full.
-4. The WI-PF1 project record in Paperclip — internal spec, copy deck, art
-   direction, hygiene decisions, and live object ids. Read it before any content
+4. The WI-PF1 private record (see the first section) — internal spec, copy deck,
+   art direction, hygiene decisions, and live object ids. Read it before any content
    change, and copy nothing from it into this repo.
 
 `docs/DESIGN.md` and `docs/PRODUCT.md` are the public, design-only design-system
