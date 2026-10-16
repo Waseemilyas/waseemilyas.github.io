@@ -28,6 +28,7 @@ export const REVISION_RE = /^[0-9a-f]{40}$/;
 /**
  * Validate one candidate revision string.
  * Returns the trimmed value, or throws with a precise diagnosis.
+ * @param {unknown} value
  */
 export function assertRevision(value, label = "revision") {
   const trimmed = typeof value === "string" ? value.trim() : "";
@@ -46,6 +47,7 @@ export function assertRevision(value, label = "revision") {
   return trimmed;
 }
 
+/** @param {{cwd?: string, gitBin: string}} options */
 function gitHead({ cwd, gitBin }) {
   let stdout;
   try {
@@ -56,9 +58,11 @@ function gitHead({ cwd, gitBin }) {
     });
   } catch (err) {
     const detail =
-      err && typeof err.stderr === "string" ? err.stderr.trim().split("\n")[0] : "";
+      err && typeof err === "object" && "stderr" in err && typeof err.stderr === "string"
+        ? err.stderr.trim().split("\n")[0] : "";
+    const code = err && typeof err === "object" && "code" in err ? err.code : undefined;
     throw new Error(
-      `revision: could not read git HEAD (${err?.code ?? "unknown error"}${
+      `revision: could not read git HEAD (${code ?? "unknown error"}${
         detail ? `: ${detail}` : ""
       }). Set SITE_REVISION explicitly when building outside a git checkout.`
     );
@@ -130,8 +134,9 @@ export function resolveRevision({
       ? readGitHead(["rev-parse", "HEAD"])
       : gitHead({ cwd, gitBin });
   } catch (err) {
+    const message = err && typeof err === "object" && "message" in err ? err.message : undefined;
     throw new Error(
-      `revision: could not read git HEAD (${err.message}). Set SITE_REVISION explicitly when building outside a git checkout.`
+      `revision: could not read git HEAD (${message}). Set SITE_REVISION explicitly when building outside a git checkout.`
     );
   }
   const revision = assertRevision(head, "git HEAD");

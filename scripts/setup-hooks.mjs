@@ -46,8 +46,9 @@ export const REQUIRED_HOOKS = ["pre-commit", "pre-push"];
 const OUTSIDE_RE =
   /not a git repository|not a work tree|must be run in a work tree/i;
 
+/** @param {unknown} err */
 function stderrOf(err) {
-  const s = err && typeof err.stderr === "string" ? err.stderr : "";
+  const s = err && typeof err === "object" && "stderr" in err && typeof err.stderr === "string" ? err.stderr : "";
   return s.trim();
 }
 
@@ -56,14 +57,16 @@ function stderrOf(err) {
  * directory containing every entry of REQUIRED_HOOKS as a regular,
  * executable file (symlinks count through their target).
  * Throws with a precise diagnosis listing every problem found.
+ * @param {string} hooksAbsPath
  */
 export function validateHooksDir(hooksAbsPath) {
   let dirStat;
   try {
     dirStat = statSync(hooksAbsPath);
   } catch (err) {
+    const code = err && typeof err === "object" && "code" in err ? err.code : undefined;
     throw new Error(
-      `setup-hooks: refusing to wire — ${hooksAbsPath} cannot be inspected (${err?.code ?? "unknown error"})`
+      `setup-hooks: refusing to wire — ${hooksAbsPath} cannot be inspected (${code ?? "unknown error"})`
     );
   }
   if (!dirStat.isDirectory()) {
@@ -101,13 +104,15 @@ export function validateHooksDir(hooksAbsPath) {
  * @param {string} [options.cwd] working directory to operate on
  * @param {string} [options.gitBin] git executable name/path
  * @param {string} [options.hooksDir] repo-relative hooks directory
- * @returns {{wired: boolean, reason: string, value?: string, hooks?: string[]}}
+ * @returns {{wired: true, reason: string, value: string, hooks: string[]}
+ *         | {wired: false, reason: string}}
  */
 export function setupHooks({
   cwd = process.cwd(),
   gitBin = process.env.GIT_BIN || "git",
   hooksDir = HOOKS_DIR,
 } = {}) {
+  /** @param {string[]} args */
   const run = (args) => {
     let child;
     try {
@@ -122,17 +127,18 @@ export function setupHooks({
       });
     } catch (err) {
       const detail = stderrOf(err);
+      const status = err && typeof err === "object" && "status" in err ? err.status : undefined;
       // Spawn failure (missing/broken executable): status is null and there
       // is no diagnostic from git itself. Never classify these as "outside".
-      if (err == null || err.status === null || err.status === undefined) {
-        const code = err?.code ?? "unknown";
+      if (status === null || status === undefined) {
+        const code = err && typeof err === "object" && "code" in err ? err.code : undefined;
         throw new Error(
-          `setup-hooks: could not execute ${JSON.stringify(gitBin)} (${code}) while running git ${args.join(" ")}`
+          `setup-hooks: could not execute ${JSON.stringify(gitBin)} (${code ?? "unknown"}) while running git ${args.join(" ")}`
         );
       }
       if (!OUTSIDE_RE.test(detail)) {
         throw new Error(
-          `setup-hooks: git ${args.join(" ")} failed with exit status ${err.status}${
+          `setup-hooks: git ${args.join(" ")} failed with exit status ${status}${
             detail ? `: ${detail.split("\n")[0]}` : " (no diagnostic output)"
           }`
         );
@@ -146,7 +152,7 @@ export function setupHooks({
   try {
     topLevel = run(["rev-parse", "--show-toplevel"]);
   } catch (err) {
-    if (err?.outsideWorkTree) {
+    if (err && typeof err === "object" && "outsideWorkTree" in err && err.outsideWorkTree) {
       return { wired: false, reason: "not inside a git work tree; hooks not wired" };
     }
     throw err;
@@ -192,7 +198,8 @@ if (invokedDirectly) {
       console.log(`${scriptName}: skipped — ${result.reason}`);
     }
   } catch (err) {
-    console.error(`${scriptName}: FAILED — ${err.message}`);
+    const message = err && typeof err === "object" && "message" in err ? err.message : undefined;
+    console.error(`${scriptName}: FAILED — ${message}`);
     process.exit(1);
   }
 }

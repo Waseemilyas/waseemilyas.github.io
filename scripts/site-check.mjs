@@ -60,9 +60,14 @@ export const REVISION_ARTIFACT_PATH = "revision.txt";
 // ---------------------------------------------------------------------------
 // small parsing helpers
 
-/** Recursively list every file under `root` as POSIX-style relative paths. */
+/**
+ * Recursively list every file under `root` as POSIX-style relative paths.
+ * @param {string} root
+ */
 export function walkFiles(root) {
+  /** @type {string[]} */
   const out = [];
+  /** @param {string} rel */
   const visit = (rel) => {
     const abs = rel === "" ? root : join(root, rel);
     for (const entry of readdirSync(abs, { withFileTypes: true })) {
@@ -75,8 +80,10 @@ export function walkFiles(root) {
   return out.sort();
 }
 
+/** @param {string} p */
 const isFile = (p) => existsSync(p) && statSync(p).isFile();
 
+/** @param {string} s */
 function decodeEntities(s) {
   return s
     .replace(/&#x([0-9a-fA-F]+);/g, (_, h) => String.fromCodePoint(parseInt(h, 16)))
@@ -90,14 +97,21 @@ function decodeEntities(s) {
 }
 
 /** Remove every accepted reference (&amp;/&lt;/…/&#…;/&#x…) so any leftover
- *  '&' marks a bare ampersand. Applied to text and attribute values alike. */
+ *  '&' marks a bare ampersand. Applied to text and attribute values alike.
+ *  @param {string} s
+ */
 const stripReferences = (s) =>
   s.replace(/&(?:amp|lt|gt|quot|apos|#[0-9]+|#x[0-9a-fA-F]+);/g, "");
 
-/** Parse attributes of every `<tag ...>` occurrence into plain objects. */
+/**
+ * Parse attributes of every `<tag ...>` occurrence into plain objects.
+ * @param {string} html
+ * @param {string} tag
+ */
 export function extractTagAttrs(html, tag) {
   const out = [];
   for (const m of html.matchAll(new RegExp(`<${tag}\\b[^>]*>`, "gi"))) {
+    /** @type {Partial<Record<string, string>>} */
     const attrs = {};
     for (const a of m[0].matchAll(/([\w:-]+)\s*=\s*(?:"([^"]*)"|'([^']*)')/g)) {
       attrs[a[1].toLowerCase()] = decodeEntities(a[2] ?? a[3]);
@@ -107,14 +121,21 @@ export function extractTagAttrs(html, tag) {
   return out;
 }
 
-/** Built-file path → public URL path ("dir/index.html" → "/dir/"). */
+/**
+ * Built-file path → public URL path ("dir/index.html" → "/dir/").
+ * @param {string} relPath
+ */
 export function urlPathFromFile(relPath) {
   if (relPath === "index.html") return "/";
   if (relPath.endsWith("/index.html")) return `/${relPath.slice(0, -"/index.html".length)}/`;
   return `/${relPath}`;
 }
 
-/** Strip origin from an absolute URL produced from `siteUrl`. */
+/**
+ * Strip origin from an absolute URL produced from `siteUrl`.
+ * @param {string} url
+ * @param {string} siteUrl
+ */
 export function pathFromAbsolute(url, siteUrl) {
   return url.startsWith(`${siteUrl}/`) || url === siteUrl
     ? url.slice(siteUrl.length) || "/"
@@ -124,6 +145,8 @@ export function pathFromAbsolute(url, siteUrl) {
 /**
  * Resolve a link/src target to a site-root-relative POSIX path.
  * Returns null for anything not locally resolvable (external, fragment…).
+ * @param {string} fromPageRel
+ * @param {string} target
  */
 export function resolveLocalTarget(fromPageRel, target) {
   let t = target.trim();
@@ -147,7 +170,11 @@ export function resolveLocalTarget(fromPageRel, target) {
   return abs;
 }
 
-/** Does a root-relative path resolve to something in the built tree? */
+/**
+ * Does a root-relative path resolve to something in the built tree?
+ * @param {string} siteDir
+ * @param {string} absPath
+ */
 export function localTargetExists(siteDir, absPath) {
   const clean = absPath === "" ? "" : posix.normalize(absPath);
   if (clean === ".." || clean.startsWith("../")) return false; // escapes built root
@@ -160,10 +187,17 @@ export function localTargetExists(siteDir, absPath) {
 // ---------------------------------------------------------------------------
 // per-page contracts
 
+/**
+ * @param {string} html
+ */
 export function extractHeadings(html) {
   return [...html.matchAll(/<h([1-6])(?=[\s>])/gi)].map((m) => Number(m[1]));
 }
 
+/**
+ * @param {string} page
+ * @param {string} html
+ */
 export function checkHeadings(page, html) {
   const failures = [];
   const levels = extractHeadings(html);
@@ -193,6 +227,10 @@ export function checkHeadings(page, html) {
   return failures;
 }
 
+/**
+ * @param {string} page
+ * @param {string} html
+ */
 export function checkRenderedText(page, html) {
   const failures = [];
 
@@ -235,8 +273,18 @@ export function checkRenderedText(page, html) {
   return failures;
 }
 
+/**
+ * @param {string} page
+ * @param {string} html
+ * @param {string} siteUrl
+ */
 export function checkMetadata(page, html, siteUrl) {
   const failures = [];
+  /**
+   * @param {string} label
+   * @param {unknown} cond
+   * @param {string} detail
+   */
   const expectOnce = (label, cond, detail) => {
     if (!cond) {
       failures.push({ check: "metadata", file: page, message: `contract metadata/${label}: ${detail}` });
@@ -263,6 +311,7 @@ export function checkMetadata(page, html, siteUrl) {
   );
 
   const metas = extractTagAttrs(html, "meta");
+  /** @param {string} prop */
   const og = (prop) => metas.filter((a) => (a.property ?? "").toLowerCase() === prop);
   for (const prop of [
     "og:title",
@@ -292,13 +341,21 @@ export function checkMetadata(page, html, siteUrl) {
   return failures;
 }
 
+/**
+ * @param {string} html
+ */
 export function extractJsonLd(html) {
   return [...html.matchAll(
     /<script\b[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi
   )].map((m) => m[1]);
 }
 
+/**
+ * @param {string} page
+ * @param {string} html
+ */
 export function checkJsonLd(page, html) {
+  /** @type {{check: string, file: string, message: string}[]} */
   const failures = [];
   const blocks = extractJsonLd(html);
   if (blocks.length === 0) {
@@ -310,6 +367,7 @@ export function checkJsonLd(page, html) {
     return failures;
   }
   blocks.forEach((block, i) => {
+    /** @type {unknown} */
     let parsed;
     try {
       parsed = JSON.parse(block);
@@ -317,10 +375,11 @@ export function checkJsonLd(page, html) {
       failures.push({
         check: "jsonld",
         file: page,
-        message: `contract jsonld/valid: block ${i + 1} is not valid JSON (${err.message})`,
+        message: `contract jsonld/valid: block ${i + 1} is not valid JSON (${/** @type {SyntaxError} */ (err).message})`,
       });
       return;
     }
+    /** @type {unknown[]} */
     const nodes = Array.isArray(parsed) ? parsed : [parsed];
     if (!nodes.every((n) => n && typeof n === "object" && "@context" in n)) {
       failures.push({
@@ -333,6 +392,10 @@ export function checkJsonLd(page, html) {
   return failures;
 }
 
+/**
+ * @param {string} pageRel
+ * @param {string} html
+ */
 export function collectLocalTargets(pageRel, html) {
   const targets = [];
   for (const m of html.matchAll(/(?<![\w:-])(href|src)\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)) {
@@ -342,6 +405,11 @@ export function collectLocalTargets(pageRel, html) {
   return targets;
 }
 
+/**
+ * @param {string} page
+ * @param {string} html
+ * @param {string} siteDir
+ */
 export function checkLinks(page, html, siteDir) {
   const failures = [];
   const seen = new Set();
@@ -383,11 +451,13 @@ export function checkLinks(page, html, siteDir) {
  * character validity of text. Do not claim general well-formedness from
  * this function alone.
  * Returns { ok, rootName, xmlns, errors }.
+ * @param {string} xml
  */
 export function validateXml(xml) {
   const errors = [];
   const NAME_RE = /^[A-Za-z_:][A-Za-z0-9._:-]*$/;
   let i = xml.charCodeAt(0) === 0xfeff ? 1 : 0;
+  /** @type {string[]} */
   const stack = [];
   let rootName = null;
   let rootOpenTag = null;
@@ -542,6 +612,9 @@ export function validateXml(xml) {
 // ---------------------------------------------------------------------------
 // sitemap parity + feeds + drafts
 
+/**
+ * @param {string} sitemapXml
+ */
 export function extractSitemapLocs(sitemapXml) {
   return [...sitemapXml.matchAll(/<loc>([^<]*)<\/loc>/g)].map((m) => decodeEntities(m[1]));
 }
@@ -552,17 +625,21 @@ export function extractSitemapLocs(sitemapXml) {
  * against — exact parsed URLs, never a raw substring scan of the XML, so a
  * draft slug "post" cannot false-positive against a published "post-one"
  * route or against prose that merely mentions the word.
+ * @param {string} feedXml
  */
 export function extractFeedUrls(feedXml) {
   const urls = extractTagAttrs(feedXml, "link")
     .map((a) => a.href)
-    .filter((h) => typeof h === "string" && h !== "");
+    .filter(/** @returns {h is string} */ (h) => typeof h === "string" && h !== "");
   for (const m of feedXml.matchAll(/<id>([^<]*)<\/id>/g)) {
     urls.push(decodeEntities(m[1]));
   }
   return urls;
 }
 
+/**
+ * @param {string} postsDir
+ */
 export function findDraftSlugs(postsDir) {
   if (!existsSync(postsDir)) return null;
   const drafts = [];
@@ -599,6 +676,7 @@ export function findDraftSlugs(postsDir) {
  * This inspects signatures and header fields ONLY: it does not decode
  * pixels, verify CRCs or entropy data, or confirm that the file renders.
  * Returns { width, height, format } or null when no such header is present.
+ * @param {Buffer} buffer
  */
 export function imageSize(buffer) {
   // PNG: signature + IHDR chunk shape before reading any fixed offset.
@@ -650,6 +728,11 @@ export function imageSize(buffer) {
  * revision-artifact contract compares `_site/revision.txt` byte-for-byte
  * against it. The CLI resolves it from SITE_REVISION / GITHUB_SHA /
  * `git rev-parse HEAD` when --revision is not given.
+ * @param {object} [options]
+ * @param {string} [options.siteDir]
+ * @param {string} [options.postsDir]
+ * @param {string} [options.siteUrl]
+ * @param {string} [options.expectedRevision] Required at runtime; omission throws.
  */
 export function runSiteChecks({
   siteDir = "_site",
@@ -784,6 +867,7 @@ export function runSiteChecks({
     // word. Routes referenced by each document are extracted with the same
     // parsers used elsewhere in this checker (sitemap <loc>s; feed <link
     // href>s and <id>s) and reduced to site-root paths for comparison.
+    /** @param {string} label */
     const referencedPaths = (label) => {
       const abs = join(siteDir, label);
       if (!isFile(abs)) return null;
@@ -795,6 +879,7 @@ export function runSiteChecks({
         .map((p) => (p.startsWith("/") ? p : null))
         .filter((p) => p !== null);
     };
+    /** @type {[string, string[] | null][]} */
     const referenced = [
       ["sitemap.xml", referencedPaths("sitemap.xml")],
       ["notes/feed.xml", referencedPaths("notes/feed.xml")],
@@ -827,7 +912,12 @@ export function runSiteChecks({
   };
 }
 
-/** Every rendered HTML document identifies the exact build that emitted it. */
+/**
+ * Every rendered HTML document identifies the exact build that emitted it.
+ * @param {string} page
+ * @param {string} html
+ * @param {string | undefined} expectedRevision
+ */
 export function checkRevisionMeta(page, html, expectedRevision) {
   const markers = extractTagAttrs(html, "meta").filter(
     (attrs) => (attrs.name ?? "").toLowerCase() === "waseemilyas-revision",
@@ -855,8 +945,11 @@ export function checkRevisionMeta(page, html, expectedRevision) {
  * Classifies violations as missing, malformed (wrong shape: not a bare
  * full SHA + single newline) or stale (well-formed but a different
  * revision). Read-only.
+ * @param {string} siteDir
+ * @param {string | undefined} expectedRevision
  */
 export function checkRevisionArtifact(siteDir, expectedRevision) {
+  /** @type {{check: string, file: string, message: string}[]} */
   const failures = [];
   const abs = join(siteDir, REVISION_ARTIFACT_PATH);
   if (!isFile(abs)) {
@@ -872,6 +965,7 @@ export function checkRevisionArtifact(siteDir, expectedRevision) {
   if (raw === expectedBytes) return failures;
 
   const body = raw.endsWith("\n") ? raw.slice(0, -1) : raw;
+  /** @param {string} s */
   const preview = (s) =>
     JSON.stringify(s.length > 80 ? `${s.slice(0, 77)}…(${s.length} bytes)` : s);
   if (!REVISION_RE.test(body) || raw !== `${body}\n`) {
@@ -890,6 +984,12 @@ export function checkRevisionArtifact(siteDir, expectedRevision) {
   return failures;
 }
 
+/**
+ * @param {string} page
+ * @param {string} imageUrl
+ * @param {string} html
+ * @param {{siteDir: string, siteUrl: string}} options
+ */
 function checkOgImage(page, imageUrl, html, { siteDir, siteUrl }) {
   const failures = [];
   const localPath = pathFromAbsolute(imageUrl, siteUrl) ?? imageUrl;
@@ -948,6 +1048,7 @@ function checkOgImage(page, imageUrl, html, { siteDir, siteUrl }) {
 
 function main() {
   const args = process.argv.slice(2);
+  /** @param {string} name */
   const flag = (name) => {
     const i = args.indexOf(name);
     return i >= 0 ? args[i + 1] : undefined;
@@ -962,7 +1063,7 @@ function main() {
       ? assertRevision(flag("--revision"), "--revision")
       : resolveRevision().revision;
   } catch (err) {
-    console.error(`site-check: ${err.message}`);
+    console.error(`site-check: ${/** @type {Error} */ (err).message}`);
     process.exit(1);
   }
 

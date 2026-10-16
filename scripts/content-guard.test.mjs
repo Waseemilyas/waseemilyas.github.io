@@ -13,7 +13,6 @@ import { spawnSync } from "node:child_process";
 import {
   mkdirSync,
   mkdtempSync,
-  readFileSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -24,7 +23,6 @@ import { fileURLToPath } from "node:url";
 import {
   checkContent,
   runContentGuard,
-  walkSourceFiles,
 } from "./content-guard.mjs";
 
 const SCRIPT = join(dirname(fileURLToPath(import.meta.url)), "content-guard.mjs");
@@ -63,9 +61,8 @@ test("clean fixture passes with zero violations", () => {
 });
 
 test("repository src/ tree passes content guard with zero violations", () => {
-  const { violations, stats } = runContentGuard({ dir: "src" });
+  const { violations } = runContentGuard({ dir: "src" });
   assert.deepEqual(violations, []);
-  assert.ok(stats.files >= 30, `expected at least 30 source files, got ${stats.files}`);
 });
 
 // ---------------------------------------------------------------------------

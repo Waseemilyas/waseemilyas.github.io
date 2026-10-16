@@ -50,3 +50,7 @@ openclaw.json
 /notes.md
 
 .DS_Store
+
+# Local audit receipts and browser captures
+.audit/
+__pycache__/

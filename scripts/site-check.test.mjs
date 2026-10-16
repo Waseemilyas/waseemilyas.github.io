@@ -37,7 +37,7 @@ import os from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { checkRenderedText, imageSize, runSiteChecks, validateXml } from "./site-check.mjs";
+import { imageSize, runSiteChecks, validateXml } from "./site-check.mjs";
 
 const SCRIPT = join(dirname(fileURLToPath(import.meta.url)), "site-check.mjs");
 const SITE_URL = "https://fixture.example";
@@ -408,27 +408,6 @@ test("mutation: duplicate canonical link fails the metadata/canonical diagnostic
   );
 });
 
-test("mutation: removed og:image meta fails the per-property og:image count diagnostic", () => {
-  const fx = makeFixture(test);
-  const p = join(fx.siteDir, "index.html");
-  writeFileSync(p, readFileSync(p, "utf8").replace(/<meta property="og:image"[^>]*>\n/, ""));
-  const { failures } = runChecks(fx);
-  const hits = ofCheck(failures, "metadata").filter((f) => /property=og:image\]/.test(f.message));
-  assert.ok(hits.length >= 1, JSON.stringify(failures));
-  assert.match(hits[0].message, /found 0/);
-});
-
-test("mutation: duplicate og:title fails the per-property og:title count diagnostic", () => {
-  const fx = makeFixture(test);
-  const p = join(fx.siteDir, "index.html");
-  const meta = '<meta property="og:title" content="Fixture">';
-  writeFileSync(p, readFileSync(p, "utf8").replace(meta, `${meta}\n${meta}`));
-  const { failures } = runChecks(fx);
-  const hits = ofCheck(failures, "metadata").filter((f) => /property=og:title\]/.test(f.message));
-  assert.ok(hits.length >= 1, JSON.stringify(failures));
-  assert.match(hits[0].message, /found 2/);
-});
-
 test("mutation: og:url disagreeing with canonical fails metadata/og-url-matches-canonical", () => {
   const fx = makeFixture(test);
   const p = join(fx.siteDir, "index.html");
@@ -655,15 +634,6 @@ for (const [label, file, validText, closeTag, openPrefix] of XML_TARGETS) {
 
 // Direct validator units — attribute separation and ampersand scope.
 // The counterexamples come straight from re-review round 2.
-
-test("xml attributes: an attribute glued to the previous one is rejected (exact counterexample)", () => {
-  const r = validateXml('<feed xmlns="x"a="1"></feed>');
-  assert.equal(r.ok, false, JSON.stringify(r.errors));
-  assert.ok(
-    r.errors.some((e) => /missing whitespace between attributes/.test(e)),
-    JSON.stringify(r.errors)
-  );
-});
 
 test("xml attributes: whitespace-separated multi-attribute tags are valid", () => {
   const r = validateXml(

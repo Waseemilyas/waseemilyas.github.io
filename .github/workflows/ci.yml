@@ -1,56 +1,38 @@
-# PR checks share one full-history checkout; deployment keeps its main push workflow.
 name: CI
-
 on:
   pull_request:
   workflow_dispatch:
-
 permissions:
   contents: read
-
+  pull-requests: read
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
-
 jobs:
   checks:
-    name: checks
+    name: ci gate
     runs-on: ubuntu-24.04
     timeout-minutes: 10
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
-      - name: Secret scan (gitleaks)
+      - name: Secret scan
         uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatic token; not a user credential
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_ENABLE_COMMENTS: "false"
+          GITLEAKS_REPORT_PATH: ${{ runner.temp }}/gitleaks.sarif
       - uses: Automancer-Ltd/estate-checks@v1
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          # pnpm 11 (pinned in package.json packageManager) needs Node >= 22.13,
-          # matching deploy.yml.
-          node-version: 22
+          node-version: 24
           cache: pnpm
-      - run: corepack enable
-      - name: Install dependencies (frozen lockfile)
-        run: pnpm install --frozen-lockfile
-      - name: Focused tests (node:test, concurrency 1)
-        run: pnpm run test
-      - name: Content guardrails (AGENTS.md §1)
-        run: node scripts/content-guard.mjs
-      - name: Production build
-        run: pnpm run build
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm test
+      - name: Build and check the rendered site
+        run: pnpm build && node scripts/site-check.mjs
         env:
-          # Revision under build, set AT the build step: the emitted
-          # /revision.txt must carry exactly this value.
           SITE_REVISION: ${{ github.sha }}
-        # No SENTRY_DSN on purpose: non-production builds emit no monitoring loader.
-      - name: Rendered-site contract checks
-        # Expected revision defaults to SITE_REVISION/GITHUB_SHA — identical to
-        # what the build above just emitted.
-        run: node scripts/site-check.mjs

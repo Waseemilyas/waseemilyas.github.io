@@ -1,5 +1,8 @@
 {
   "kind": "auto",
-  "url": "https://waseemilyas.github.io/revision.txt",
-  "text": true
+  "url": "https://waseemilyas.uk/revision.txt",
+  "text": true,
+  "owner": "GitHub Actions .github/workflows/deploy.yml",
+  "platform": "GitHub Pages",
+  "preview": false
 }
