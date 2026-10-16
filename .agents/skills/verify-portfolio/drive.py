@@ -32,14 +32,17 @@ def run(*words):
 def state(expression):
     return json.loads(json.loads(run("eval", "JSON.stringify(" + expression + ")")))
 def require(expression):
-    assert state(expression) is True, expression
+    if state(expression) is not True:
+        run("eval", "JSON.stringify({path:location.pathname,width:innerWidth,ready:document.readyState,nav:document.getElementById('primary-nav')?.outerHTML})")
+        raise AssertionError(expression)
 def remember():
     # Retain exact PID/start identities owned by this session/profile, never a broad reap.
     for entry in Path("/proc").iterdir():
         if not entry.name.isdigit(): continue
         try:
             command = (entry / "cmdline").read_bytes().replace(b"\0", b" ").decode(errors="replace")
-            if (session in command or (entry / "cwd").resolve() == root) and ("agent-browser" in command or "chrome" in command):
+            executable = (entry / "comm").read_text().strip()
+            if executable in ("agent-browser", "chrome", "chromium", "chrome_crashpad") and (session in command or (entry / "cwd").resolve() == root):
                 owned[entry.name] = (entry / "stat").read_text().split(") ", 1)[1].split()[19]
         except (FileNotFoundError, PermissionError, ProcessLookupError): pass
 
@@ -122,7 +125,10 @@ try:
     capture("phone-nav-open")
     run("press", "Escape")
     require("document.activeElement.matches('.nav-toggle') && document.getElementById('primary-nav').inert && document.querySelector('.nav-toggle').getAttribute('aria-expanded') === 'false'")
-    run("click", ".nav-toggle"); run("click", '#primary-nav a[href="/about/"]')
+    run("click", ".nav-toggle")
+    run("wait", "--fn", "document.getElementById('primary-nav').getAnimations().every(a=>a.playState==='finished') && getComputedStyle(document.getElementById('primary-nav')).transform==='matrix(1, 0, 0, 1, 0, 0)'")
+    run("click", '#primary-nav a[href="/about/"]')
+    run("wait", "--fn", "location.pathname === '/about/' && document.getElementById('primary-nav').inert")
     require("location.pathname === '/about/' && document.getElementById('primary-nav').inert")
     run("set", "viewport", "1440", "900")
     require("!document.getElementById('primary-nav').inert && !document.getElementById('primary-nav').hasAttribute('aria-hidden')")
