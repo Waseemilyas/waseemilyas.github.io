@@ -30,7 +30,7 @@ def run(*words):
     assert result.returncode == 0, result.stdout
     return result.stdout.strip()
 def state(expression):
-    return json.loads(run("eval", "JSON.stringify(" + expression + ")"))
+    return json.loads(json.loads(run("eval", "JSON.stringify(" + expression + ")")))
 def require(expression):
     assert state(expression) is True, expression
 def remember():
@@ -39,7 +39,7 @@ def remember():
         if not entry.name.isdigit(): continue
         try:
             command = (entry / "cmdline").read_bytes().replace(b"\0", b" ").decode(errors="replace")
-            if session in command and ("agent-browser" in command or "chrome" in command):
+            if (session in command or (entry / "cwd").resolve() == root) and ("agent-browser" in command or "chrome" in command):
                 owned[entry.name] = (entry / "stat").read_text().split(") ", 1)[1].split()[19]
         except (FileNotFoundError, PermissionError, ProcessLookupError): pass
 
