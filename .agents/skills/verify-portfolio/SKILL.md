@@ -1,0 +1,73 @@
+---
+name: verify-portfolio
+description: Drive the real portfolio pages, capability map and mobile navigation after a change, retaining browser evidence and cleanup receipts.
+---
+
+# Verify the portfolio
+
+Last verified: 2026-10-16 on Linux with Chromium.
+
+## Launch
+
+Use a clean checkout. Install Node/pnpm from the repository's package configuration,
+Python 3 and a global `agent-browser` with Chrome available. Do not install browser
+automation into this package. Run ordinary browser checks on the local browser host.
+
+```bash
+pnpm install --frozen-lockfile
+pnpm check
+pnpm build
+node scripts/site-check.mjs
+python3 .agents/skills/verify-portfolio/drive.py --out .audit/browser-local
+```
+
+The output directory must not already exist. The executable helper serves this
+checkout's `_site/` on its own ephemeral loopback port and opens a unique browser
+session. It refuses tracked or untracked source changes and a stale build before
+starting either. Each CLI operation is bounded; the whole browser path has a
+five-minute ceiling. Run `checkq --` around install/check/build and the helper on
+shared hosts that provide it.
+
+## Doctor
+
+`agent-browser doctor` must find a usable browser. The helper checks exact
+`revision.txt` bytes before driving anything, and verifies the rendered revision
+meta tag. Its server and browser session are private to the run. A failure before
+those checks is unavailable verification, not proof that the website is broken.
+
+## Drive
+
+Run the helper above. It operates actual navigation, nodes and keyboard events;
+it does not call internal application functions. [features/index.md](features/index.md)
+maps the complete visitor surface. It captures each built HTML page at desktop
+and phone widths, checks overflow, drives the mobile drawer, changes capability
+selection and checks reduced motion. It reads feed/sitemap/audio bodies and contact
+link targets without opening external destinations, sending mail or playing audio.
+
+After a deploy, build the checked-out merged revision and repeat against production:
+
+```bash
+python3 .agents/skills/verify-portfolio/drive.py --out .audit/browser-production --url https://waseemilyas.uk
+```
+
+The production mode is read-only and requires the same expected build revision.
+Never treat an older site's successful journey as proof of the new revision.
+
+## Evidence
+
+Retain `commands.log`, `result.json` and all PNGs in the chosen output directory.
+Read the screenshots: a passed DOM assertion cannot establish legibility. Copy or
+archive the directory outside a disposable checkout before removing it. The
+receipt records revision, actual actions, page coverage, process identities and
+port closure. A partially populated receipt after failure is not a pass.
+
+Browser dimensions do not prove physical phone, Safari, screen-reader, actual touch,
+platform mail handlers or audible playback behaviour. Reduced-motion rendering is
+checked; no frame-rate or performance claim is made.
+
+## Cleanup
+
+The helper closes its unique normal and JavaScript-disabled sessions, shuts down its own server in `finally`,
+checks its listener is gone and compares recorded PID/start identities. It leaves
+evidence intact. Inspect `survivors` and `port_closed` in the receipt; verify the
+named identities if a close command failed. Never close all browser sessions.

@@ -30,7 +30,8 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm check
+      - name: Quick lint, typecheck and privacy scan
+        run: pnpm check
       - run: pnpm test
       - name: Build and check the rendered site
         run: pnpm build && node scripts/site-check.mjs
