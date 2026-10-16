@@ -156,6 +156,7 @@ try:
     require("document.getElementById('primary-nav').getAttribute('data-open') === null")
     require("document.querySelector('[data-bind=h]').textContent === " + json.dumps(nodes[0]["title"]))
     run("scrollintoview", '.foot .fnav a[href="/about/"]')
+    run("wait", "--fn", "(()=>{const r=document.querySelector('.foot .fnav a[href=\"/about/\"]').getBoundingClientRect();return r.top>=0&&r.bottom<=innerHeight})()")
     capture("phone-nojs-footer")
     run("click", '.foot .fnav a[href="/about/"]')
     require("location.pathname === '/about/'")
