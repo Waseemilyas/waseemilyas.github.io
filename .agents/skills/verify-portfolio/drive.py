@@ -16,6 +16,7 @@ args.out = args.out.resolve()
 args.out.mkdir(parents=True, exist_ok=False)
 started = time.monotonic()
 session = "portfolio-" + uuid.uuid4().hex[:12]
+sessions = [session]
 server = None
 port = None
 receipts = []
@@ -144,7 +145,12 @@ try:
             if route.endswith(".xml"): assert marker in body
     run("open", base + "/contact/")
     require("document.querySelector('a[href^=\"mailto:\"]').href.startsWith('mailto:')")
-    run("network", "route", "**/assets/js/site.js", "--abort")
+    errors = run("errors")
+    assert errors in ("", "No errors", "No page errors", "[]"), errors
+    remember(); run("close")
+    # A fresh browser disables author scripts before load, including cached assets.
+    session += "-nojs"; sessions.append(session)
+    env["AGENT_BROWSER_ARGS"] += ",--blink-settings=scriptEnabled=false"
     run("set", "viewport", "390", "844")
     run("open", base + "/?nojs=" + session)
     require("document.getElementById('primary-nav').getAttribute('data-open') === null")
@@ -153,8 +159,7 @@ try:
     capture("phone-nojs-footer")
     run("click", '.foot .fnav a[href="/about/"]')
     require("location.pathname === '/about/'")
-    run("network", "unroute", "**/assets/js/site.js")
-    receipts.append("script-blocked phone page: static capability text and footer navigation work")
+    receipts.append("JavaScript-disabled phone page: static capability text and footer navigation work")
     errors = run("errors")
     assert errors in ("", "No errors", "No page errors", "[]"), errors
     receipts.append("feed/sitemap/audio HTTP bodies present; contact links inspected without sending")
@@ -173,7 +178,7 @@ finally:
             except FileNotFoundError: pass
         if port:
             with socket.socket() as probe: assert probe.connect_ex(("127.0.0.1", port)) != 0
-        result = {"success": success and not survivors, "revision": revision, "session": session, "base": base if 'base' in locals() else None, "elapsed_seconds": time.monotonic()-started, "receipts": receipts, "owned_pid_identities": owned, "survivors": survivors, "port": port, "port_closed": True if port else None, "screenshots": sorted(p.name for p in args.out.glob("*.png"))}
+        result = {"success": success and not survivors, "revision": revision, "sessions": sessions, "base": base if 'base' in locals() else None, "elapsed_seconds": time.monotonic()-started, "receipts": receipts, "owned_pid_identities": owned, "survivors": survivors, "port": port, "port_closed": True if port else None, "screenshots": sorted(p.name for p in args.out.glob("*.png"))}
         (args.out / "result.json").write_text(json.dumps(result, indent=2) + "\n")
         log.close()
         assert not survivors, "Owned processes survived: " + str(survivors)
