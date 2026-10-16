@@ -1,50 +1,20 @@
-# CI safety net for waseemilyas.uk.
-#
-# Runs on every pull request and every push to main (deploy.yml remains the
-# publisher). Two independent jobs so a secret-scan failure can never be
-# blurred into a build failure:
-#
-#   secret-scan — official gitleaks action, SHA-pinned to the release commit
-#                 resolved from the gitleaks/gitleaks-action repository
-#                 (v3.0.0 = e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e).
-#                 Full history is fetched so push builds are scanned whole.
-#                 GITHUB_TOKEN below is the workflow's own automatic token;
-#                 no user credentials or license secrets are required for a
-#                 personal-account repo. PR commenting stays off so the job
-#                 needs no write permissions at all.
-#
-#   site-check  — frozen install, focused tests (concurrency 1), content
-#                 guardrails (AGENTS.md §1), production build, then the
-#                 rendered-site contract checker over the built output. The
-#                 build's SITE_REVISION (github.sha, set at the build step)
-#                 is what the checker expects /revision.txt to carry. No
-#                 SENTRY_DSN is set here: the monitoring loader is env-gated
-#                 and emits nothing in non-production builds, and the
-#                 checker validates the rendered output as built in exactly
-#                 this configuration.
-#
-# House rules honoured: pull_request trigger; push filtered to main;
-# cancel-in-progress concurrency; timeout-minutes on every job; GitHub-hosted
-# runner (public repo); every action pinned to an immutable commit SHA
-# (Dependabot keeps the pins fresh); least-privilege permissions.
-
+# PR checks share one full-history checkout; deployment keeps its main push workflow.
 name: CI
 
 on:
   pull_request:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  secret-scan:
-    name: Secret scan (gitleaks)
+  checks:
+    name: checks
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
@@ -52,31 +22,13 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          fetch-depth: 0 # scan full history on push events
+          fetch-depth: 0
       - name: Secret scan (gitleaks)
         uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # automatic token; not a user credential
           GITLEAKS_ENABLE_COMMENTS: "false"
-
-  estate-checks:
-    name: estate checks
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
       - uses: Automancer-Ltd/estate-checks@v1
-
-  site-check:
-    name: Tests, build and rendered-site contracts
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    permissions:
-      contents: read
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
