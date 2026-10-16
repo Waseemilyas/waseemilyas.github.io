@@ -41,12 +41,14 @@ export const ALLOWED_EMAIL_DOMAINS = ["automancer.uk", "waseemilyas.uk"];
 /**
  * Closed carve-out per AGENTS.md §1 for pre-existing content approved in June 2026.
  * Specific rules exempted for specific grandfathered files only.
+ * @type {Partial<Record<string, Set<string>>>}
  */
 export const GRANDFATHERED_EXEMPTIONS = {
   "_data/timeline.json": new Set(["guard/commercial-revenue"]),
   "src/_data/timeline.json": new Set(["guard/commercial-revenue"]),
 };
 
+/** @param {string} relPath */
 function getExemptions(relPath) {
   const norm = normalize(relPath).replace(/\\/g, "/");
   const withoutSrc = norm.startsWith("src/") ? norm.slice(4) : norm;
@@ -60,13 +62,18 @@ function getExemptions(relPath) {
   return set;
 }
 
+/** @param {string} content @param {number} index */
 function lineNumberAtIndex(content, index) {
   return content.slice(0, index).split("\n").length;
 }
 
-/** Recursively list every non-binary file under `root` as relative POSIX paths. */
+/** Recursively list every non-binary file under `root` as relative POSIX paths.
+ * @param {string} root
+ */
 export function walkSourceFiles(root) {
+  /** @type {string[]} */
   const out = [];
+  /** @param {string} rel */
   const visit = (rel) => {
     const abs = rel === "" ? root : join(root, rel);
     for (const entry of readdirSync(abs, { withFileTypes: true })) {
@@ -88,11 +95,16 @@ export function walkSourceFiles(root) {
 /**
  * Scan a single file's content against content guardrails.
  * Returns an array of violations: { check, file, line, message }.
+ * @param {string} relPath
+ * @param {string} content
+ * @returns {{check: string, file: string, line: number, message: string}[]}
  */
 export function checkContent(relPath, content) {
+  /** @type {ReturnType<typeof checkContent>} */
   const violations = [];
   const exemptions = getExemptions(relPath);
 
+  /** @param {string} ruleId @param {string} message @param {number} index */
   const report = (ruleId, message, index) => {
     if (exemptions.has(ruleId)) return;
     const line = lineNumberAtIndex(content, index);
@@ -220,6 +232,7 @@ export function runContentGuard({ dir = "src" } = {}) {
 
 function main() {
   const args = process.argv.slice(2);
+  /** @param {string} name */
   const flag = (name) => {
     const i = args.indexOf(name);
     return i >= 0 ? args[i + 1] : undefined;

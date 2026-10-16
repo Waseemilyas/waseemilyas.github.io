@@ -1,100 +1,49 @@
-# Build the Eleventy site and deploy it to GitHub Pages.
-# Deployment is UNGATED: the site is public by design and agent-maintained, so a
-# push to main publishes. The pre-launch manual-only gate retired when the site
-# went live.
-# The content rules that replace that gate live in AGENTS.md.
-#
-# After every deploy, production is verified to serve EXACTLY the revision that
-# was just shipped: /revision.txt (emitted by the build from GITHUB_SHA via
-# SITE_REVISION) is fetched cache-busted with bounded retries and its body is
-# compared byte-for-byte against github.sha. A timeout or mismatch goes red.
 name: Build & deploy site
-
 on:
   push:
     branches: [main]
   workflow_dispatch:
-
-# No workflow-level grants: each job asks for exactly what it needs (least
-# privilege). Build only reads the repo; only deploy may write Pages.
 permissions: {}
-
 concurrency:
   group: pages
   cancel-in-progress: false
-
 jobs:
-  build:
-    runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    permissions:
-      contents: read # checkout only; the build writes nothing back
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          # pnpm 11 (pinned in package.json packageManager) needs Node >= 22.13.
-          # Node 20 here silently broke the deploy from the pnpm migration until
-          # push-triggered deploys surfaced it.
-          node-version: 22
-          cache: pnpm
-      - run: corepack enable
-      - run: pnpm install --frozen-lockfile
-      - name: Production build
-        run: pnpm run build
-        env:
-          # Public browser DSN; kept in Actions so non-production builds do not
-          # emit a monitoring loader.
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-          # The revision being built, set AT the build step so the generator
-          # itself sees it: /revision.txt carries exactly this value. The
-          # generator cross-checks it against GITHUB_SHA and fails the build on
-          # any invalid or contradictory input.
-          SITE_REVISION: ${{ github.sha }}
-      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
-        with:
-          path: _site
-
   deploy:
-    needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
-      contents: read # checkout of the verifier script
-      pages: write # deploy-pages publishes the artifact
-      id-token: write # deploy-pages OIDC deployment token
+      contents: read
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          persist-credentials: false # verification only; no git push from this job
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # This build is consumed by Pages, rather than repeating the PR test suite.
+      - name: Build the production artifact and validate its contracts
+        run: pnpm build && node scripts/site-check.mjs
+        env:
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SITE_REVISION: ${{ github.sha }}
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: _site
       - id: deployment
         uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
-      - name: Verify production serves the deployed revision
-        # Cache-busted GET of /revision.txt after the Pages deployment step,
-        # bounded retries for CDN propagation; the response BODY must equal
-        # github.sha exactly (status alone certifies nothing). Failure here is
-        # red. No secrets are read or printed by the verifier.
-        #
-        # Retry budget — derived from this job's 10-minute (600 s) timeout,
-        # not from any claimed measurement of Pages propagation:
-        #   worst case = attempts × timeout + (attempts − 1) × backoff
-        #              = 8 × 10 s + 7 × 3 s = 101 s
-        # ≈ 17% of the job budget, leaving ample headroom for checkout and the
-        # deploy step itself. If propagation ever exceeds ~100 s the run goes
-        # red and the budget gets revisited explicitly rather than padded.
-        # The verifier validates these controls before its retry loop; the
-        # test suite asserts these exact configured values are accepted.
-        run: |
-          node scripts/verify-deploy.mjs \
-            --url "${PRODUCTION_URL}/revision.txt" \
-            --revision "${SITE_REVISION}" \
-            --attempts 8 \
-            --backoff-ms 3000 \
-            --timeout-ms 10000
+      - name: Verify the exact revision from production
+        run: >-
+          node scripts/verify-deploy.mjs
+          --url https://waseemilyas.uk/revision.txt
+          --revision "${SITE_REVISION}"
+          --attempts 8 --backoff-ms 3000 --timeout-ms 10000
         env:
-          PRODUCTION_URL: https://waseemilyas.uk
           SITE_REVISION: ${{ github.sha }}

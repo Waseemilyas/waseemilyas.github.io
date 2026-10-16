@@ -32,10 +32,6 @@ import { HOOKS_DIR, setupHooks } from "./setup-hooks.mjs";
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const SCRIPT = join(REPO_ROOT, "scripts", "setup-hooks.mjs");
 
-function git(cwd, ...args) {
-  return execFileSync("git", args, { cwd, encoding: "utf8" }).trim();
-}
-
 /** Read a config value; "" when the key is unset (git exits 1). */
 function gitGet(cwd, key) {
   const r = spawnSync("git", ["config", "--get", key], { cwd, encoding: "utf8" });
@@ -159,7 +155,7 @@ test("unreadable .git/config (permission failure) fails rather than skipping", (
   }
 });
 
-test("CLI entry fails with exit 1 and a diagnosis on an operational git error — never a silent skip", (t) => {
+test("CLI entry fails with exit 1 and a diagnosis on an operational git error — never a silent skip", () => {
   const r = spawnSync(process.execPath, [SCRIPT], {
     cwd: REPO_ROOT,
     encoding: "utf8",

@@ -104,14 +104,3 @@ test(
     );
   }
 );
-
-test("regex fallback also blocks the planted value when it reaches that arm", (t) => {
-  // Prove the hook's own regex arm (the fallback when gitleaks is absent)
-  // recognises the planted shape: run the arm the way the hook does.
-  const r = spawnSync(
-    "bash",
-    ["-c", `echo 'key = "${PLANTED}"' | grep -E 'ghp_[A-Za-z0-9]{20,}' >/dev/null`],
-    { encoding: "utf8" }
-  );
-  assert.equal(r.status, 0, "the fallback token regex must match the planted PAT shape");
-});

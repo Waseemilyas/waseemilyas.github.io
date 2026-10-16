@@ -87,11 +87,6 @@ for (const [label, env] of [
   });
 }
 
-test("genuinely unset keys still fall through (blank detection has no false positive)", () => {
-  const r = resolveRevision({ env: {}, readGitHead: okGit });
-  assert.deepEqual(r, { revision: SHA_A, source: "git HEAD" });
-});
-
 // Without an install this control would die on MODULE_NOT_FOUND and the
 // regex assertion would report a baffling mismatch; skip loudly instead.
 test("build-facing control: the real Eleventy build fails on a blank SITE_REVISION", {

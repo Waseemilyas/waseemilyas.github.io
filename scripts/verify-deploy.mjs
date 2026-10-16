@@ -40,7 +40,9 @@ import { assertRevision, resolveRevision } from "./revision.mjs";
 export const DEFAULT_URL = "https://waseemilyas.uk/revision.txt";
 export const DEFAULT_PROVE_URL = "http://127.0.0.1:9/revision.txt"; // loopback discard port: refuses connections
 
-/** Hide any userinfo credentials before a URL is printed anywhere. */
+/** Hide any userinfo credentials before a URL is printed anywhere.
+ * @param {string} rawUrl
+ */
 export function sanitizeUrl(rawUrl) {
   try {
     const u = new URL(rawUrl);
@@ -54,7 +56,10 @@ export function sanitizeUrl(rawUrl) {
   }
 }
 
-/** Cache-bust so CDNs cannot answer with a cached earlier revision. */
+/** Cache-bust so CDNs cannot answer with a cached earlier revision.
+ * @param {string} rawUrl
+ * @param {string | number} token
+ */
 export function cacheBustUrl(rawUrl, token) {
   const u = new URL(rawUrl);
   u.searchParams.set("cb", String(token));
@@ -65,6 +70,7 @@ export function cacheBustUrl(rawUrl, token) {
  * Describe a malformed body WITHOUT reproducing any of it. Diagnostics must
  * never emit response content: a malformed body means something other than
  * our own artifact answered, and that something could include secrets.
+ * @param {string} bodyText
  */
 export function describeMalformedBody(bodyText) {
   const bytes = Buffer.byteLength(bodyText);
@@ -81,6 +87,9 @@ export function describeMalformedBody(bodyText) {
  * One bounded fetch of the revision artifact.
  * Resolves { status, body } on ANY HTTP response; rejects { name, message }
  * on transport-level failure (connection refused, DNS, abort/timeout…).
+ * @param {string} url
+ * @param {number} timeoutMs
+ * @param {typeof fetch} fetchImpl
  */
 async function fetchAttempt(url, timeoutMs, fetchImpl) {
   try {
@@ -92,8 +101,10 @@ async function fetchAttempt(url, timeoutMs, fetchImpl) {
     const body = await res.text();
     return { status: res.status, body };
   } catch (err) {
-    throw Object.assign(new Error(`${err?.name ?? "Error"}: ${err?.message ?? err}`), {
-      name: err?.name ?? "Error",
+    const name = err && typeof err === "object" && "name" in err ? err.name : undefined;
+    const message = err && typeof err === "object" && "message" in err ? err.message : undefined;
+    throw Object.assign(new Error(`${name ?? "Error"}: ${message ?? err}`), {
+      name: name ?? "Error",
     });
   }
 }
@@ -104,6 +115,9 @@ async function fetchAttempt(url, timeoutMs, fetchImpl) {
  * 40-char SHA followed by one newline. Anything else is either malformed
  * (wrong shape — e.g. another application's HTML) or stale (a well-formed
  * older revision).
+ * @param {string} bodyText
+ * @param {string} expectedRevision
+ * @returns {{kind: "match", revision: string} | {kind: "malformed"} | {kind: "stale", got: string}}
  */
 export function classifyBody(bodyText, expectedRevision) {
   if (bodyText === `${expectedRevision}\n`) return { kind: "match", revision: expectedRevision };
@@ -112,6 +126,7 @@ export function classifyBody(bodyText, expectedRevision) {
   return { kind: "stale", got: body };
 }
 
+/** @type {(ms: number) => Promise<void>} */
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 /**
@@ -120,6 +135,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
  * backoff must be finite and non-negative. Rejecting zero/NaN/negative here is
  * what guarantees the loop always executes at least once and therefore always
  * has a concrete failure to report — no null dereference on exhaustion.
+ * @param {{attempts: number, backoffMs: number, timeoutMs: number}} controls
  */
 export function validateControls({ attempts, backoffMs, timeoutMs }) {
   if (!Number.isInteger(attempts) || attempts < 1) {
@@ -163,9 +179,10 @@ export async function verifyDeploy({
   timeoutMs = 10000,
   fetchImpl = fetch,
   sleepImpl = sleep,
-} = {}) {
+} = { url: DEFAULT_URL, revision: "" }) {
   assertRevision(revision, "expected revision");
   validateControls({ attempts, backoffMs, timeoutMs });
+  /** @type {{reason: "network" | "http" | "mismatch" | "malformed", detail: string} | null} */
   let last = null;
   for (let i = 1; i <= attempts; i++) {
     const busted = cacheBustUrl(url, `${Date.now()}-${i}`);
@@ -173,7 +190,8 @@ export async function verifyDeploy({
     try {
       res = await fetchAttempt(busted, timeoutMs, fetchImpl);
     } catch (err) {
-      last = { reason: "network", detail: `attempt ${i}: request failed (${err.message})` };
+      const message = err && typeof err === "object" && "message" in err ? err.message : undefined;
+      last = { reason: "network", detail: `attempt ${i}: request failed (${message})` };
     }
     if (res) {
       if (res.status !== 200) {
@@ -191,6 +209,7 @@ export async function verifyDeploy({
     }
     if (i < attempts) await sleepImpl(backoffMs);
   }
+  if (!last) throw new Error("verify-deploy: no verification attempt completed");
   return { ok: false, reason: last.reason, attempts, detail: `${last.detail}; after ${attempts} attempt(s)` };
 }
 
@@ -198,6 +217,14 @@ export async function verifyDeploy({
  * The verifier's own proof: run it against an address that cannot serve and
  * require failure. Performs no deploy. Throws if the probe unexpectedly
  * passes (which would mean the gate cannot fail and certifies nothing).
+ * @param {object} options
+ * @param {string} [options.url]
+ * @param {string} options.revision
+ * @param {number} [options.attempts]
+ * @param {number} [options.backoffMs]
+ * @param {number} [options.timeoutMs]
+ * @param {typeof fetch} [options.fetchImpl]
+ * @param {(ms: number) => Promise<void>} [options.sleepImpl]
  */
 export async function proveVerification({
   url = DEFAULT_PROVE_URL,
@@ -207,7 +234,7 @@ export async function proveVerification({
   timeoutMs = 3000,
   fetchImpl = fetch,
   sleepImpl = sleep,
-} = {}) {
+} = { revision: "" }) {
   console.log(
     `verify-deploy: PROVE MODE — expecting verification to FAIL against ${sanitizeUrl(url)}; failure is the required outcome; no deploy occurs.`
   );
@@ -231,10 +258,12 @@ export async function proveVerification({
   return result;
 }
 
+/** @param {string[]} argv */
 export function parseArgs(argv) {
   // A flag that is present must have a value; a following "--…" token or the
   // end of argv is a missing value, rejected loudly rather than silently
   // treated as unset.
+  /** @param {string} name */
   const flag = (name) => {
     const i = argv.indexOf(name);
     if (i < 0) return undefined;
@@ -244,6 +273,7 @@ export function parseArgs(argv) {
     }
     return value;
   };
+  /** @param {string} name */
   const numFlag = (name) => {
     const raw = flag(name);
     if (raw === undefined) return undefined;
@@ -253,6 +283,7 @@ export function parseArgs(argv) {
     }
     return n;
   };
+  /** @param {string} name */
   const has = (name) => argv.includes(name);
   return {
     prove: has("--prove-verification"),
@@ -283,7 +314,8 @@ async function main() {
   try {
     expected = args.revision ? assertRevision(args.revision, "--revision") : resolveRevision().revision;
   } catch (err) {
-    console.error(`verify-deploy: ${err.message}`);
+    const message = err && typeof err === "object" && "message" in err ? err.message : undefined;
+    console.error(`verify-deploy: ${message}`);
     process.exit(1);
   }
 
@@ -312,8 +344,9 @@ if (
   process.argv[1] &&
   import.meta.url === pathToFileURL(resolve(process.argv[1])).href
 ) {
-  main().catch((err) => {
-    console.error(`verify-deploy: FAILED — ${err.message}`);
+  main().catch(/** @param {unknown} err */ (err) => {
+    const message = err && typeof err === "object" && "message" in err ? err.message : undefined;
+    console.error(`verify-deploy: FAILED — ${message}`);
     process.exit(1);
   });
 }

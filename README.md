@@ -18,110 +18,28 @@ pnpm run serve     # local dev server with live reload
 pnpm run build     # static build → _site/
 ```
 
-### Checks and git hooks
-
-The repo's safety net is a focused node:test suite — dependency-free except for
-jsdom, which loads the real built page to exercise the mobile nav drawer:
+### Check a change
 
 ```bash
-pnpm run test      # focused node:test suite (concurrency 1) — checker, guard + hook-setup logic
-pnpm run build     # production build → _site/
-pnpm run check     # tests, content guardrails over src/, production build, then rendered-site contracts over _site/
+pnpm check                                 # lint, strict JS types, source privacy guard
+pnpm check scripts/nav-drawer.test.mjs      # plus only this named owner test
 ```
 
-`scripts/content-guard.mjs` scans source files under `src/` to enforce the standing
-guardrails in `AGENTS.md` §1: no commercially sensitive fees, currency amounts, day/hourly
-rates, contract terms, profit margins or commercial revenue statements; no internal
-filesystem paths (`/opt`, `/home`, `/Users`, `C:\`); no IP addresses or internal mesh domains
-(`*.ts.net`, `.internal`, `.local`, `.lan`); no non-allowlisted emails; and no credentials or
-secrets in code or comments. Pre-existing approved content carries scoped closed-carve-out
-exemptions.
+CI runs `pnpm test`, a production build and `node scripts/site-check.mjs` once on
+the pull request. The rendered checker covers page headings, metadata, links,
+JSON-LD, draft exclusion, sitemap/feed parity, revision bytes and OG image headers.
+Image pixels are not decoded. The privacy scanner complements the judgement rules
+in [AGENTS.md](AGENTS.md); it cannot decide whether anonymised copy identifies a client.
 
-`scripts/site-check.mjs` verifies the **built** output against the site's published
-contracts and fails with file-named diagnostics when any of them break: exactly one
-`<h1>` per page with no skipped heading levels; each required description/canonical/OG
-metadata property present exactly once (with `og:url` matching the canonical); JSON-LD
-present, parseable and carrying an `@context`; every root-relative or relative `href`/
-`src` resolving into `_site/`; rendered text carrying no leak literals (`TODO`, `FIXME`,
-`lorem`, `[object Object]`) and no empty `<h1>`–`<h3>` or `<p>` content elements (preventing
-silent data-loop drift);
-sitemap ↔ built-page parity in both directions, with every `<loc>` on the site's own
-origin; structurally valid sitemap/Atom XML (single root element, balanced tags,
-whitespace-separated quoted attributes, no bare `&` in text or attribute values)
-declaring their expected roots; draft posts never
-reaching disk, the sitemap or the feed; a required `/revision.txt` whose bytes are
-exactly the expected build revision plus one newline (see below — missing, malformed or
-stale artifacts fail the check); and the OG image's PNG signature+IHDR (or
-JPEG SOFn) header reporting the declared 1200×630. Header check only — pixels are
-not decoded, checksums are not verified, renderability is not claimed.
+Strict `checkJs` uses the native TypeScript compiler over production browser,
+build and CLI JavaScript. TypeScript's editor compiler remains available for
+language servers. After the frozen install, `tsconfig.json` resolves imports
+without a build or generated types. `pnpm exec tsc --noEmit` is an editor-compiler
+cross-check, not another required CI pass. Exact tool versions live in `package.json`.
 
-### Build revision artifact and deploy proof
-
-Every production build stamps its output with the exact commit it was built from:
-
-- **Artifact.** `_site/revision.txt` (served at `/revision.txt`) contains **exactly**
-  the full 40-character commit SHA followed by one newline. Nothing else is written.
-- **HTML metadata.** Every rendered page also carries
-  `<meta name="waseemilyas-revision" content="<full-sha>">`, checked against the
-  same expected build revision as `/revision.txt`.
-- **Revision source.** `SITE_REVISION` is selected first, and only when it is valid
-  (exactly 40 lowercase hex) and consistent with any `GITHUB_SHA` also present;
-  otherwise `GITHUB_SHA` (the authority on GitHub Actions); otherwise a local build
-  derives it truthfully from `git rev-parse HEAD`, so developers never set anything
-  by hand.
-- **No ambiguous builds.** A malformed (not 40 lowercase hex chars) or contradictory
-  (`SITE_REVISION` ≠ `GITHUB_SHA`) input **fails the build** rather than publishing an
-  ambiguous value. A variable that is **set but blank/whitespace is an error too** —
-  it fails the resolution instead of silently falling through to the next source;
-  only a genuinely unset key falls through. The shared resolver lives in
-  `scripts/revision.mjs`.
-- **Checked at build time.** `node scripts/site-check.mjs` requires the artifact to
-  match the expected revision (`--revision <sha>`, defaulting to the same resolution
-  as the build) and distinguishes missing / malformed / stale artifacts.
-- **Verified in production after every deploy.** `.github/workflows/deploy.yml`
-  fetches `https://waseemilyas.uk/revision.txt` **after** the Pages deployment step
-  with a cache-busting query parameter and bounded retries (Pages propagation is
-  asynchronous), captures the response body and compares it byte-for-byte against
-  `github.sha`. A timeout, HTTP error, connection failure, malformed body or stale
-  revision turns the workflow red with a concise diagnostic that prints no secrets.
-- **The verifier proves itself.** Its gate can fail and can pass, both directions are
-  tested:
-
-  ```bash
-  node scripts/verify-deploy.mjs --prove-verification
-  # expects FAILURE against http://127.0.0.1:9/revision.txt (loopback, nothing
-  # listening), states that no deploy occurs, and itself exits non-zero if the
-  # probe unexpectedly passes
-  pnpm run test   # includes acceptance + rejection controls: matching SHA accepted;
-                  # old SHA / HTTP error / connection failure / malformed content /
-                 # another app's response all rejected, servers loopback-only and closed
-  ```
-
-Git hooks live in `.githooks/` (sensitive-path blocklist, gitleaks staged/history
-scan, regex fallback). They are wired automatically by installs that do real work
-(fresh clones, CI runners) — the package's `prepare` lifecycle invokes
-`node scripts/setup-hooks.mjs`, which validates the hooks directory first (`.githooks`
-must be a directory containing executable `pre-commit` and `pre-push` files — a file
-named `.githooks`, a missing hook or a non-executable one fails the install loudly),
-then sets local `core.hooksPath=.githooks` and verifies it by reading the value back
-from git config; note pnpm may skip
-lifecycle scripts entirely on an already up-to-date re-install. Only a genuine
-"not inside a git work tree" result (or an absent `.githooks/`) degrades to an
-informative no-op, so installs in non-git contexts never fail; operational git
-failures — missing executable, unsafe-directory refusal, permission errors —
-fail loudly with their diagnosis instead of masquerading as a skip. Wire by hand
-anytime with `pnpm run setup`, and confirm
-wiring with `git config --get core.hooksPath` (it must print `.githooks`) —
-never assume from file existence alone. Setup itself proves the hooks are
-present and executable before wiring, so a successful run means git will
-invoke them; it does not guarantee any particular hook passes. The hooks use
-`gitleaks` when available
-on PATH and fall back to a regex/filename scan when not; CI runs the official
-gitleaks action regardless.
-
-Pull requests get their own CI (`.github/workflows/ci.yml`): secret scan plus
-tests/build/check. Deployment stays automatic on push to main via
-`.github/workflows/deploy.yml`.
+Installs wire `.githooks/` through `prepare`; `pnpm setup` verifies and rewires them
+when an up-to-date install skipped lifecycle scripts. Keep the gitleaks rules and
+sensitive-path guards enabled.
 
 ## Structure
 
@@ -148,27 +66,23 @@ sit in `posts/` safely.
 
 ## Deployment
 
-Deployment is automatic. `.github/workflows/deploy.yml` builds `_site/` and publishes it
-to GitHub Pages on **every push to `main`**, and can also be started by hand
-(`workflow_dispatch`). After publishing, the workflow verifies the live domain serves
-exactly the deployed commit via `/revision.txt` (see above). The pre-launch
-manual-only gate was retired when the site went
-live, and the Pages source is already set to "GitHub Actions". Anything merged to `main`
-is public within a few minutes, so review content before pushing; the content rules that
-replaced the deployment gate are in `AGENTS.md`.
+`.github/workflows/deploy.yml` builds and publishes `_site/` on a main push or
+manual dispatch. It checks the generated site, uploads it to GitHub Pages, then
+runs `scripts/verify-deploy.mjs` against the custom domain. Production must serve
+exactly the expected SHA plus one newline from `/revision.txt`; each HTML page also
+carries that SHA in its revision meta tag. Revision precedence and validation live
+in `scripts/revision.mjs`; blank, malformed or contradictory inputs fail the build.
 
-### Release notes
+```bash
+node scripts/verify-deploy.mjs --prove-verification
+# Deliberately probes an unavailable loopback endpoint and requires rejection.
+node scripts/verify-deploy.mjs --url https://waseemilyas.uk/revision.txt
+# Requires the checkout revision; bounded retries reject stale or malformed output.
+```
 
-`CHANGELOG.md`, the `v`-prefixed tags and the GitHub releases are written after a change
-is live, not by the deploy. The deploy runs entirely on GitHub's runners, and the notes
-writer does not run there. `.release-notes.json` declares `"deployTrigger": "push"` so
-the hourly release catch-up picks this repository up. When `main` is ahead of the last
-release tag, it writes the notes, commits `CHANGELOG.md` to `main` as
-`release: <version>`, pushes the tag and publishes the matching GitHub release. That
-commit changes only `CHANGELOG.md`, and the deploy it triggers is an ordinary one.
-
-Without that key the catch-up skipped this repository, so changes shipped after
-`v2026.08.31.1` had no notes until October 2026. Do not rewrite a published release
-body, and do not label a user-facing commit as internal to keep it out of the notes.
+`deploy.json` declares the live revision endpoint. Main is production; no staging
+or preview environment is needed. `.release-notes.json` enrolls shipped changes
+in the estate's release catch-up. The notes writer runs separately from Actions;
+its changelog commit also publishes normally. Published release bodies are history.
 
 Contact: `waseem@automancer.uk`

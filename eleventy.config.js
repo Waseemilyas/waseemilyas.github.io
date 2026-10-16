@@ -2,6 +2,16 @@
 // Source in src/, static output in _site/. No client framework; pure HTML/CSS/vanilla JS.
 import { resolveRevision } from "./scripts/revision.mjs";
 
+/**
+ * Only the Eleventy boundary used here; page data comes from front matter.
+ * @typedef {{data: {order?: number, draft?: boolean}, date: Date}} CollectionItem
+ * @param {{
+ * addGlobalData(name: string, value: string): void,
+ * addPassthroughCopy(paths: Record<string, string>): void,
+ * addCollection(name: string, collect: (api: {getFilteredByTag(tag: string): CollectionItem[]}) => CollectionItem[]): void,
+ * addFilter(name: string, filter: (date: Date | string | number) => string): void
+ * }} eleventyConfig
+ */
 export default function (eleventyConfig) {
   // Resolve the built revision up front: an invalid, missing or contradictory
   // revision input fails the build here rather than publishing ambiguity.
@@ -26,7 +36,7 @@ export default function (eleventyConfig) {
     api
       .getFilteredByTag("note")
       .filter((item) => !item.data.draft)
-      .sort((a, b) => b.date - a.date)
+      .sort((a, b) => b.date.getTime() - a.date.getTime())
   );
 
   // Readable date filter for notes/feed.

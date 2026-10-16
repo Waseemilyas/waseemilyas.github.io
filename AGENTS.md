@@ -5,20 +5,11 @@ published to the open internet at <https://waseemilyas.uk> and is indexed,
 archived, and screenshotted by parties nobody controls. There is no staging gate
 between a commit and the public site. Treat every edit as a press release.
 
-Tracked as **WI-PF1** in the tracker. This file is public, so it states the
-rules only. The internal specifics (client codes, credential sources, live
-object ids) were recorded in Paperclip, now retired; the private Brain document
-`06-paperclip.md` says where that record is kept. Read it too — never copy any of
-it into this repo.
+Origin: <https://github.com/Waseemilyas/waseemilyas.github.io.git>. The local
+checkout is called `portfolio`; there is no `Waseemilyas/portfolio` repository.
 
-**Repository origin & clone URL:** The remote origin is
-`https://github.com/Waseemilyas/waseemilyas.github.io.git`.
-The local directory is named `portfolio`, but the GitHub repository is
-`Waseemilyas/waseemilyas.github.io` (the GitHub Pages user repository).
-Cloning `Waseemilyas/portfolio.git` fails with "Repository not found"; always clone
-or reference `https://github.com/Waseemilyas/waseemilyas.github.io.git`.
-
----
+Before content changes, read the private project record identified by the estate's
+private Brain index. Copy none of that record into this public repository.
 
 ## 1. Standing content guardrails (never negotiable)
 
@@ -56,41 +47,24 @@ anything new.** New and changed content follows section 1 with no exceptions,
 and `src/work/cs-care.md` remains the reference implementation. The specifics
 are in that private record, not here.
 
-## 2. What agents are here to do
+## 2. Scope and publishing
 
-Keep the site a current reflection of the kind of work Waseem is doing —
-generically described. In scope, ungated:
+Anonymised case studies, notes, capability/about/timeline copy, build tooling,
+dependencies, accessibility, performance and link hygiene are in scope. Redesigns,
+art direction, new top-level sections and stack changes need explicit instruction.
+Preserve settled design decisions and grandfathered copy.
 
-- New or refreshed case studies in `src/work/`, anonymised per rule 4.
-- Notes/posts in `src/notes/posts/` (front matter: `title`, `date`, `summary`,
-  optional `tags`, `draft`). Reveal **Notes** in the primary nav only once at
-  least one non-draft post is published.
-- Capability, about, and timeline copy in `src/_data/` and the `*.njk` pages.
-- Build, dependency, accessibility, performance, and link hygiene.
+A merge to `main` publishes through `.github/workflows/deploy.yml`. Publishing is
+ungated; email, DMs, form submissions, directory submissions and other outreach
+need Waseem's approval under the estate decision policy.
 
-Out of scope without an explicit instruction: redesigns, art-direction changes,
-new top-level sections, changing the stack, and anything recorded as a settled
-design decision.
+## 3. Working rules
 
-## 3. Publishing is ungated; telling people about it is not
-
-The estate's decision policy applies here unchanged. What is specific to this
-repo is where the line falls:
-
-- **Publishing is ungated.** Push to `main`; GitHub Actions builds and deploys
-  to GitHub Pages. Publish a content change that satisfies section 1 on your own
-  authority.
-- **Anything that reaches a person is outbound**, and needs Waseem's approval
-  first: email, DMs, messages, a contact form, submitting the site to a
-  directory, newsletter, aggregator, or awards list, posting it to social media,
-  or contacting anyone on Waseem's behalf. Publishing a page is not outreach;
-  telling someone about it is.
-
-## 4. Working rules
-
-- Verify before publishing: `pnpm install && pnpm run build` must pass, and read
-  the rendered output of whatever changed — not just the source.
-- `grep` the diff for client names and codes before committing. If the change
+- Install with `pnpm install --frozen-lockfile`. Run `pnpm check` plus explicit
+  changed-owner test paths, for example `pnpm check scripts/nav-drawer.test.mjs`.
+  CI owns the full suite and rendered-site checks. Read the changed output before
+  publishing. `README.md` owns launch and release commands.
+- Search the diff for client names and codes before committing. If the change
   touches `src/work/`, `src/_data/`, `src/about.njk`, `src/index.njk`, or
   `src/lab.njk`, re-read section 1 first.
 - Credentials stay in the host secret store. The browser error-reporting DSN is
@@ -106,7 +80,7 @@ repo is where the line falls:
   must remain in this repository and must not be deleted or renamed. See
   `audio/README.md`.
 
-## 5. Docs, in reading order
+## 4. Read by task
 
 1. `README.md` — stack, build, structure. Read before your first build here.
 2. `docs/DESIGN.md` — the design system: tokens, type scale, component
@@ -114,9 +88,7 @@ repo is where the line falls:
 3. `docs/PRODUCT.md` — register, audience, and design principles. Read before
    writing or rewriting site copy. It restates only what is already published on
    the live site; section 1 applies to it in full.
-4. The WI-PF1 private record (see the first section) — internal spec, copy deck,
-   art direction, hygiene decisions, and live object ids. Read it before any content
-   change, and copy nothing from it into this repo.
+4. The private project record above — before any content change; publish none of it.
 
 `docs/DESIGN.md` and `docs/PRODUCT.md` are the public, design-only design-system
 context. Root `/DESIGN.md` and `/PRODUCT.md` stay gitignored for internal
