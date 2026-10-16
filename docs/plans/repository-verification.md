@@ -59,6 +59,20 @@ beside the feature map. The two missed targets are tracked as follow-up work.
 Monitoring registry coverage is tracked separately: the first release verifier
 proved revision change but could not check unknown error/uptime sources.
 
-Remaining work: inspect screenshots, re-run independently, merge on green and
-verify production. Preserve unrelated worktrees. Exact receipts belong in the
-pull requests.
+The final helper passed at `263be6106608429828cad573340105df4025dc85` in
+35.760575366 seconds; its footer capture now waits for the actual link to enter
+the viewport. The chair inspected the complete contact sheet and full-size
+capability, phone article/case-study, desktop About and no-JavaScript footer
+captures. An independent clean checkout of `11faf0b29b6d84fe96d4e1df14a6ad4cacf71cb9`
+passed frozen install, quick check, build, rendered contracts and the identical
+helper in 35.605875138 seconds, retaining another 33 screenshots and closed-port
+receipt. The only subsequent CI change names the lint/type/privacy work already
+performed by `pnpm check`; it adds no check or job.
+
+The raw floor is 80/82; one reader pass, deliberate product failure and retained
+independent rerun evidence bring the judged result to 91. No architectural
+decision record was invented for points. Always-loaded instructions decreased
+from 16,547 to 9,846 bytes; the full documentation union grew because it retains
+the specification, feature map and raw reader evidence. Exact final budgets,
+green CI and merged production receipts belong in the pull requests. Preserve
+unrelated worktrees and archive browser evidence before removing owned checkouts.
