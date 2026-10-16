@@ -41,6 +41,24 @@ actual release/privacy/hook contracts. Five retained owners went red under delib
 in-memory mutations. Documentation union including this plan was 51,047 → 45,967
 bytes at the first slice; final navigation/feature-map growth is measured separately.
 
-Remaining work: execute the clean-checkout browser path, inspect screenshots, obtain
-fresh-reader timings, re-run independently, merge on green and verify production.
-Preserve unrelated worktrees. Exact receipts belong in the pull requests.
+The clean browser path passed on `01a1d1b627d33e2580bb3c8fa8338dde803f6cbb`
+in 34.072166461 seconds with 33 screenshots. It visited all 14 built pages at
+desktop and phone dimensions, operated capability and navigation inputs, checked
+reduced motion and used footer navigation with author scripts disabled. Its
+ephemeral listener closed and none of the twelve recorded process identities
+survived. Failed drafts remain failed evidence: one decoded browser strings
+incorrectly, one clicked the moving drawer, and one failed to block a cached
+script. The helper now waits for the actual transition, starts a separate browser
+with scripts disabled before load, and identifies cleanup targets by executable
+and checkout/session ownership rather than matching shell argument text.
+
+Fresh source readers took 23.785300956 seconds for navigation, 53.056715082 for
+draft publication and 35.230232854 for capabilities. One of three passed the
+thirty-second target; raw before/after traces and uncertainties are committed
+beside the feature map. The two missed targets are tracked as follow-up work.
+Monitoring registry coverage is tracked separately: the first release verifier
+proved revision change but could not check unknown error/uptime sources.
+
+Remaining work: inspect screenshots, re-run independently, merge on green and
+verify production. Preserve unrelated worktrees. Exact receipts belong in the
+pull requests.

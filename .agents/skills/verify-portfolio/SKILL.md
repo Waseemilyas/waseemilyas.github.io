@@ -67,7 +67,7 @@ checked; no frame-rate or performance claim is made.
 
 ## Cleanup
 
-The helper closes only its unique session, shuts down its own server in `finally`,
+The helper closes its unique normal and JavaScript-disabled sessions, shuts down its own server in `finally`,
 checks its listener is gone and compares recorded PID/start identities. It leaves
 evidence intact. Inspect `survivors` and `port_closed` in the receipt; verify the
 named identities if a close command failed. Never close all browser sessions.

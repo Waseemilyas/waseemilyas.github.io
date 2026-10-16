@@ -9,6 +9,9 @@
 | [Read with reduced motion](motion.md) | Entry reveals and static content | `setupReveals`, reduced-motion CSS |
 | [Contact and linked assets](links-and-assets.md) | Contact links, sitemap, intentional audio URLs | Contact/base templates, passthrough config |
 
+[Source comprehension receipts](reader-traces.md) retain the before/after reader
+measurements and full explanations, including the two final missed targets.
+
 The helper discovers built HTML files from `_site/` and checks each at both widths.
 This avoids maintaining a second route inventory. New interactions need an actual
 Drive step and resulting-state proof here; a page screenshot alone does not exercise them.

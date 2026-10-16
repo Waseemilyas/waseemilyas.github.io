@@ -9,5 +9,5 @@ longer inert or aria-hidden.
 `setupNavigation` owns registration and `setDrawer` owns the accessibility state.
 The stylesheet owns visibility and its matching breakpoint. Without JavaScript the
 mobile toggle cannot open; footer links are the documented fallback. The helper
-blocks the enhancement script in a fresh navigation and checks that fallback,
+starts a fresh browser with author scripts disabled and checks that fallback,
 including static capability text. Do not call that a working no-JS drawer.
