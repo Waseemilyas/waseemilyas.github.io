@@ -28,6 +28,19 @@ had no correctness lint. The initial script floor was 38/82. Documentation and
 reader measurements, deliberate failure, final checks and merged receipts follow
 in the pull requests; they are evidence, not future requirements on contributors.
 
-Remaining work: complete strict checks, inspect bounded patches, land the first
-slice on green, then execute the clean-checkout browser path and fresh reader
-traces. Verify each merged revision from production. Preserve unrelated worktrees.
+First slice merged as PR #31, revision `401611ed0030633d26e64e8921a31ecfec2edf43`.
+Its exact-head CI passed in 49 seconds. All production JavaScript now checks strict.
+The local quick check took 2.153 seconds; native typecheck 0.632 seconds against
+editor tsc 1.567 seconds. Deliberate Escape-focus typo was rejected, then restored
+byte for byte. Before a build, a fresh installed checkout's language server resolved
+both project-source and Node declaration imports. All built files except the
+browser enhancement script matched the baseline bytes.
+
+The test audit removed six redundant/detached tests and two assertion pins, keeping
+actual release/privacy/hook contracts. Five retained owners went red under deliberate
+in-memory mutations. Documentation union including this plan was 51,047 → 45,967
+bytes at the first slice; final navigation/feature-map growth is measured separately.
+
+Remaining work: execute the clean-checkout browser path, inspect screenshots, obtain
+fresh-reader timings, re-run independently, merge on green and verify production.
+Preserve unrelated worktrees. Exact receipts belong in the pull requests.

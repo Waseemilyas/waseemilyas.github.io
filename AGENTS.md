@@ -93,3 +93,11 @@ need Waseem's approval under the estate decision policy.
 `docs/DESIGN.md` and `docs/PRODUCT.md` are the public, design-only design-system
 context. Root `/DESIGN.md` and `/PRODUCT.md` stay gitignored for internal
 planning material and must not be un-ignored.
+
+## Behaviour and proof
+
+Read `GLOSSARY.md` for the portfolio's language and `SPEC.md` for observed behaviour.
+For browser verification, use `.agents/skills/verify-portfolio/SKILL.md`; its feature
+map names deciding symbols and covers the visitor journeys. The work record is
+`docs/plans/repository-verification.md`. No generated evidence belongs in public
+site content.
