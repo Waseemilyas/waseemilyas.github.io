@@ -1,5 +1,14 @@
 # Release notes
 
+## v2026.10.17.2 — 17 October 2026
+
+The workflow diagrams now remain easy to read on narrow screens.
+
+### Easier to read
+
+- Diagram labels stay at a readable size on phones, while the diagrams keep their wide layout.
+
+
 ## v2026.10.04.1 — 4 October 2026
 
 The product case study now identifies its client by sector only.
