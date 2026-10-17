@@ -45,7 +45,7 @@ description: "Waseem Ilyas runs Automancer, a UK automation consultancy helping 
 
     <div class="cap" data-cal>
       <figure class="capfig" aria-label="Capability map: five domains wired to one practice hub. Activate a node to read its description.">
-        <svg viewBox="0 0 720 440">
+        <svg class="cap-settled" viewBox="0 0 720 440">
           <g id="traces" stroke-linecap="round">
             {%- for n in capabilities.nodes %}
             <path class="trace" data-for="{{ n.key }}" d="{{ n.trace }}"/>
@@ -64,6 +64,14 @@ description: "Waseem Ilyas runs Automancer, a UK automation consultancy helping 
           </g>
           {%- endfor %}
         </svg>
+        <div class="cap-phone">
+          <p class="cap-phone-hub">PRACTICE</p>
+          <div class="cap-phone-grid">
+            {%- for n in capabilities.nodes %}
+            <button type="button" class="node" aria-describedby="capread" data-key="{{ n.key }}" data-code="{{ n.code }}" data-title="{{ n.title }}" data-body="{{ n.body }}">{{ n.label }}</button>
+            {%- endfor %}
+          </div>
+        </div>
       </figure>
 
       <div class="capread" id="capread" aria-live="polite">
