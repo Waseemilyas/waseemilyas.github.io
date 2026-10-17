@@ -1,14 +1,358 @@
 # Source comprehension receipts
 
-Last verified: 2026-10-16 on Linux.
+Last verified: 2026-10-17 on Linux.
 
-Each reader started before repository discovery and stopped after explaining the deciding code and change paths. These are source traces, separate from browser verification. Monotonic nanoseconds include discovery, reading and comprehension. Different fresh readers took the before and after samples; one sample is not a controlled performance benchmark. One of three final traces meets thirty seconds, earning three of ten judged points. Draft and capability traces remain follow-up work; no rerun was coached to replace them. `<checkout>` replaces the local checkout path below. Historical line references in these receipts describe their recorded revisions, not navigation instructions.
+Each reader started before repository discovery and stopped after explaining the deciding code and change paths. These are source traces, separate from browser verification. Monotonic nanoseconds include discovery, reading and comprehension. Different fresh readers took the before and after samples; one sample is not a controlled performance benchmark. The 16 Oct rows are the first-pass samples. After revision 06a7c55 (#33), fresh readers re-timed the draft and capability traces on 17 Oct (follow-up table below); no reader was coached. `<checkout>` replaces the local checkout path below. Historical line references in these receipts describe their recorded revisions, not navigation instructions.
 
 | Behaviour | Before (seconds) | After (seconds) | Final result |
 | --- | ---: | ---: | --- |
 | Mobile navigation | 41.901065364 | 23.785300956 | Pass |
 | Draft publication | 16.749124588 | 53.056715082 | Miss |
 | Capability map | 95.196378679 | 35.230232854 | Miss |
+
+Follow-up on 17 Oct at `06a7c55` (one fresh Codex reader per behaviour, each in a clean checkout with this file removed):
+
+| Behaviour | Seconds | Result |
+| --- | ---: | --- |
+| Draft publication | 16.641284098 | Pass |
+| Capability map | 18.001881478 | Pass |
+
+The capability reader made two failed path guesses, included in its time. Neither run built or opened a browser. Single samples, not a controlled benchmark.
+
+## reader-followup-drafts
+
+```json
+{
+  "start": {
+    "monotonic_ns": 1953368741420592,
+    "utc": "2026-10-17T06:45:16.120078+00:00"
+  },
+  "end": {
+    "monotonic_ns": 1953385382704690,
+    "utc": "2026-10-17T06:45:32.761361+00:00"
+  },
+  "elapsed_seconds": 16.641284098,
+  "commands": [
+    {
+      "order": 1,
+      "command": "python3 -c \"import time,datetime;print(time.monotonic_ns(),datetime.datetime.now(datetime.timezone.utc).isoformat())\"",
+      "purpose": "Start timestamp; first command, immediately before first repository read.",
+      "exit_code": 0
+    },
+    {
+      "order": 2,
+      "command": "pwd && rg --files -g 'AGENTS.md' -g 'VISION.md' -g 'SPEC.md' -g 'GLOSSARY.md' -g '*eleventy*' -g '*notes*' -g '*sitemap*' -g '*feed*' -g '*atom*' -g 'package.json' -g '!\\.audit/**' -g '!CHANGELOG*' -g '!node_modules/**' -g '!_site/**' -g '!\\.git/**'",
+      "exit_code": 0
+    },
+    {
+      "order": 3,
+      "command": "rg -n --glob '!node_modules/**' --glob '!_site/**' --glob '!.audit/**' --glob '!CHANGELOG*' --glob '!**/CHANGELOG*' --glob '!pnpm-lock.yaml' 'draft|collections\\.notes|sitemap|feed\\.njk|eleventyExcludeFromCollections|permalink' eleventy.config.js src scripts SPEC.md GLOSSARY.md package.json",
+      "exit_code": 0
+    },
+    {
+      "order": 4,
+      "command": "nl -ba eleventy.config.js && nl -ba src/notes/feed.njk && nl -ba src/sitemap.njk && rg --files src/notes src/_data src/_includes scripts -g '!*.test.mjs' -g '!*.css' -g '!*.svg' -g '!*.png' -g '!*.jpg' -g '!*.woff*'",
+      "exit_code": 0
+    },
+    {
+      "order": 5,
+      "parallel_group": 1,
+      "command": "nl -ba src/notes/posts/posts.11tydata.js && nl -ba src/notes/index.njk && nl -ba src/_includes/note.njk && nl -ba src/notes/posts/example-post.md && nl -ba package.json && nl -ba scripts/site-check.mjs | sed -n '613,665p;675,710p;850,915p;1020,1090p' && nl -ba scripts/site-check.test.mjs | sed -n '740,840p' && rg -n 'site-check|build|check' .github/workflows README.md scripts/check.mjs",
+      "exit_code": 0
+    },
+    {
+      "order": 6,
+      "parallel_group": 1,
+      "command": "cat /opt/automancer/brain/INDEX.md && cat /home/ubuntu/.agents/skills/retrospective/SKILL.md && cat GLOSSARY.md && cat SPEC.md",
+      "exit_code": 0
+    },
+    {
+      "order": 7,
+      "command": "python3 -c \"import time,datetime;print(time.monotonic_ns(),datetime.datetime.now(datetime.timezone.utc).isoformat())\"",
+      "purpose": "End timestamp after understanding deciding code, before writing the receipt or explanation.",
+      "exit_code": 0
+    }
+  ],
+  "command_log_scope": "Exact shell commands through the comprehension end timestamp. Commands 5 and 6 were dispatched concurrently in the listed order; completion ordering is not asserted. All succeeded; no failed commands. Receipt creation/readback occurs afterwards and is excluded from comprehension timing.",
+  "explanation": {
+    "summary": "Draft exclusion has two source-level layers: directory computed data prevents page output and collection membership; the named notes collection independently filters draft items. Notes listing, sitemap and Atom feed all iterate that filtered collection.",
+    "deciding_files": [
+      {
+        "file": "src/notes/posts/posts.11tydata.js",
+        "lines": "6-14",
+        "role": "Directory data applies layout note.njk, tag note and default draft:false to posts. A note's front matter can mark draft:true. Computed permalink returns false for a truthy draft, preventing Eleventy from writing its page; otherwise its route is /notes/<fileSlug>/. Computed eleventyExcludeFromCollections returns true for a draft, preventing collection membership. These are separate controls: suppressing a URL alone is not the entire discovery policy."
+      },
+      {
+        "file": "eleventy.config.js",
+        "lines": "34-39",
+        "role": "The named notes collection takes items tagged note, filters !item.data.draft and sorts newest first. This explicitly enforces non-draft membership in addition to directory-level collection exclusion."
+      },
+      {
+        "file": "src/notes/index.njk",
+        "lines": "16-30",
+        "role": "The Notes listing renders only collections.notes. It shows an empty-state message if that collection is empty; it does not scan Markdown files independently."
+      },
+      {
+        "file": "src/sitemap.njk",
+        "lines": "7-16",
+        "role": "The sitemap has an explicit static route list, a case-study loop and a notes loop. Individual note URLs come only from collections.notes at lines 14-16; /notes/ itself remains an intentional static URL."
+      },
+      {
+        "file": "src/notes/feed.njk",
+        "lines": "12-24",
+        "role": "Atom entries come only from collections.notes at lines 16-24. Feed updated time also uses the first published note at lines 12-14. Drafts therefore affect neither entries nor that timestamp."
+      },
+      {
+        "file": "src/_includes/note.njk",
+        "lines": "4-18",
+        "role": "The note layout renders article content; it contains no draft switch. The publication decision happens upstream in computed data and collection construction."
+      },
+      {
+        "file": "src/notes/posts/example-post.md",
+        "lines": "1-15",
+        "role": "Existing concrete example has draft:true at line 6 and documents publishing by removing that flag or setting it false at line 15."
+      }
+    ],
+    "rendered_check_fallback": {
+      "source": "scripts/site-check.mjs:643-654,855-907",
+      "description": "After a build, findDraftSlugs reads direct .md children of the posts directory and detects a standalone draft:true front-matter line. The draft-exclusion check fails if _site/notes/<slug> exists or if the exact /notes/<slug>/ route (also accepting no trailing slash) occurs in sitemap loc values or Atom link href/id values. Routes are parsed rather than substring-matched. A missing source posts directory fails the check.",
+      "url_extractors": "scripts/site-check.mjs:618-637",
+      "failure_exit": "scripts/site-check.mjs:1070-1082",
+      "invocation": "node scripts/site-check.mjs after pnpm build; found in .github/workflows/ci.yml:36-37 and .github/workflows/deploy.yml:31-33. Neither was run.",
+      "existing_regression_source": "scripts/site-check.test.mjs:742-790 injects draft output and references, including Atom id, and expects rejection. Read only; not executed.",
+      "limits": "The dedicated draft check does not directly inspect the Notes listing. Listing exclusion follows its collections.notes loop; independently proving rendered listing absence would require inspecting _site/notes/index.html. The checker uses a small front-matter regex and filename-based conventional routes, not Eleventy's full data cascade; its direct-directory scan does not establish coverage for nested posts or alternative truthy draft representations.",
+      "clean_output_boundary": "SPEC.md:31-35 identifies a clean build as the publication boundary. permalink:false suppresses new output; it is not evidence that a stale page from a prior build was deleted. The built-directory check would catch a conventional stale draft route."
+    },
+    "change_surfaces": [
+      "Publish a single note: remove draft:true or set draft:false in that note's Markdown front matter; directory default is false.",
+      "Change whether draft pages are emitted: src/notes/posts/posts.11tydata.js:11-12, the computed permalink.",
+      "Change collection eligibility: src/notes/posts/posts.11tydata.js:13-14 and eleventy.config.js:35-39. Allowing drafts through only one layer leaves the other exclusion in effect.",
+      "Change individual discovery output behavior: src/notes/index.njk:16-30, src/sitemap.njk:14-16 or src/notes/feed.njk:12-24. All currently share collections.notes, so changing that collection affects all three.",
+      "If intentionally changing the draft publication contract or route/front-matter conventions, align scripts/site-check.mjs:643-654,855-907 and its relevant existing regression tests, plus SPEC.md:31-35 and the example-post instructions."
+    ]
+  },
+  "unresolved_uncertainty": [
+    "No build, browser, test execution or network verification was performed, as requested. This establishes the source flow, not current rendered or live-site state.",
+    "Eleventy dependency internals were not inspected; the intended meanings of computed permalink:false and eleventyExcludeFromCollections:true are supported by the repository's code and observed-behavior specification.",
+    "The combined read output was truncated in part of the later checker tests. The deciding production code and the primary disk/sitemap/feed and Atom-id negative controls were visible; no claim relies on the truncated test body."
+  ],
+  "scope_compliance": {
+    "repository_sources_edited": false,
+    "build_run": false,
+    "browser_run": false,
+    "network_used": false,
+    "deploy_run": false,
+    "ship_script_run": false,
+    "deleted_anything": false,
+    "audit_directory_read": false,
+    "git_history_read": false,
+    "changelog_read": false,
+    "secrets_accessed": false,
+    "commits": [],
+    "pull_requests": [],
+    "retrospective": "No background processes or services were started. No source changes or follow-up work were needed for this read-only explanation. Receipt retained as requested.",
+    "remaining": "No requested comprehension work remains. Runtime verification was deliberately out of scope. No Waseem action required."
+  }
+}
+```
+
+## reader-followup-capabilities
+
+```json
+{
+  "start": {
+    "monotonic_ns": 1953369989305206,
+    "utc": "2026-10-17T06:45:17.367966+00:00"
+  },
+  "end": {
+    "monotonic_ns": 1953387991186684,
+    "utc": "2026-10-17T06:45:35.369853+00:00"
+  },
+  "elapsed_seconds": 18.001881478,
+  "timing_scope": "From the required first command, immediately before repository discovery, through understanding the deciding source. The end timestamp precedes receipt composition and writing.",
+  "commands": [
+    {
+      "order": 1,
+      "command": "python3 -c \"import time,datetime;print(time.monotonic_ns(),datetime.datetime.now(datetime.timezone.utc).isoformat())\"",
+      "exit_code": 0,
+      "purpose": "start"
+    },
+    {
+      "order": 2,
+      "command": "pwd; rg --files -g '!\\.audit/**' -g '*cap*' -g '*index*' -g 'AGENTS.md' -g 'GLOSSARY.md' -g 'SPEC.md' -g 'VISION.md' -g 'README.md' -g 'SKILL.md'",
+      "exit_code": 0
+    },
+    {
+      "order": 3,
+      "parallel_group": 1,
+      "command": "cat /opt/automancer/brain/INDEX.md /home/ubuntu/.agents/skills/writing-for-humans/SKILL.md /home/ubuntu/.agents/skills/retrospective/SKILL.md",
+      "exit_code": 0,
+      "note": "Submitted before command 4 in the same parallel group; actual process scheduling order was not measured. Combined tool output was truncated; retrospective was reread in command 6."
+    },
+    {
+      "order": 4,
+      "parallel_group": 1,
+      "command": "rg -n 'capabilit|cap-map|capmap' src scripts GLOSSARY.md SPEC.md README.md AGENTS.md; nl -ba src/_data/capabilities.json; nl -ba src/index.njk",
+      "exit_code": 0
+    },
+    {
+      "order": 5,
+      "command": "rg -n 'capread|data-key|\\.node|data-for|selectNode|activate|data-cal|noscript' src/assets src/_includes .eleventy* GLOSSARY.md SPEC.md README.md; rg --files src/assets/js src/_includes; nl -ba src/assets/js/main.js; nl -ba src/assets/css/styles.css | sed -n '1,75p;175,225p;465,560p'; nl -ba src/_includes/base.njk; cat GLOSSARY.md SPEC.md",
+      "exit_code": 0,
+      "failed_subcommands": [
+        {
+          "command": "rg -n 'capread|data-key|\\.node|data-for|selectNode|activate|data-cal|noscript' src/assets src/_includes .eleventy* GLOSSARY.md SPEC.md README.md",
+          "diagnostic": "rg: .eleventy*: No such file or directory (os error 2)",
+          "note": "Search still returned matches from the other paths; individual status was not captured."
+        },
+        {
+          "command": "nl -ba src/assets/js/main.js",
+          "diagnostic": "nl: src/assets/js/main.js: No such file or directory",
+          "note": "Individual status was not captured. Discovered site.js and read it next."
+        }
+      ]
+    },
+    {
+      "order": 6,
+      "command": "nl -ba src/assets/js/site.js; nl -ba src/assets/css/styles.css | sed -n '74,100p;332,355p'; nl -ba eleventy.config.js | sed -n '1,160p'; rg -n 'Capability|capabilit|node|trace|capread|\\.cap' docs/DESIGN.md .agents/skills/verify-portfolio; cat /home/ubuntu/.agents/skills/retrospective/SKILL.md",
+      "exit_code": 0
+    },
+    {
+      "order": 7,
+      "command": "python3 -c \"import time,datetime;print(time.monotonic_ns(),datetime.datetime.now(datetime.timezone.utc).isoformat())\"",
+      "exit_code": 0,
+      "purpose": "end"
+    },
+    {
+      "order": 8,
+      "command": "python3 -c \"import json,pathlib; p=pathlib.Path('<scratch>/receipt-caps.json'); d=json.loads(p.read_text()); print(p); print('elapsed_seconds:',d['elapsed_seconds']); print('explanation sections:',', '.join(d['explanation'])); print('recorded commands:',len(d['commands']))\"",
+      "exit_code": 0,
+      "purpose": "Read back and parse the written receipt after the timed comprehension window; this command was appended to the receipt after it completed."
+    }
+  ],
+  "explanation": {
+    "content": [
+      {
+        "text": "Eleventy reads global data from src/_data and renders Nunjucks templates. capabilities.json authors the introduction and ordered nodes: AI automation, Digital practice, Learning design, Web & product, and Creative roots.",
+        "refs": [
+          "eleventy.config.js:48-57",
+          "src/_data/capabilities.json:1-60"
+        ]
+      },
+      {
+        "text": "Each node has a key, panel code, SVG label, panel title/body, x/y position, label textY offset, and SVG trace path. The homepage loops over this data to render paths and node groups; it puts panel content in data-code/data-title/data-body and connects a node's data-key to its path's data-for. The section heading, central PRACTICE hub, figure description and interaction hint are literal template content.",
+        "refs": [
+          "src/_data/capabilities.json:4-13",
+          "src/index.njk:38-74"
+        ]
+      }
+    ],
+    "behaviour": [
+      {
+        "text": "The base layout loads site.js with defer. Its IIFE calls setupCapabilityMap, which collects .node and .trace elements plus the three data-bind panel fields. The panel starts with nodes[0] content, but neither template nor initialization sets any node/trace .on class; initial text is not an initialized selected highlight.",
+        "refs": [
+          "src/_includes/base.njk:110",
+          "src/assets/js/site.js:64-96",
+          "src/index.njk:50-72"
+        ]
+      },
+      {
+        "text": "Every node is an SVG group with tabindex=0 and role=button. mouseenter, focus and click all call the same activate function. Tab/Shift+Tab use normal document focus order, and arriving focus selects the node immediately. Enter or Space on keydown also activates it and prevents the default action, including Space scrolling. There are no map-specific arrow-key handlers.",
+        "refs": [
+          "src/index.njk:59-64",
+          "src/assets/js/site.js:83-89"
+        ]
+      },
+      {
+        "text": "activate first requires all three panel fields. It copies the activated node's code/title/body attributes into textContent, toggles .on on exactly that node, and toggles .on on every trace whose data-for matches its key. With the current unique keys there is one matching trace. The DOM text and classes are the selection state; there is no separate selection variable, route change, storage or network request.",
+        "refs": [
+          "src/assets/js/site.js:65-81",
+          "src/_data/capabilities.json:4-57"
+        ]
+      },
+      {
+        "text": "Hover is selection rather than a temporary preview. There is no mouseleave or blur reset, so the last activation stays selected until another one occurs. Click does not toggle selection off. CSS also independently highlights hovered or focus-visible nodes, so a focused node and a differently hovered/selected node can both look highlighted while only one carries .on.",
+        "refs": [
+          "src/assets/js/site.js:74-90",
+          "src/assets/css/styles.css:199-202"
+        ]
+      },
+      {
+        "text": "The panel is an aria-live=polite region and each node references it through aria-describedby. Activation does not update aria-pressed or aria-selected, and does not explicitly move focus. The source intends polite description announcements; assistive-technology behavior was not exercised.",
+        "refs": [
+          "src/index.njk:59-74",
+          "src/assets/js/site.js:74-89"
+        ]
+      }
+    ],
+    "without_javascript": [
+      {
+        "text": "The complete SVG map, all five labels/connections, heading, introduction and interaction hint remain rendered. The panel displays the first authored capability: AI\u00b7AUTO / AI automation / Designing and building AI-assisted workflows and lightweight systems that do real work for small businesses. Other descriptions remain data attributes; they are not rendered as a fallback list.",
+        "refs": [
+          "src/index.njk:38-74",
+          "src/_data/capabilities.json:4-13"
+        ]
+      },
+      {
+        "text": "No interaction changes the panel or selects a trace without JavaScript. CSS hover/focus-visible node styling can still appear. No .on node/trace is initially emitted. The map stays visible because reveal styling only adds animation to .js [data-cal].in; it does not hide the base content. setupReveals is separate decoration, not fallback logic.",
+        "refs": [
+          "src/assets/css/styles.css:193-202",
+          "src/assets/css/styles.css:336-345",
+          "src/assets/js/site.js:48-61",
+          "src/index.njk:50-72"
+        ]
+      }
+    ],
+    "change_surfaces": {
+      "content": [
+        {
+          "text": "Edit capabilities.json for intro, capability order, labels, codes, titles and descriptions. Array order also decides tab order and the initial/fallback panel. Edit index.njk for the surrounding heading, hub label, figure description and hint. Changing the node count also requires reviewing the literal 'five domains' figure description.",
+          "refs": [
+            "src/_data/capabilities.json:1-60",
+            "src/index.njk:40-74"
+          ]
+        }
+      ],
+      "behaviour": [
+        {
+          "text": "Edit setupCapabilityMap in site.js for event handling, keyboard support and selection effects. Edit index.njk for rendered data wiring, focusability, ARIA and initial panel state. Keep node data-key and trace data-for aligned through their shared JSON key.",
+          "refs": [
+            "src/assets/js/site.js:64-92",
+            "src/index.njk:50-74"
+          ]
+        }
+      ],
+      "look": [
+        {
+          "text": "Edit styles.css capability rules for grid layout, map frame, node/trace colors and transitions, and panel typography. The layout is two columns, becoming one at max-width 820px; selected nodes use --signal and selected connections use --trace. Shared colors, typography and spacing come from :root tokens.",
+          "refs": [
+            "src/assets/css/styles.css:24-71",
+            "src/assets/css/styles.css:188-209"
+          ]
+        },
+        {
+          "text": "Map geometry also lives in capabilities.json (x, y, textY and trace) and index.njk (720x440 viewBox, hub position/radius and node ring/core sizes). A positioning change is therefore not necessarily a CSS change.",
+          "refs": [
+            "src/_data/capabilities.json:10-13",
+            "src/index.njk:48-63"
+          ]
+        }
+      ]
+    }
+  },
+  "unresolved_uncertainty": [
+    "No unresolved uncertainty about the requested source flow. No build, browser or runtime checks were performed, so actual rendering, physical touch and screen-reader behavior remain unverified.",
+    "The existing source-based browser journey was only searched, not executed; its past claims are not treated as verification from this run."
+  ],
+  "retrospective": {
+    "friction": "Two guessed paths failed (.eleventy* and main.js); the returned file list/matches exposed eleventy.config.js and site.js. One combined tool response was truncated; the relevant retrospective text was reread. These detours are included in elapsed time.",
+    "retained_artifact": "<scratch>/receipt-caps.json",
+    "cleanup": "No servers, browsers, background jobs, branches or other resources were started. No repository sources were edited. No commits or PRs were created. No network, git history or .audit/ reads were used.",
+    "remaining_work": "None within the source-comprehension brief.",
+    "waseem_action": "None."
+  }
+}
+```
 
 ## reader-before-nav
 
