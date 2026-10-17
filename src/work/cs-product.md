@@ -28,6 +28,15 @@ datasheet:
       <g><rect x="490" y="87" width="120" height="36" rx="7" fill="oklch(0.66 0.185 42 / .12)" stroke="oklch(0.56 0.17 40)"/><text x="550" y="109" text-anchor="middle" fill="oklch(0.40 0.13 40)">SHIPPED</text></g>
     </g>
   </svg>
+  <div class="diagram-phone" role="img" aria-label="Abstract product composition: interface, logic, and data layers composing a shipped product. Generated, no private data.">
+    <div class="dflow">
+      <span class="dnode">INTERFACE</span>
+      <span class="djoin" aria-hidden="true"></span>
+      <span class="dnode">LOGIC</span>
+      <span class="djoin" aria-hidden="true"></span>
+      <span class="dnode dnode-live">SHIPPED</span>
+    </div>
+  </div>
   <figcaption>FIG.1 — Abstract product composition. Generated, no private data.</figcaption>
 </figure>
 

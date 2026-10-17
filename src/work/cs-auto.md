@@ -30,6 +30,21 @@ datasheet:
       <g><rect x="500" y="88" width="120" height="36" rx="7" fill="oklch(0.66 0.185 42 / .12)" stroke="oklch(0.56 0.17 40)"/><text x="560" y="110" text-anchor="middle" fill="oklch(0.40 0.13 40)">SYSTEM</text></g>
     </g>
   </svg>
+  <div class="diagram-phone" role="img" aria-label="Abstract delivery model: a problem and its data flow through scope and design into a running system. Generated, no client data.">
+    <div class="dflow">
+      <div class="drow">
+        <span class="dnode">PROBLEM</span>
+        <span class="dnode">DATA</span>
+      </div>
+      <span class="djoin" aria-hidden="true"></span>
+      <div class="drow">
+        <span class="dnode">SCOPE</span>
+        <span class="dnode">DESIGN</span>
+      </div>
+      <span class="djoin" aria-hidden="true"></span>
+      <span class="dnode dnode-live">SYSTEM</span>
+    </div>
+  </div>
   <figcaption>FIG.1 — Abstract delivery model. Generated, no client data.</figcaption>
 </figure>
 

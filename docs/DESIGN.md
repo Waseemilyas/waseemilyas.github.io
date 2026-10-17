@@ -308,9 +308,14 @@ element; the capability-map labels are fixed at `11px` (`.node text`) and `10px`
 (`.hub text`); and every inline diagram label is `12px`
 (the `font-size="12"` on the node group in `partials/diagram-workflow.njk`, and the
 `figure` SVG in each of the three case studies). The SVG sizes are fixed because
-they scale with the viewBox, not the page. Outside SVG, use a step — if a value
-is not in the scale, the answer is almost always the nearest step rather than a
-new one.
+they scale with the viewBox, not the page. That is the settled wide-canvas
+treatment: do not enlarge those user-unit sizes to chase a phone viewport, or
+the desktop composition changes. When the frame is narrower than the settled
+composition (36rem for the capability map and case-study figures, 28rem for the
+workflow panel), the same authored labels are shown again in HTML at `--step-0`.
+See `.diagram-phone` and `.cap-phone` in `styles.css`. Outside SVG, use a step —
+if a value is not in the scale, the answer is almost always the nearest step
+rather than a new one.
 
 - `--sans` (Geist) sets everything structural. `--mono` (Geist Mono) is for
   **metadata rather than prose** — refs, keys, eyebrows, datasheet terms, timeline

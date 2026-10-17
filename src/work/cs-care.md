@@ -29,6 +29,18 @@ datasheet:
       <g><rect x="500" y="88" width="118" height="36" rx="7" fill="oklch(0.66 0.185 42 / .12)" stroke="oklch(0.56 0.17 40)"/><text x="559" y="110" text-anchor="middle" fill="oklch(0.40 0.13 40)">AUTOMATION</text></g>
     </g>
   </svg>
+  <div class="diagram-phone" role="img" aria-label="Abstract delivery map: intake feeding scheduling and records, with an automation layer reducing manual steps. Generated, no client data.">
+    <div class="dflow">
+      <span class="dnode">INTAKE</span>
+      <span class="djoin" aria-hidden="true"></span>
+      <div class="drow">
+        <span class="dnode">SCHEDULING</span>
+        <span class="dnode">RECORDS</span>
+      </div>
+      <span class="djoin" aria-hidden="true"></span>
+      <span class="dnode dnode-live">AUTOMATION</span>
+    </div>
+  </div>
   <figcaption>FIG.1 — Abstract delivery map. Generated, no client or care-recipient data.</figcaption>
 </figure>
 
