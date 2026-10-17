@@ -9,6 +9,11 @@
 | [Read with reduced motion](motion.md) | Entry reveals and static content | `setupReveals`, reduced-motion CSS |
 | [Contact and linked assets](links-and-assets.md) | Contact links, sitemap, intentional audio URLs | Contact/base templates, passthrough config |
 
+## Fast traces for source changes
+
+- **Draft publication:** start at [`work-and-notes.md`](work-and-notes.md#draft-publication-fast-source-trace): directory data decides page output and collection exclusion; Eleventy config decides explicit note collection membership; Notes, feed and sitemap consume that collection. The page, collection and rendered-check fallback are distinct.
+- **Capability content/events/fallback:** start at [`capabilities.md`](capabilities.md#capability-map-fast-source-trace): JSON authors content → `src/index.njk` renders node attributes and initial description → `setupCapabilityMap` handles selection → CSS presents it. The first description is the no-JS fallback.
+
 [Source comprehension receipts](reader-traces.md) retain the before/after reader
 measurements and full explanations, including the two final missed targets.
 
