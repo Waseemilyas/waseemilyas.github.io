@@ -31,7 +31,7 @@ JSON-LD, draft exclusion, sitemap/feed parity, revision bytes and OG image heade
 Image pixels are not decoded. The privacy scanner complements the judgement rules
 in [AGENTS.md](AGENTS.md); it cannot decide whether anonymised copy identifies a client.
 
-Strict `checkJs` uses the native TypeScript compiler over production browser,
+Strict `checkJs` uses tsrs, the Rust port of the TypeScript compiler, over production browser,
 build and CLI JavaScript. TypeScript's editor compiler remains available for
 language servers. After the frozen install, `tsconfig.json` resolves imports
 without a build or generated types. `pnpm exec tsc --noEmit` is an editor-compiler
