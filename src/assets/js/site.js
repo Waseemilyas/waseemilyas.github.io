@@ -1,4 +1,4 @@
-/* WI-PF1 — progressive enhancement only. Content works with JS disabled. */
+/* Progressive enhancement only. Content works with JS disabled. */
 (function () {
   "use strict";
   var rm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
