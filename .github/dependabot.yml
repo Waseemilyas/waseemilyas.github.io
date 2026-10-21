@@ -1,13 +1,21 @@
 version: 2
 updates:
+  # One grouped pull request a month. Security updates are separate and
+  # arrive immediately whatever this schedule says.
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-  # Actions in .github/workflows are pinned to immutable commit SHAs, so the
-  # major-version tags no longer float upstream and nothing refreshes them by
-  # itself. Dependabot bumps the pinned SHA and rewrites the trailing version
-  # comment; without this block the pins silently rot.
+      interval: monthly
+    groups:
+      npm:
+        patterns:
+          - "*"
+    ignore:
+      # Types follow the Node major in .github/workflows (node-version).
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+  # Actions are pinned to commit SHAs; Dependabot bumps the SHA and the
+  # trailing version comment, otherwise the pins rot.
   - package-ecosystem: github-actions
     directory: /
     schedule:

@@ -37,8 +37,7 @@ language servers. After the frozen install, `tsconfig.json` resolves imports
 without a build or generated types. `pnpm exec tsc --noEmit` is an editor-compiler
 cross-check, not another required CI pass. Exact tool versions live in `package.json`.
 
-Installs wire `.githooks/` through `prepare`; `pnpm setup` verifies and rewires them
-when an up-to-date install skipped lifecycle scripts. Keep the gitleaks rules and
+Installs point git at `.githooks/` through `prepare`. Keep the gitleaks rules and
 sensitive-path guards enabled.
 
 ## Structure
