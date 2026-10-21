@@ -1,9 +1,7 @@
 // Interactive control for the mobile navigation drawer.
 //
-// docs/polish-report-2026-08-07.md records that the hamburger's aria-expanded
-// toggle and the Escape-close behaviour had only ever been verified by code
-// review — headless screenshots cannot click. This suite closes that gap: it
-// builds the real site, loads the real built index.html plus the real
+// Headless screenshots cannot click, so the hamburger's aria-expanded toggle
+// and the Escape-close behaviour need a driven test. It builds the real site, loads the real built index.html plus the real
 // built site.js inside jsdom (mobile-width matchMedia stub), and drives the
 // drawer like a user: open by click, close by Escape.
 //
