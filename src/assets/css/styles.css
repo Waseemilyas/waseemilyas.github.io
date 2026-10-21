@@ -90,6 +90,7 @@ img, svg { max-width: 100%; }
 a { color: inherit; }
 ::selection { background: var(--signal); color: var(--on-signal); }
 h1, h2, h3 { font-weight: 700; line-height: 1.04; letter-spacing: -0.03em; text-wrap: balance; }
+p, li { text-wrap: pretty; }
 .mono { font-family: var(--mono); font-weight: 500; letter-spacing: 0.02em; }
 .label { font-family: var(--mono); font-size: var(--step--1); letter-spacing: 0.08em; text-transform: uppercase; color: var(--bone-mute); }
 .shell { max-width: var(--maxw); margin-inline: auto; padding-inline: var(--space-shell-inline); }
@@ -268,7 +269,7 @@ h1, h2, h3 { font-weight: 700; line-height: 1.04; letter-spacing: -0.03em; text-
 .milestone .era { font-family: var(--mono); font-size: var(--step--1); color: var(--signal); letter-spacing: .05em; }
 .milestone h3 { font-size: var(--step-1); margin: .25rem 0 .4rem; letter-spacing: -0.02em; }
 .milestone p { color: var(--bone-mute); max-width: 60ch; }
-.proof { margin: 1rem 0 0 0; padding: 1rem 1.2rem; border: 1px solid var(--line-dark); border-radius: var(--rounded-md); background: var(--graphite-800); list-style: none; }
+.proof { max-width: 60ch; margin: 1rem 0 0 0; padding: 1rem 1.2rem; border: 1px solid var(--line-dark); border-radius: var(--rounded-md); background: var(--graphite-800); list-style: none; }
 .proof li { display: flex; gap: .6rem; padding: .35rem 0; color: var(--bone); font-size: var(--step--1); }
 .proof li::before { content: "→"; color: var(--signal); font-family: var(--mono); }
 
@@ -442,6 +443,7 @@ h1, h2, h3 { font-weight: 700; line-height: 1.04; letter-spacing: -0.03em; text-
 .foot a { color: var(--bone); text-decoration: none; }
 .foot a:hover { color: var(--signal); }
 .foot .fnav { display: flex; gap: 1.2rem; flex-wrap: wrap; }
+@media (max-width: 620px) { .foot .fnav { display: grid; grid-template-columns: repeat(4, max-content); gap: .9rem 1.2rem; } }
 .foot .meta { color: var(--bone-mute); }
 .foot .meta + .meta { margin-top: .4rem; }
 
