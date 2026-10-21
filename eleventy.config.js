@@ -24,7 +24,7 @@ export default function (eleventyConfig) {
   eleventyConfig.addPassthroughCopy({ "src/assets": "assets" });
   eleventyConfig.addPassthroughCopy({ "src/static": "/" });
   // Prayer-time audio fetched over HTTP by Home Assistant; intentional, do not remove (see audio/README.md).
-  eleventyConfig.addPassthroughCopy({ audio: "audio" });
+  eleventyConfig.addPassthroughCopy({ "audio/*.mp3": "audio" });
 
   // Case studies collection (datasheet narratives in src/work/).
   eleventyConfig.addCollection("casestudies", (api) =>

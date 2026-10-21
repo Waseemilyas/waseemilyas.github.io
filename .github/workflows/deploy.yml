@@ -28,6 +28,8 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Privacy guard on the source being published
+        run: node scripts/content-guard.mjs
       # This build is consumed by Pages, rather than repeating the PR test suite.
       - name: Build the production artifact and validate its contracts
         run: pnpm build && node scripts/site-check.mjs
