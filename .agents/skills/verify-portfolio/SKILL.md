@@ -5,13 +5,14 @@ description: Drive the real portfolio pages, capability map and mobile navigatio
 
 # Verify the portfolio
 
-Last verified: 2026-10-16 on Linux with Chromium.
+Last verified: 2026-10-21 on Linux with Chromium (35 s, 14 pages, 33 screenshots).
 
 ## Launch
 
 Use a clean checkout. Install Node/pnpm from the repository's package configuration,
 Python 3 and a global `agent-browser` with Chrome available. Do not install browser
-automation into this package. Run ordinary browser checks on the local browser host.
+automation into this package. Run it on auto-vps under `/opt/automancer/bin/lane-run --name <lane>-drive --mem 6G --swap 0 --`:
+`heavy` lands on auto-vault, which has no `agent-browser` (the helper fails with `FileNotFoundError`).
 
 ```bash
 pnpm install --frozen-lockfile
