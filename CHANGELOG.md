@@ -1,5 +1,10 @@
 # Release notes
 
+## v2026.10.21.1 — 21 October 2026
+
+The site now shares only the audio files intended for visitors.
+
+
 ## v2026.10.17.2 — 17 October 2026
 
 The workflow diagrams now remain easy to read on narrow screens.
