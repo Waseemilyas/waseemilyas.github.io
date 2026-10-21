@@ -173,7 +173,7 @@ export function checkContent(relPath, content) {
   for (const m of content.matchAll(tokenRe)) {
     report("guard/credentials", `secret token marker detected: "${m[0].slice(0, 4)}…"`, m.index);
   }
-  const credAssignRe = /(?:password|passwd|api[-_]?key|secret[-_]?key|client[-_]?secret|access[-_]?token|auth[-_]?token|bearer\s+[a-zA-Z0-9_\-\.]+)\s*[:=]/gi;
+  const credAssignRe = /(?:password|passwd|api[-_]?key|secret[-_]?key|client[-_]?secret|access[-_]?token|auth[-_]?token|bearer\s+[a-zA-Z0-9_.-]+)\s*[:=]/gi;
   for (const m of content.matchAll(credAssignRe)) {
     report("guard/credentials", `credential assignment pattern detected: "${m[0]}"`, m.index);
   }

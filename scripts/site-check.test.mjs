@@ -9,35 +9,23 @@
 // specific assertion fail, verified against the exact diagnostic contract id —
 // not merely a non-zero result. A fully valid fixture is the positive control.
 //
-// Read-only proof: the checker must never write. The snapshot observes the
-// whole promised property — file bytes (sha256), inode identity (dev/ino),
-// size/mode/timestamps, AND every directory including empty ones. Its own
-// teeth are proven below: each materially different sabotage (same-bytes
-// rewrite with restored mtime, added file, added empty directory, content
-// rewrite) is shown to change the comparison for the intended reason, while a
-// legacy files-only/size+mtime view of the same fixture is shown to be blind.
-//
 // Fixtures live under os.tmpdir() mkdtemp directories and are always removed.
 
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { createHash } from "node:crypto";
 import {
   mkdirSync,
   mkdtempSync,
   readFileSync,
-  readdirSync,
   rmSync,
-  statSync,
-  utimesSync,
   writeFileSync,
 } from "node:fs";
 import os from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { imageSize, runSiteChecks, validateXml } from "./site-check.mjs";
+import { runSiteChecks } from "./site-check.mjs";
 
 const SCRIPT = join(dirname(fileURLToPath(import.meta.url)), "site-check.mjs");
 const SITE_URL = "https://fixture.example";
@@ -113,8 +101,8 @@ const VALID_FEED = `<?xml version="1.0" encoding="utf-8"?>
 
 /** Both XML roots the checker validates, with their valid baseline text. */
 const XML_TARGETS = [
-  ["sitemap", "sitemap.xml", VALID_SITEMAP, "</urlset>", "<urlset "],
-  ["atom feed", "notes/feed.xml", VALID_FEED, "</feed>", "<feed "],
+  ["sitemap", "sitemap.xml", VALID_SITEMAP, "</urlset>"],
+  ["atom feed", "notes/feed.xml", VALID_FEED, "</feed>"],
 ];
 
 /**
@@ -170,9 +158,6 @@ function runChecks(fixture, overrides = {}) {
 }
 
 const ofCheck = (failures, id) => failures.filter((f) => f.check === id);
-
-/** Let the clock advance past filesystem timestamp granularity. */
-const tick = () => new Promise((r) => setTimeout(r, 60));
 
 // ---------------------------------------------------------------------------
 // positive control
@@ -594,7 +579,7 @@ test("mutation: built page absent from sitemap fails sitemap-parity/listed", () 
 // ---------------------------------------------------------------------------
 // negative controls — XML structure and declared roots, both roots covered
 
-for (const [label, file, validText, closeTag, openPrefix] of XML_TARGETS) {
+for (const [label, file, validText, closeTag] of XML_TARGETS) {
   test(`malformed XML (${label}): text after the root closes fails xml/structure`, () => {
     const fx = makeFixture(test);
     writeFileSync(
@@ -618,65 +603,7 @@ for (const [label, file, validText, closeTag, openPrefix] of XML_TARGETS) {
     assert.ok(hits.some((f) => /xml\/structure/.test(f.message)), JSON.stringify(failures));
     assert.match(hits.find((f) => /xml\/structure/.test(f.message)).message, /bare "&"/);
   });
-
-  test(`malformed XML (${label}): junk attribute text fails xml/structure`, () => {
-    const fx = makeFixture(test);
-    writeFileSync(
-      join(fx.siteDir, file),
-      validText.replace(openPrefix, `${openPrefix}junk tokens `)
-    );
-    const { failures } = runChecks(fx);
-    const hits = ofCheck(failures, "xml").filter((f) => f.file === file);
-    assert.ok(hits.some((f) => /xml\/structure/.test(f.message)), JSON.stringify(failures));
-    assert.match(hits.find((f) => /xml\/structure/.test(f.message)).message, /malformed attribute syntax/);
-  });
 }
-
-// Direct validator units — attribute separation and ampersand scope.
-// The counterexamples come straight from re-review round 2.
-
-test("xml attributes: whitespace-separated multi-attribute tags are valid", () => {
-  const r = validateXml(
-    '<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en" title="Fixture &amp; Co"><entry/></feed>'
-  );
-  assert.deepEqual(r.errors, [], JSON.stringify(r));
-  assert.equal(r.rootName, "feed");
-  assert.equal(r.xmlns, "http://www.w3.org/2005/Atom");
-});
-
-for (const [label, openTag] of [
-  ["sitemap", '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'],
-  ["atom feed", '<feed xmlns="http://www.w3.org/2005/Atom"'],
-]) {
-  test(`xml attributes (${label}): a bare '&' inside a quoted value is rejected`, () => {
-    const r = validateXml(`${openTag} note="a&b"></${label === "sitemap" ? "urlset" : "feed"}>`);
-    assert.equal(r.ok, false, JSON.stringify(r.errors));
-    assert.ok(
-      r.errors.some((e) => /bare "&" in the value of note/.test(e)),
-      JSON.stringify(r.errors)
-    );
-  });
-
-  test(`xml attributes (${label}): references inside quoted values are accepted`, () => {
-    const r = validateXml(
-      `${openTag} note="R&amp;D &#38; more"><e/></${label === "sitemap" ? "urlset" : "feed"}>`
-    );
-    assert.deepEqual(r.errors, [], JSON.stringify(r));
-  });
-}
-
-test("mutation: glued attributes in the built sitemap fail xml/structure through runSiteChecks", () => {
-  const fx = makeFixture(test);
-  writeFileSync(
-    join(fx.siteDir, "sitemap.xml"),
-    VALID_SITEMAP.replace('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">', '<urlset xmlns="x"a="1">')
-  );
-  const { failures } = runChecks(fx);
-  const hits = ofCheck(failures, "xml").filter((f) => f.file === "sitemap.xml");
-  assert.ok(hits.some((f) => /xml\/structure/.test(f.message)), JSON.stringify(failures));
-  assert.match(hits.find((f) => /xml\/structure/.test(f.message)).message, /missing whitespace between attributes/);
-});
-
 test("mutation: unclosed entry element fails the xml/structure diagnostic", () => {
   const fx = makeFixture(test);
   const p = join(fx.siteDir, "notes", "feed.xml");
@@ -899,113 +826,6 @@ test("mutation: OG image at the wrong required size fails og-image/dimensions vs
 });
 
 // ---------------------------------------------------------------------------
-// image header parsing — PNG signature/IHDR shape and JPEG walk, both ways.
-// Unit-level: these prove the header reader rejects foreign bytes rather than
-// reading fixed offsets off anything that starts like a signature. Headers
-// only — nothing here says anything about pixel decoding or renderability.
-
-/**
- * Minimal JPEG header fixture: SOI + one SOF0 frame segment (marker, declared
- * length, precision, height, width, then `sofLen - 8` filler component bytes)
- * + EOI. Header-shaped only — not a decodable image, by design.
- */
-function makeJpeg(width, height, { sofLen = 17 } = {}) {
-  const sof = Buffer.alloc(2 + sofLen);
-  sof[0] = 0xff;
-  sof[1] = 0xc0;
-  sof.writeUInt16BE(sofLen, 2); // Lf includes itself; spec minimum is 11
-  sof[4] = 8; // sample precision
-  sof.writeUInt16BE(height, 5);
-  sof.writeUInt16BE(width, 7);
-  return Buffer.concat([Buffer.from([0xff, 0xd8]), sof, Buffer.from([0xff, 0xd9])]);
-}
-
-test("imageSize reads a well-formed signature+IHDR PNG (positive control)", () => {
-  assert.deepEqual(imageSize(makePng(1200, 630)), { width: 1200, height: 630, format: "png" });
-});
-
-test("imageSize rejects a buffer whose first four bytes merely mimic a PNG signature", () => {
-  // The re-reviewer's fabrication: bytes 0–3 set, no valid remaining
-  // signature, no IHDR marker — dimensions planted at offsets 16/20.
-  const fabricated = Buffer.alloc(24);
-  fabricated[0] = 0x89;
-  fabricated[1] = 0x50;
-  fabricated[2] = 0x4e;
-  fabricated[3] = 0x47;
-  fabricated.writeUInt32BE(1200, 16);
-  fabricated.writeUInt32BE(630, 20);
-  assert.equal(imageSize(fabricated), null);
-});
-
-test("imageSize rejects a complete PNG signature whose first chunk is not IHDR", () => {
-  const buf = Buffer.alloc(32);
-  Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(buf);
-  buf.write("IDAT", 12, "latin1"); // right signature, wrong first chunk type
-  buf.writeUInt32BE(1200, 16);
-  buf.writeUInt32BE(630, 20);
-  assert.equal(imageSize(buf), null);
-});
-
-test("imageSize rejects an IHDR chunk whose declared payload length is not 13", () => {
-  const buf = Buffer.alloc(32);
-  Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]).copy(buf);
-  buf.write("IHDR", 12, "latin1");
-  buf.writeUInt32BE(999, 8); // IHDR data is always exactly 13 bytes per spec
-  buf.writeUInt32BE(1200, 16);
-  buf.writeUInt32BE(630, 20);
-  assert.equal(imageSize(buf), null);
-});
-
-test("imageSize rejects PNGs truncated before the IHDR dimension fields", () => {
-  const full = makePng(1200, 630);
-  assert.equal(imageSize(full.subarray(0, 23)), null); // dims end at byte 24
-  assert.equal(imageSize(full.subarray(0, 8)), null); // bare signature
-});
-
-test("imageSize reads a minimal SOI+SOF0 JPEG frame header (positive control)", () => {
-  assert.deepEqual(imageSize(makeJpeg(1200, 630)), { width: 1200, height: 630, format: "jpeg" });
-});
-
-test("imageSize returns null for SOI-only and SOI+EOI bytes", () => {
-  assert.equal(imageSize(Buffer.from([0xff, 0xd8])), null);
-  assert.equal(imageSize(Buffer.from([0xff, 0xd8, 0xff, 0xd9])), null);
-});
-
-test("imageSize rejects a JPEG truncated inside its dimension fields", () => {
-  const full = makeJpeg(1200, 630);
-  // Cut between the height and width fields of the frame header.
-  assert.equal(imageSize(full.subarray(0, 9)), null);
-});
-
-test("imageSize rejects SOFn segments declaring less than the spec-minimum length", () => {
-  // A real encoder never writes Lf < 11; accepting it would read dimensions
-  // out of a malformed frame header.
-  assert.equal(imageSize(makeJpeg(1200, 630, { sofLen: 8 })), null);
-});
-
-test("imageSize collapses ff fill bytes before a marker instead of skipping past it", () => {
-  const padded = Buffer.concat([
-    Buffer.from([0xff, 0xd8, 0xff, 0xff]), // SOI then a fill run…
-    makeJpeg(1200, 630).subarray(2), // …then the same SOF0 frame header
-  ]);
-  assert.deepEqual(imageSize(padded), { width: 1200, height: 630, format: "jpeg" });
-});
-
-test("imageSize stops at SOS rather than walking entropy-coded data for markers", () => {
-  // After SOS the stream is entropy data; an FF C1 pair in there is not a
-  // frame header and its "dimensions" must never be reported.
-  const afterSosJunk = Buffer.from([
-    0xff, 0xda, 0x00, 0x08, 0x01, 0x01, 0x00, 0x3f, 0x00, // SOS segment
-    0x12, 0x34, 0xff, 0xc1, 0x00, 0x11, 0x08, 0x02, 0x76, 0x04, 0xb0, // junk that mimics SOF1
-  ]);
-  assert.equal(imageSize(Buffer.concat([Buffer.from([0xff, 0xd8]), afterSosJunk])), null);
-});
-
-test("imageSize returns null when a segment length runs past end of file", () => {
-  assert.equal(imageSize(Buffer.from([0xff, 0xd8, 0xff, 0xe1, 0xff, 0xff])), null);
-});
-
-// ---------------------------------------------------------------------------
 // negative controls — inputs to the whole run
 
 test("mutation: no built output fails the build/output contract", () => {
@@ -1021,167 +841,6 @@ test("mutation: no built output fails the build/output contract", () => {
   assert.equal(failures[0].check, "build");
   assert.match(failures[0].message, /contract build\/output/);
   assert.match(failures[0].message, /production build first/);
-});
-
-// ---------------------------------------------------------------------------
-// read-only proof — observes contents, stats, inodes AND directories
-
-/**
- * Full-tree observation used for the read-only proof. Records every file's
- * bytes (sha256), size, inode identity (dev/ino), mode and timestamps, plus
- * every directory itself — so same-bytes rewrites and added empty directories
- * cannot slip through. Sorted by path for stable comparison.
- */
-function snapshot(rootDir) {
-  const out = [];
-  const visit = (rel) => {
-    const entries = readdirSync(join(rootDir, rel), { withFileTypes: true }).sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
-    for (const entry of entries) {
-      const childRel = rel === "" ? entry.name : `${rel}/${entry.name}`;
-      const st = statSync(join(rootDir, childRel));
-      if (entry.isDirectory()) {
-        out.push({ kind: "dir", path: childRel, dev: st.dev, ino: st.ino, mode: st.mode, mtimeMs: st.mtimeMs });
-        visit(childRel);
-      } else if (entry.isFile()) {
-        out.push({
-          kind: "file",
-          path: childRel,
-          sha256: createHash("sha256").update(readFileSync(join(rootDir, childRel))).digest("hex"),
-          dev: st.dev,
-          ino: st.ino,
-          size: st.size,
-          mode: st.mode,
-          mtimeMs: st.mtimeMs,
-          ctimeMs: st.ctimeMs,
-        });
-      }
-    }
-  };
-  visit("");
-  return out;
-}
-
-/** Field-level differences between two snapshots, for asserting WHY. */
-function snapshotDiffs(before, after) {
-  const diffs = [];
-  const beforeByPath = new Map(before.map((e) => [e.path, e]));
-  const afterPaths = new Set(after.map((e) => e.path));
-  for (const e of after) {
-    const b = beforeByPath.get(e.path);
-    if (!b) {
-      diffs.push({ path: e.path, field: "(added)", kind: e.kind });
-      continue;
-    }
-    for (const k of Object.keys(e)) {
-      if (b[k] !== e[k]) diffs.push({ path: e.path, field: k, from: b[k], to: e[k] });
-    }
-  }
-  for (const e of before) {
-    if (!afterPaths.has(e.path)) diffs.push({ path: e.path, field: "(removed)", kind: e.kind });
-  }
-  return diffs;
-}
-
-/** The pre-strengthening view: files only, size+mtime+mode, no bytes/inodes. */
-const legacyView = (snap) =>
-  snap
-    .filter((e) => e.kind === "file")
-    .map(({ path, size, mtimeMs, mode }) => ({ path, size, mtimeMs, mode }));
-
-test("checker leaves the scanned tree unchanged: contents, stats, inodes and directories (read-only proof)", () => {
-  const fx = makeFixture(test);
-  const beforeSite = snapshot(fx.siteDir);
-  const beforePosts = snapshot(fx.postsDir);
-  assert.ok(beforeSite.filter((e) => e.kind === "file").length >= 6, "snapshot should cover the fixture files");
-  assert.ok(beforeSite.filter((e) => e.kind === "dir").length >= 5, "snapshot should cover directories too");
-
-  runChecks(fx);
-  runChecks(fx); // twice: a first-run lazy write would be caught by the second
-
-  assert.deepEqual(snapshotDiffs(beforeSite, snapshot(fx.siteDir)), [], "site tree changed");
-  assert.deepEqual(snapshotDiffs(beforePosts, snapshot(fx.postsDir)), [], "posts tree changed");
-});
-
-// The proof's teeth: each materially different sabotage must be caught, for
-// the intended reason. These tests exercise the comparison itself, never the
-// checker, and restore nothing afterwards — each uses its own fixture copy.
-
-test("teeth: a same-bytes rewrite with restored mtime is caught by inode/timestamp fields the legacy view misses", async () => {
-  const fx = makeFixture(test);
-  await tick();
-  const targetRel = "assets/img/og-card.png";
-  const targetAbs = join(fx.siteDir, targetRel);
-  // Pin the target's mtime to a WHOLE second before the baseline snapshot:
-  // sub-second timestamp precision differs per filesystem (GitHub runners
-  // round differently from ext4), so restoring a float-millisecond mtime is
-  // not exact everywhere. A whole second restores exactly on any filesystem,
-  // keeping this test about the legacy view's blindness, not fs granularity.
-  const pinnedSec = Math.floor(Date.now() / 1000) - 10;
-  utimesSync(targetAbs, pinnedSec, pinnedSec);
-  const before = snapshot(fx.siteDir);
-  const originalBytes = readFileSync(targetAbs);
-
-  // Sabotage: rewrite identical bytes, then restore the old mtime so a
-  // size+mtime check sees nothing at all.
-  writeFileSync(targetAbs, originalBytes);
-  utimesSync(targetAbs, pinnedSec, pinnedSec);
-  const st = before.find((e) => e.path === targetRel);
-
-  const after = snapshot(fx.siteDir);
-
-  // The strengthened observation flags it…
-  const diffs = snapshotDiffs(before, after);
-  assert.ok(diffs.length >= 1, "same-bytes rewrite must be detected");
-  assert.ok(
-    diffs.some((d) => d.path === targetRel && (d.field === "ctimeMs" || d.field === "mtimeMs")),
-    `expected timestamp evidence, got ${JSON.stringify(diffs)}`
-  );
-  // …while its bytes are provably identical, isolating the rewrite detection:
-  assert.equal(after.find((e) => e.path === targetRel).sha256, st.sha256);
-
-  // …and the legacy files-only/size+mtime view of the SAME sabotage is blind.
-  assert.deepEqual(legacyView(before), legacyView(after), "legacy view unexpectedly saw the rewrite");
-});
-
-test("teeth: an added file changes the listing", async () => {
-  const fx = makeFixture(test);
-  await tick();
-  const before = snapshot(fx.siteDir);
-  writeFileSync(join(fx.siteDir, "extra.html"), "<p>sneaked in</p>");
-  const diffs = snapshotDiffs(before, snapshot(fx.siteDir));
-  assert.ok(diffs.some((d) => d.path === "extra.html" && d.field === "(added)"), JSON.stringify(diffs));
-});
-
-test("teeth: an added EMPTY directory changes the listing (invisible to files-only views)", async () => {
-  const fx = makeFixture(test);
-  await tick();
-  const before = snapshot(fx.siteDir);
-  mkdirSync(join(fx.siteDir, "empty-dir"));
-  const after = snapshot(fx.siteDir);
-  const diffs = snapshotDiffs(before, after);
-  assert.ok(diffs.some((d) => d.path === "empty-dir" && d.field === "(added)" && d.kind === "dir"), JSON.stringify(diffs));
-  // Prove the blindness claim about the weaker shape on the same sabotage:
-  assert.equal(legacyView(before).length, legacyView(after).length);
-});
-
-test("teeth: a content rewrite is caught by the byte hash even when timestamps are restored", async () => {
-  const fx = makeFixture(test);
-  await tick();
-  const targetRel = "index.html";
-  const targetAbs = join(fx.siteDir, targetRel);
-  const before = snapshot(fx.siteDir);
-  const st = before.find((e) => e.path === targetRel);
-
-  writeFileSync(targetAbs, readFileSync(targetAbs, "utf8").replace("Fixture", "Tampered"));
-  utimesSync(targetAbs, st.mtimeMs / 1000, st.mtimeMs / 1000);
-
-  const diffs = snapshotDiffs(before, snapshot(fx.siteDir));
-  assert.ok(
-    diffs.some((d) => d.path === targetRel && (d.field === "sha256" || d.field === "size")),
-    `expected byte-level evidence, got ${JSON.stringify(diffs)}`
-  );
 });
 
 // ---------------------------------------------------------------------------

@@ -60,10 +60,11 @@ need Waseem's approval under the estate decision policy.
 
 ## 3. Working rules
 
-- Install with `pnpm install --frozen-lockfile`. Run `pnpm check` plus explicit
-  changed-owner test paths, for example `pnpm check scripts/nav-drawer.test.mjs`.
-  CI owns the full suite and rendered-site checks. Read the changed output before
-  publishing. `README.md` owns launch and release commands.
+- Install with `pnpm install --frozen-lockfile`. The fast check is `pnpm check` (lint,
+  tsrs typecheck, source privacy guard), plus explicit owner tests, for example
+  `pnpm check scripts/nav-drawer.test.mjs`. The pull request's CI is the full verdict
+  (`pnpm test`, build, `node scripts/site-check.mjs`); do not repeat it locally.
+  `README.md` owns launch and release commands.
 - Search the diff for client names and codes before committing. If the change
   touches `src/work/`, `src/_data/`, `src/about.njk`, `src/index.njk`, or
   `src/lab.njk`, re-read section 1 first.
@@ -82,22 +83,19 @@ need Waseem's approval under the estate decision policy.
 
 ## 4. Read by task
 
-1. `README.md` — stack, build, structure. Read before your first build here.
-2. `docs/DESIGN.md` — the design system: tokens, type scale, component
-   inventory, and the heading-hierarchy contract. Read before any UI change.
-3. `docs/PRODUCT.md` — register, audience, and design principles. Read before
-   writing or rewriting site copy. It restates only what is already published on
-   the live site; section 1 applies to it in full.
-4. The private project record above — before any content change; publish none of it.
+- `README.md`: stack, build, structure, release. Before your first build.
+- `docs/DESIGN.md`: tokens, type scale, components, heading hierarchy. Before any UI change.
+- `docs/PRODUCT.md`: register and audience. Before writing site copy; section 1 applies to it.
+- The private project record above: before any content change; publish none of it.
+- `GLOSSARY.md` for the portfolio's language, `SPEC.md` for observed behaviour,
+  `.agents/skills/verify-portfolio/SKILL.md` for the browser walk of every visitor journey.
 
-`docs/DESIGN.md` and `docs/PRODUCT.md` are the public, design-only design-system
-context. Root `/DESIGN.md` and `/PRODUCT.md` stay gitignored for internal
-planning material and must not be un-ignored.
+Root `/DESIGN.md` and `/PRODUCT.md` stay gitignored for internal planning and must
+not be un-ignored. No generated evidence belongs in public site content.
 
-## Behaviour and proof
+## After a merge
 
-Read `GLOSSARY.md` for the portfolio's language and `SPEC.md` for observed behaviour.
-For browser verification, use `.agents/skills/verify-portfolio/SKILL.md`; its feature
-map names deciding symbols and covers the visitor journeys. The work record is
-`docs/plans/repository-verification.md`. No generated evidence belongs in public
-site content.
+`main` deploys in about a minute and the workflow ends by checking
+`https://waseemilyas.uk/revision.txt` for the merged SHA. Then read production with
+`obs uptime portfolio` (UptimeRobot), `obs errors portfolio --since 1h` (Sentry,
+tagged with the release SHA) and `curl -s https://waseemilyas.uk/revision.txt`.

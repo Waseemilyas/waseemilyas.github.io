@@ -51,7 +51,7 @@
      The loader stays lazy: the SDK bundle downloads only after an error. -->
 <script>
   window.sentryOnLoad = function () {
-    Sentry.init({ dsn: {{ monitoring.sentryDsnJson | safe }} });
+    Sentry.init({ dsn: {{ monitoring.sentryDsnJson | safe }}, release: "{{ siteRevision }}" });
     Sentry.setTag("site", "waseemilyas.uk");
     Sentry.setTag("deployment", "github-pages");
   };

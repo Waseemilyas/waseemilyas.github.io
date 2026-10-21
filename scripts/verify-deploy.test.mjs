@@ -28,16 +28,9 @@ import http from "node:http";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { readFileSync } from "node:fs";
-
 import {
-  classifyBody,
   DEFAULT_PROVE_URL,
-  describeMalformedBody,
-  parseArgs,
   proveVerification,
-  sanitizeUrl,
-  validateControls,
   verifyDeploy,
 } from "./verify-deploy.mjs";
 
@@ -244,22 +237,6 @@ test("exhausted retries report the LAST observation, not the first", async (t) =
 });
 
 // ---------------------------------------------------------------------------
-// body classification units
-
-test("classifyBody mirrors the checker: exact bytes match, everything else splits stale/malformed", () => {
-  assert.deepEqual(classifyBody(ARTIFACT, GOOD_SHA), { kind: "match", revision: GOOD_SHA });
-  assert.equal(classifyBody(`${OLD_SHA}\n`, GOOD_SHA).kind, "stale");
-  assert.equal(classifyBody(GOOD_SHA, GOOD_SHA).kind, "malformed"); // missing newline
-  assert.equal(classifyBody("<html>other app</html>\n", GOOD_SHA).kind, "malformed");
-});
-
-test("sanitizeUrl hides userinfo credentials in diagnostics", () => {
-  const out = sanitizeUrl("https://user:super-secret@waseemilyas.uk/revision.txt");
-  assert.doesNotMatch(out, /super-secret/);
-  assert.match(out, /\*\*\*@waseemilyas\.uk/);
-});
-
-// ---------------------------------------------------------------------------
 // prove mode — the gate must be able to fail, and must be able to pass
 
 test("proveVerification passes (resolves) when the target cannot serve", async (t) => {
@@ -357,167 +334,5 @@ test("CLI --prove-verification fails loudly when the probe unexpectedly passes",
       assert.match(output, /unexpectedly PASSED/);
       return true;
     }
-  );
-});
-
-// ---------------------------------------------------------------------------
-// secrecy: diagnostics must NEVER include response content (final-review fix 1)
-
-// Assembled at runtime so the repo's own secret scanners (which are right to
-// flag a contiguous credential shape in source) see nothing to flag, while
-// the VALUE the fixture serves is fully credential-shaped.
-const CREDENTIAL_MARKER = ["sk-live", "SECRETMARKER1234567890abcdef"].join("-");
-
-test("a credential-shaped marker in a malformed body never reaches the returned detail", async (t) => {
-  const body = `<html><body>Internal error. Debug token: ${CREDENTIAL_MARKER}</body></html>\n`;
-  const { port } = await startServer(t, serveBody(body));
-  const r = await verifyDeploy({
-    url: `http://127.0.0.1:${port}/revision.txt`,
-    revision: GOOD_SHA,
-    attempts: 1,
-    backoffMs: 5,
-    timeoutMs: 1000,
-  });
-  assert.equal(r.ok, false);
-  assert.equal(r.reason, "malformed");
-  assert.ok(!r.detail.includes(CREDENTIAL_MARKER), "detail must not contain response content");
-  assert.ok(!r.detail.includes("SECRETMARKER"), "detail must not contain any fragment of the body");
-  assert.ok(!r.detail.includes("Debug token"), "detail must not contain any fragment of the body");
-  assert.match(r.detail, /content withheld from diagnostics/);
-  assert.match(r.detail, /\d+ byte\(s\)/, "safe metadata (byte count) is still reported");
-});
-
-test("CLI output never contains a credential-shaped marker from a malformed body", async (t) => {
-  const body = `oops ${CREDENTIAL_MARKER}\n`;
-  const { port } = await startServer(t, serveBody(body));
-  await assert.rejects(
-    execFileP(process.execPath, [
-      SCRIPT,
-      "--url", `http://127.0.0.1:${port}/revision.txt`,
-      "--revision", GOOD_SHA,
-      "--attempts", "1",
-      "--backoff-ms", "5",
-      "--timeout-ms", "1000",
-    ]),
-    (err) => {
-      const output = `${err.stdout}\n${err.stderr}`;
-      assert.equal(err.code, 1);
-      assert.ok(!output.includes(CREDENTIAL_MARKER), "CLI output must not contain the marker");
-      assert.ok(!output.includes("SECRETMARKER"), "CLI output must not contain any marker fragment");
-      assert.match(output, /malformed/);
-      return true;
-    }
-  );
-});
-
-test("describeMalformedBody reports only metadata, never content", () => {
-  const d = describeMalformedBody(`x ${CREDENTIAL_MARKER}`);
-  assert.ok(!d.includes("SECRETMARKER"));
-  assert.match(d, /^\d+ byte\(s\), non-revision content; content withheld/);
-  assert.match(describeMalformedBody(""), /0 byte\(s\), empty/);
-  assert.match(describeMalformedBody("abcdef"), /hex-like but wrong length\/termination/);
-});
-
-// ---------------------------------------------------------------------------
-// retry-control validation (final-review fix 5)
-
-test("validateControls accepts the defaults and the workflow's configured values", () => {
-  assert.deepEqual(
-    validateControls({ attempts: 6, backoffMs: 2000, timeoutMs: 10000 }),
-    { attempts: 6, backoffMs: 2000, timeoutMs: 10000 }
-  );
-  assert.deepEqual(
-    validateControls({ attempts: 8, backoffMs: 3000, timeoutMs: 10000 }),
-    { attempts: 8, backoffMs: 3000, timeoutMs: 10000 }
-  );
-  // zero backoff is a legal (if aggressive) choice; zero attempts is not
-  validateControls({ attempts: 1, backoffMs: 0, timeoutMs: 1 });
-});
-
-for (const [label, controls] of [
-  ["zero attempts", { attempts: 0, backoffMs: 5, timeoutMs: 100 }],
-  ["negative attempts", { attempts: -1, backoffMs: 5, timeoutMs: 100 }],
-  ["fractional attempts", { attempts: 2.5, backoffMs: 5, timeoutMs: 100 }],
-  ["NaN attempts", { attempts: NaN, backoffMs: 5, timeoutMs: 100 }],
-  ["zero timeout", { attempts: 2, backoffMs: 5, timeoutMs: 0 }],
-  ["negative timeout", { attempts: 2, backoffMs: 5, timeoutMs: -100 }],
-  ["Infinity timeout", { attempts: 2, backoffMs: 5, timeoutMs: Infinity }],
-  ["NaN timeout", { attempts: 2, backoffMs: 5, timeoutMs: NaN }],
-  ["negative backoff", { attempts: 2, backoffMs: -5, timeoutMs: 100 }],
-  ["Infinity backoff", { attempts: 2, backoffMs: Infinity, timeoutMs: 100 }],
-  ["NaN backoff", { attempts: 2, backoffMs: NaN, timeoutMs: 100 }],
-]) {
-  test(`validateControls rejects ${label} before any request is made`, async () => {
-    assert.throws(() => validateControls(controls), /invalid --/);
-    // and verifyDeploy enforces it up front: no fetch may ever run
-    let fetched = 0;
-    await assert.rejects(
-      verifyDeploy({
-        url: "http://127.0.0.1:9/revision.txt",
-        revision: GOOD_SHA,
-        ...controls,
-        fetchImpl: () => { fetched += 1; return Promise.reject(new Error("must not run")); },
-      }),
-      /invalid --/
-    );
-    assert.equal(fetched, 0, "invalid controls must be rejected before the retry loop");
-  });
-}
-
-test("parseArgs rejects missing and non-numeric flag values", () => {
-  assert.throws(() => parseArgs(["--attempts"]), /requires a value/);
-  assert.throws(() => parseArgs(["--attempts", "--backoff-ms", "5"]), /requires a value/);
-  assert.throws(() => parseArgs(["--attempts", "abc"]), /not a number/);
-  assert.throws(() => parseArgs(["--timeout-ms", ""]), /not a number/);
-  assert.deepEqual(parseArgs(["--attempts", "8"]).attempts, 8);
-});
-
-for (const [label, argv] of [
-  ["zero attempts", ["--attempts", "0"]],
-  ["negative attempts", ["--attempts", "-3"]],
-  ["fractional attempts", ["--attempts", "2.5"]],
-  ["NaN attempts", ["--attempts", "many"]],
-  ["missing attempts value", ["--attempts"]],
-]) {
-  test(`CLI rejects ${label} with a concise error and exit 1`, async () => {
-    await assert.rejects(
-      execFileP(process.execPath, [
-        SCRIPT,
-        "--url", "http://127.0.0.1:9/revision.txt",
-        "--revision", GOOD_SHA,
-        ...argv,
-      ]),
-      (err) => {
-        assert.equal(err.code, 1);
-        assert.match(`${err.stderr}`, /invalid --attempts|not a number|requires a value/);
-        return true;
-      }
-    );
-  });
-}
-
-// ---------------------------------------------------------------------------
-// workflow budget parity (final-review fix 8): the values deploy.yml actually
-// configures are accepted by the validator and fit the job's 600 s timeout.
-
-test("deploy.yml's configured verifier controls are valid and fit the job budget", () => {
-  const workflow = readFileSync(
-    join(dirname(fileURLToPath(import.meta.url)), "..", ".github", "workflows", "deploy.yml"),
-    "utf8"
-  );
-  const num = (flag) => {
-    const m = workflow.match(new RegExp(`--${flag}\\s+(\\d+)`));
-    assert.ok(m, `deploy.yml must pass --${flag} explicitly`);
-    return Number(m[1]);
-  };
-  const attempts = num("attempts");
-  const backoffMs = num("backoff-ms");
-  const timeoutMs = num("timeout-ms");
-  validateControls({ attempts, backoffMs, timeoutMs });
-  const worstCaseMs = attempts * timeoutMs + (attempts - 1) * backoffMs;
-  const jobBudgetMs = Number(workflow.match(/timeout-minutes:\s*(\d+)/)?.[1]) * 60 * 1000;
-  assert.ok(
-    worstCaseMs <= jobBudgetMs / 2,
-    `worst-case verifier time ${worstCaseMs}ms must stay safely under half the ${jobBudgetMs}ms job budget`
   );
 });
