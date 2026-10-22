@@ -1,6 +1,6 @@
 // Eleventy config for WI-PF1 — Waseem Ilyas portfolio.
 // Source in src/, static output in _site/. No client framework; pure HTML/CSS/vanilla JS.
-import { resolveRevision } from "./scripts/revision.mjs";
+import { revision } from "./scripts/revision.mjs";
 
 /**
  * Only the Eleventy boundary used here; page data comes from front matter.
@@ -13,12 +13,7 @@ import { resolveRevision } from "./scripts/revision.mjs";
  * }} eleventyConfig
  */
 export default function (eleventyConfig) {
-  // Resolve the built revision up front: an invalid, missing or contradictory
-  // revision input fails the build here rather than publishing ambiguity.
-  // Precedence and validation live in scripts/revision.mjs.
-  const { revision, source } = resolveRevision();
-  console.log(`eleventy: building revision ${revision} (from ${source})`);
-  eleventyConfig.addGlobalData("siteRevision", revision);
+  eleventyConfig.addGlobalData("siteRevision", revision());
 
   // Static passthrough: assets, plus the root-level files GitHub Pages needs.
   eleventyConfig.addPassthroughCopy({ "src/assets": "assets" });
