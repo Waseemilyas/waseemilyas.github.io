@@ -97,5 +97,5 @@ not be un-ignored. No generated evidence belongs in public site content.
 
 `main` deploys in about a minute and the workflow ends by checking
 `https://waseemilyas.uk/revision.txt` for the merged SHA. Then read production with
-`obs uptime portfolio` (UptimeRobot), `obs errors portfolio --since 1h` (Sentry,
-tagged with the release SHA) and `curl -s https://waseemilyas.uk/revision.txt`.
+`obs uptime portfolio`, `obs errors portfolio --since 1h` (browser errors, tagged
+with the release SHA) and `curl -s https://waseemilyas.uk/revision.txt`.
