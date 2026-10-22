@@ -65,17 +65,10 @@ sit in `posts/` safely.
 
 `.github/workflows/deploy.yml` builds and publishes `_site/` on a main push or
 manual dispatch. It checks the generated site, uploads it to GitHub Pages, then
-runs `scripts/verify-deploy.mjs` against the custom domain. Production must serve
-exactly the expected SHA plus one newline from `/revision.txt`; each HTML page also
-carries that SHA in its revision meta tag. Revision precedence and validation live
-in `scripts/revision.mjs`; blank, malformed or contradictory inputs fail the build.
-
-```bash
-node scripts/verify-deploy.mjs --prove-verification
-# Deliberately probes an unavailable loopback endpoint and requires rejection.
-node scripts/verify-deploy.mjs --url https://waseemilyas.uk/revision.txt
-# Requires the checkout revision; bounded retries reject stale or malformed output.
-```
+polls the custom domain until `/revision.txt` is exactly the deployed SHA; the job
+fails if production never serves it. Each HTML page also carries that SHA in its
+revision meta tag. The revision comes from `SITE_REVISION`, else `GITHUB_SHA`,
+else `git rev-parse HEAD` (`scripts/revision.mjs`).
 
 `deploy.json` declares the live revision endpoint. Main is production; no staging
 or preview environment is needed. `.release-notes.json` enrolls shipped changes

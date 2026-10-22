@@ -21,20 +21,10 @@
 // Exits 0 on clean scan; exits 1 listing every violation with file and line.
 
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { extname, join, normalize, resolve } from "node:path";
+import { extname, join, normalize, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
-export const BINARY_EXTENSIONS = new Set([
-  ".png",
-  ".jpg",
-  ".jpeg",
-  ".gif",
-  ".webp",
-  ".ico",
-  ".woff",
-  ".woff2",
-  ".mp3",
-]);
+const BINARY_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico", ".woff", ".woff2", ".mp3"]);
 
 export const ALLOWED_EMAIL_DOMAINS = ["automancer.uk", "waseemilyas.uk"];
 
@@ -65,31 +55,6 @@ function getExemptions(relPath) {
 /** @param {string} content @param {number} index */
 function lineNumberAtIndex(content, index) {
   return content.slice(0, index).split("\n").length;
-}
-
-/** Recursively list every non-binary file under `root` as relative POSIX paths.
- * @param {string} root
- */
-export function walkSourceFiles(root) {
-  /** @type {string[]} */
-  const out = [];
-  /** @param {string} rel */
-  const visit = (rel) => {
-    const abs = rel === "" ? root : join(root, rel);
-    for (const entry of readdirSync(abs, { withFileTypes: true })) {
-      const childRel = rel === "" ? entry.name : `${rel}/${entry.name}`;
-      if (entry.isDirectory()) {
-        visit(childRel);
-      } else if (entry.isFile()) {
-        const ext = extname(entry.name).toLowerCase();
-        if (!BINARY_EXTENSIONS.has(ext)) {
-          out.push(childRel);
-        }
-      }
-    }
-  };
-  visit("");
-  return out.sort();
 }
 
 /**
@@ -213,7 +178,10 @@ export function runContentGuard({ dir = "src" } = {}) {
     };
   }
 
-  const files = walkSourceFiles(dir);
+  const files = readdirSync(dir, { recursive: true, withFileTypes: true })
+    .filter((e) => e.isFile() && !BINARY_EXTENSIONS.has(extname(e.name).toLowerCase()))
+    .map((e) => relative(dir, join(e.parentPath, e.name)).replaceAll("\\", "/"))
+    .sort();
   for (const file of files) {
     const abs = join(dir, file);
     const content = readFileSync(abs, "utf8");
