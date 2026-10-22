@@ -10,9 +10,9 @@ Last verified: 2026-10-21 on Linux with Chromium (35 s, 14 pages, 33 screenshots
 ## Launch
 
 Use a clean checkout. Install Node/pnpm from the repository's package configuration,
-Python 3 and a global `agent-browser` with Chrome available. Do not install browser
-automation into this package. Run it on auto-vps under `/opt/automancer/bin/lane-run --name <lane>-drive --mem 6G --swap 0 --`:
-`heavy` lands on auto-vault, which has no `agent-browser` (the helper fails with `FileNotFoundError`).
+Python 3 and a global `agent-browser` with Chrome available (run it on a machine that has both;
+the helper fails with `FileNotFoundError` otherwise). Do not install browser
+automation into this package.
 
 ```bash
 pnpm install --frozen-lockfile
@@ -26,8 +26,7 @@ The output directory must not already exist. The executable helper serves this
 checkout's `_site/` on its own ephemeral loopback port and opens a unique browser
 session. It refuses tracked or untracked source changes and a stale build before
 starting either. Each CLI operation is bounded; the whole browser path has a
-five-minute ceiling. Run `checkq --` around install/check/build and the helper on
-shared hosts that provide it.
+five-minute ceiling.
 
 ## Doctor
 

@@ -32,10 +32,8 @@ Image pixels are not decoded. The privacy scanner complements the judgement rule
 in [AGENTS.md](AGENTS.md); it cannot decide whether anonymised copy identifies a client.
 
 Strict `checkJs` uses tsrs, the Rust port of the TypeScript compiler, over production browser,
-build and CLI JavaScript. TypeScript's editor compiler remains available for
-language servers. After the frozen install, `tsconfig.json` resolves imports
-without a build or generated types. `pnpm exec tsc --noEmit` is an editor-compiler
-cross-check, not another required CI pass. Exact tool versions live in `package.json`.
+build and CLI JavaScript. After the frozen install, `tsconfig.json` resolves imports
+without a build or generated types. Exact tool versions live in `package.json`.
 
 Installs point git at `.githooks/` through `prepare`. Keep the gitleaks rules and
 sensitive-path guards enabled.

@@ -135,7 +135,7 @@ components:
   Design documentation only. This file is committed to a PUBLIC repository.
   Read AGENTS.md §1 before adding anything: no client names, no commercial
   detail, no infrastructure specifics. Tokens, type, and component structure
-  only. Internal positioning and planning material stays in Paperclip.
+  only. Internal positioning and planning material stays in the private project record.
 
   This file is a binding reference: agents change code on the strength of it.
   Do not assert a rule you have not checked against src/assets/css/styles.css
