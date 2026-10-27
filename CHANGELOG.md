@@ -1,5 +1,10 @@
 # Release notes
 
+## v2026.10.27.1 — 27 October 2026
+
+Behind-the-scenes housekeeping to the checks that keep passwords and keys out of the site's code; nothing on the site changes.
+
+
 ## v2026.10.21.1 — 21 October 2026
 
 The site now shares only the audio files intended for visitors.
