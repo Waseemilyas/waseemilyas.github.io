@@ -31,7 +31,7 @@ export default defineConfig({
   use: {
     baseURL: target.origin,
     serviceWorkers: "block",
-    reducedMotion: "reduce",
+    contextOptions: { reducedMotion: "reduce" },
     // Optional: use an already-installed Chromium instead of the bundled one.
     launchOptions: process.env.E2E_CHROMIUM ? { executablePath: process.env.E2E_CHROMIUM } : {},
   },

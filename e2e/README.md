@@ -27,6 +27,8 @@ the visitor journey starts.
 
 Set E2E_CHROMIUM to reuse an installed Chromium; E2E_OUT for results/screenshots.
 The JSON report and PNG attachments live in E2E_OUT (default `test-results/`).
+Captures use reduced motion, wait for fonts and fully revealed content, and
+return to the top so a scrolled sticky header does not distort a full-page image.
 Inspect the PNGs for clipping and legibility. There is no pixel comparison or
 file-size assertion; a passing DOM check does not establish visual correctness.
 

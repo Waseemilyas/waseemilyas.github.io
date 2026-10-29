@@ -43,6 +43,20 @@ const PAGES = [
   ["/contact/", /Waseem Ilyas/],
 ];
 
+async function capture(page, info, name, fullPage = true) {
+  await page.mouse.move(0, 0);
+  await page.evaluate(async () => {
+    await document.fonts.ready;
+    window.scrollTo({ top: 0, behavior: "instant" });
+  });
+  await expect.poll(() => page.locator("[data-cal]").evaluateAll(
+    (elements) => elements.every((element) => getComputedStyle(element).opacity === "1"),
+  ), { message: "page content is fully revealed before capture" }).toBe(true);
+  const path = info.outputPath(`${name}.png`);
+  await page.screenshot({ path, fullPage, animations: "disabled" });
+  await info.attach(name, { path, contentType: "image/png" });
+}
+
 test("visitor reads every main page at the expected revision", async ({ page }, info) => {
   for (const [path, title] of PAGES) {
     const res = await page.goto(path);
@@ -57,9 +71,7 @@ test("visitor reads every main page at the expected revision", async ({ page }, 
     );
     expect(overflow, path + " overflow").toBeLessThanOrEqual(1);
     // Retain pixels for visual inspection. File size cannot prove legibility.
-    await info.attach(path === "/" ? "home" : path.replaceAll("/", ""), {
-      body: await page.screenshot({ fullPage: true }), contentType: "image/png",
-    });
+    await capture(page, info, path === "/" ? "home" : path.replaceAll("/", ""));
   }
 });
 
@@ -73,7 +85,7 @@ test("primary navigation reaches Work and the phone drawer restores focus", asyn
     await toggle.click();
     await expect(toggle).toHaveAttribute("aria-expanded", "true");
     await expect(nav.getByRole("link", { name: "Work", exact: true })).toBeVisible();
-    await info.attach("open-drawer", { body: await page.screenshot(), contentType: "image/png" });
+    await capture(page, info, "open-drawer", false);
     await page.keyboard.press("Escape");
     await expect(toggle).toBeFocused();
     await expect(toggle).toHaveAttribute("aria-expanded", "false");
@@ -108,5 +120,6 @@ test("capabilities respond to pointer and keyboard selection", async ({ page }, 
   await keyboard.press("Enter");
   await expect(heading).toHaveText(keyboardTitle);
   await expect(page.locator("#capread [data-bind=p]")).toHaveText(await keyboard.getAttribute("data-body"));
-  await info.attach("selected-capability", { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
+  await capture(page, info, "selected-capability");
+  await expect(heading).toHaveText(keyboardTitle);
 });
