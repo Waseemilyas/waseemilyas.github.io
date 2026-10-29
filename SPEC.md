@@ -45,3 +45,9 @@ The unlinked prayer-time audio files remain intentional HTTP assets. Browser
 verification checks that they are served, without playback or touching the external
 consumer. Build and release inputs are in `package.json`, the lockfile and the
 workflows; their versions and retry limits are read there.
+
+The separate `e2e/` Playwright journey exercises main-page reading, primary
+navigation, phone drawer focus recovery and capability selection at desktop and
+phone widths. It requires an explicit target and full expected revision, blocks
+writes and external requests, and retains screenshots for visual inspection.
+Its invocation and limits are in `e2e/README.md`; root CI does not invoke it.

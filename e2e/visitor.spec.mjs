@@ -1,6 +1,38 @@
-import { test, expect } from "@playwright/test";
+import { test as base, expect } from "@playwright/test";
 
-// GET-only: navigates, reads, screenshots. No forms, no mailto/external clicks.
+// Requests outside the selected origin and all writes are aborted before
+// transmission. Fetch without redirects so a response cannot escape the guard.
+const test = base.extend({
+  page: async ({ page, context, baseURL }, use, info) => {
+    const blocked = [];
+    const errors = [];
+    await context.route("**/*", async (route) => {
+      const request = route.request();
+      if (!["GET", "HEAD"].includes(request.method()) || new URL(request.url()).origin !== baseURL) {
+        blocked.push({ method: request.method(), url: request.url() });
+        await route.abort("blockedbyclient");
+      } else {
+        const response = await route.fetch({ maxRedirects: 0 });
+        if (response.status() >= 300 && response.status() < 400) {
+          blocked.push({ method: request.method(), url: request.url(), reason: "redirect" });
+          await route.abort("blockedbyclient");
+        } else {
+          await route.fulfill({ response });
+        }
+      }
+    });
+    await context.routeWebSocket("**/*", (socket) => socket.close());
+    context.on("page", (opened) => opened.on("pageerror", (error) => errors.push(String(error))));
+    page.on("pageerror", (error) => errors.push(String(error)));
+    const revision = await page.goto("/revision.txt");
+    expect(revision?.status(), "revision endpoint").toBe(200);
+    expect((await revision.text()).trim(), "target build revision").toBe(process.env.EXPECTED_REVISION);
+    await use(page);
+    await info.attach("blocked-requests", { body: JSON.stringify(blocked, null, 2), contentType: "application/json" });
+    expect(errors, "uncaught page errors").toEqual([]);
+  },
+});
+
 const PAGES = [
   ["/", /Waseem Ilyas/],
   ["/about/", /Waseem Ilyas/],
@@ -11,44 +43,70 @@ const PAGES = [
   ["/contact/", /Waseem Ilyas/],
 ];
 
-test("visitor walks every page and screenshots render", async ({ page }, info) => {
-  const errors = [];
-  page.on("pageerror", (e) => errors.push(String(e)));
+test("visitor reads every main page at the expected revision", async ({ page }, info) => {
   for (const [path, title] of PAGES) {
     const res = await page.goto(path);
     expect(res?.status(), path).toBe(200);
     await expect(page, path).toHaveTitle(title);
     await expect(page.locator("main#main, main").first(), path).toBeVisible();
     await expect(page.locator("h1").first(), path).toBeVisible();
+    await expect(page.locator('meta[name="waseemilyas-revision"]'), path).toHaveAttribute("content", process.env.EXPECTED_REVISION);
     // No horizontal overflow at this viewport.
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
     );
     expect(overflow, path + " overflow").toBeLessThanOrEqual(1);
-    // Screenshot check: capture, then require a real, non-blank image.
-    const shot = await page.screenshot({ fullPage: true });
-    info.attach("shot" + (path.replaceAll("/", "_") || "_home"), { body: shot, contentType: "image/png" });
-    expect(shot.length, path + " screenshot size").toBeGreaterThan(8_000);
+    // Retain pixels for visual inspection. File size cannot prove legibility.
+    await info.attach(path === "/" ? "home" : path.replaceAll("/", ""), {
+      body: await page.screenshot({ fullPage: true }), contentType: "image/png",
+    });
   }
-  expect(errors, "uncaught page errors").toEqual([]);
 });
 
-test("navigation reaches Work by clicking", async ({ page }) => {
+test("primary navigation reaches Work and the phone drawer restores focus", async ({ page }, info) => {
   await page.goto("/");
-  const nav = page.locator("a[href=\"/work/\"]:visible").first();
-  if (await nav.count()) {
-    await nav.click();
-  } else {
-    // Phone: open the drawer first.
-    await page.locator("button[aria-controls], button[aria-expanded]").first().click();
-    await page.locator("a[href=\"/work/\"]:visible").first().click();
+  const toggle = page.getByRole("button", { name: "Toggle navigation" });
+  const nav = page.getByRole("navigation", { name: "Primary", exact: true });
+  if (info.project.name === "phone") {
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator("#primary-nav")).toHaveAttribute("inert", "");
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    await expect(nav.getByRole("link", { name: "Work", exact: true })).toBeVisible();
+    await info.attach("open-drawer", { body: await page.screenshot(), contentType: "image/png" });
+    await page.keyboard.press("Escape");
+    await expect(toggle).toBeFocused();
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(page.locator("#primary-nav")).toHaveAttribute("inert", "");
+    await toggle.click();
   }
+  await nav.getByRole("link", { name: "Work", exact: true }).click();
   await expect(page).toHaveURL(/\/work\/$/);
   await expect(page.locator("h1").first()).toBeVisible();
+  if (info.project.name === "phone") await expect(toggle).toHaveAttribute("aria-expanded", "false");
 });
 
-test("revision.txt is served", async ({ request }) => {
-  const r = await request.get("/revision.txt");
-  expect(r.status()).toBe(200);
-  expect((await r.text()).trim()).toMatch(/^[0-9a-f]{7,40}$/);
+test("capabilities respond to pointer and keyboard selection", async ({ page }, info) => {
+  await page.goto("/");
+  const nodes = page.locator('.node:visible');
+  const heading = page.locator("#capread h3");
+  const firstTitle = await heading.textContent();
+  const pointer = nodes.nth(1);
+  const pointerTitle = await pointer.getAttribute("data-title");
+  expect(pointerTitle).not.toBe(firstTitle);
+  await pointer.click();
+  await expect(heading).toHaveText(pointerTitle);
+  const keyboard = nodes.nth(2);
+  const keyboardTitle = await keyboard.getAttribute("data-title");
+  expect(keyboardTitle).not.toBe(pointerTitle);
+  await keyboard.focus();
+  // Keep keyboard focus while pointer hover selects a different capability;
+  // Enter must change the panel itself rather than passing on focus alone.
+  await page.mouse.move(0, 0);
+  await pointer.hover();
+  await expect(heading).toHaveText(pointerTitle);
+  await keyboard.press("Enter");
+  await expect(heading).toHaveText(keyboardTitle);
+  await expect(page.locator("#capread [data-bind=p]")).toHaveText(await keyboard.getAttribute("data-body"));
+  await info.attach("selected-capability", { body: await page.screenshot({ fullPage: true }), contentType: "image/png" });
 });
